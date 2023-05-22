@@ -9465,7 +9465,7 @@ end)
 --------------------------------------------------------------------------------------------------------------------------------
 -- Misc
 
-menu.action(menu.my_root(), "Alternative Manual Update Script", {}, "Grabs The Newest Version Of Script From \nLink: https://github.com/Fewdys/GTA5-FewMod-Lua", function()
+menu.action(misc, "Alternative Manual Update Script", {}, "Grabs The Newest Version Of Script From \nLink: https://github.com/Fewdys/GTA5-FewMod-Lua", function()
     async_http.init('raw.githubusercontent.com','/Fewdys/GTA5-FewMod/main/Few.lua',function(a)
         local err = select(2,load(a))
         if err then
