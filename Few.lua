@@ -10811,7 +10811,6 @@ local dont_stop = false
 	end)
 
     menu.toggle_loop(world2,"Blackhole Objects", {"objectblackhole"}, "", function(on)
-        Draw_Box_Objects()
 		for k, veh in pairs(entities.get_all_objects_as_handles()) do
             local locspeed2 = speed
             local holecoords = ENTITY.GET_ENTITY_COORDS(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(pid), true)
