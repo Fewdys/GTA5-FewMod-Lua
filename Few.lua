@@ -14,7 +14,6 @@ async_http.init("raw.githubusercontent.com", "/Fewdys/GTA5-FewMod/main/FewModVer
     response = true
     if localversion ~= currentVer then
         util.toast("There is an update for FewMod available, use the Update Button to update it.")
-	util.log("There is an update for FewMod available, use the Update Button to update it.")
         menu.action(menu.my_root(), "Update Script", {}, "Grabs The Newest Version Of Script From \nLink: https://github.com/Fewdys/GTA5-FewMod-Lua", function()
             async_http.init('raw.githubusercontent.com','/Fewdys/GTA5-FewMod/main/Few.lua',function(a)
                 local err = select(2,load(a))
@@ -5617,6 +5616,105 @@ local function request_control2(entity, timeout)
     return NETWORK.NETWORK_HAS_CONTROL_OF_ENTITY(entity)
 end
 
+YOINK_PEDS = false
+YOINK_VEHICLES = false
+YOINK_OBJECTS = false
+YOINK_PICKUPS = false
+
+YOINK_RANGE = 500
+
+Yoinkshit = false
+
+local getEntityCoords = ENTITY.GET_ENTITY_COORDS
+local getPlayerPed = PLAYER.GET_PLAYER_PED
+
+local yoinkSettings = menu.list(uwuworld, "Force Request Control Settings", {}, "")
+
+
+menu.toggle(yoinkSettings, "Force Request Control", {"controlall"}, "", function (yoink)
+    if yoink then
+        Yoinkshit = true
+        util.create_thread(function()
+            while Yoinkshit do
+                local yoinksq = YOINK_RANGE^2
+                local localCoord = getEntityCoords(getPlayerPed(players.user()))
+                local BigTable = {}
+                if YOINK_PEDS then
+                    local pedTable = entities.get_all_peds_as_pointers()
+                    for i = 1, #pedTable do
+                        local coord = entities.get_position(pedTable[i])
+                        local distsq = SYSTEM.VDIST2(coord.x, coord.y, coord.z, localCoord.x, localCoord.y, localCoord.z)
+                        local handle = entities.pointer_to_handle(pedTable[i])
+                        if not PED.IS_PED_A_PLAYER(handle) then
+                            if distsq <= yoinksq then
+                                BigTable[#BigTable+1] = handle
+                            end
+                        end
+                    end
+                end
+                wait()
+                if YOINK_VEHICLES then
+                    local vehTable = entities.get_all_vehicles_as_pointers()
+                    for i = 1, #vehTable do
+                        local coord = entities.get_position(vehTable[i])
+                        local distsq = SYSTEM.VDIST2(coord.x, coord.y, coord.z, localCoord.x, localCoord.y, localCoord.z)
+                        if distsq <= yoinksq then
+                            BigTable[#BigTable+1] = entities.pointer_to_handle(vehTable[i])
+                        end
+                    end
+                end
+                wait()
+                if YOINK_OBJECTS then
+                    local objTable = entities.get_all_objects_as_pointers()
+                    for i = 1, #objTable do
+                        local coord = entities.get_position(objTable[i])
+                        local distsq = SYSTEM.VDIST2(coord.x, coord.y, coord.z, localCoord.x, localCoord.y, localCoord.z)
+                        if distsq <= yoinksq then
+                            BigTable[#BigTable+1] = entities.pointer_to_handle(objTable[i])
+                        end
+                    end
+                end
+                if YOINK_PICKUPS then
+                    local pickTable = entities.get_all_pickups_as_pointers()
+                    for i = 1, #pickTable do
+                        local coord = entities.get_position(pickTable[i])
+                        local distsq = SYSTEM.VDIST2(coord.x, coord.y, coord.z, localCoord.x, localCoord.y, localCoord.z)
+                        if distsq <= yoinksq then
+                            BigTable[#BigTable+1] = entities.pointer_to_handle(pickTable[i])
+                        end
+                    end
+                end
+                for i = 1, #BigTable do
+                    NETWORK.NETWORK_REQUEST_CONTROL_OF_ENTITY(BigTable[i])
+                    wait()
+                end
+                util.toast("Requested control of all")
+                ----
+                wait()
+            end
+            util.stop_thread()
+        end)
+    else
+        Yoinkshit = false
+    end
+end)
+
+menu.slider(yoinkSettings, "Range For Request Control", {"controlrange"}, "", 1, 5000, 5000, 10, function (value)
+    YOINK_RANGE = value
+end)
+menu.toggle(yoinkSettings, "Peds", {}, "", function (peds)
+    YOINK_PEDS = peds
+end)
+menu.toggle(yoinkSettings, "Vehicles", {}, "", function (vehs)
+    YOINK_VEHICLES = vehs
+end)
+menu.toggle(yoinkSettings, "Objects", {}, "", function (objs)
+    YOINK_OBJECTS = objs
+end)
+menu.toggle(yoinkSettings, "Pickups", {}, "", function (pick)
+    YOINK_PICKUPS = pick
+end)
+
 menu.action(uwuworld, "Clean World/Super Cleanse", {"clearworld"}, "Literally cleans everything in the area including peds, cars, objects, bools etc.", function(on_click)
     clear_area(2000000)
     local vehicles = delete_entities_by_range(entities.get_all_vehicles_as_handles(), 1000000, "VEHICLE")
@@ -6175,6 +6273,274 @@ local interiors = {
             util.toast("Done!")
         end)
     end
+
+    focusref = {}
+isfocused = false
+selectedcoloraddict = 0
+colorselec = 1
+allchatlabel = util.get_label_text("MP_CHAT_ALL")
+teamchatlabel = util.get_label_text("MP_CHAT_TEAM")
+
+function save()
+	configfile = io.open(filesystem.store_dir().."chat_translator//config.txt", "w+")
+	configfile:write("colorselec = "..colorselec..string.char(10)..'teamchatlabel = "'..teamchatlabel..'"'..string.char(10)..'allchatlabel = "'..allchatlabel..'"')
+	configfile:close()
+end
+
+
+if not filesystem.exists(filesystem.store_dir().."chat_translator//config.txt") then
+	filesystem.mkdir(filesystem.store_dir().."chat_translator//")
+	configfile = io.open(filesystem.store_dir().."chat_translator//config.txt", "w+")
+	configfile:write("colorselec = "..colorselec..string.char(10)..'teamchatlabel = "'..util.get_label_text("MP_CHAT_TEAM")..'"'..string.char(10)..'allchatlabel = "'..util.get_label_text("MP_CHAT_ALL")..'"')
+	configfile:close()
+	colorselec = 1
+else
+	configfile = io.open(filesystem.store_dir().."chat_translator//config.txt")
+	configfiledata = configfile:read("*all")
+	configfile:close()
+	load(configfiledata)()
+end
+util.ensure_package_is_installed("lua/ScaleformLib")
+local sfchat = require("lib.ScaleformLib")("multiplayer_chat")
+sfchat:draw_fullscreen()
+
+local Languages = {
+	{ Name = "Afrikaans", Key = "af" },
+	{ Name = "Albanian", Key = "sq" },
+	{ Name = "Arabic", Key = "ar" },
+	{ Name = "Azerbaijani", Key = "az" },
+	{ Name = "Basque", Key = "eu" },
+	{ Name = "Belarusian", Key = "be" },
+	{ Name = "Bengali", Key = "bn" },
+	{ Name = "Bulgarian", Key = "bg" },
+	{ Name = "Catalan", Key = "ca" },
+	{ Name = "Chinese Simplified", Key = "zh-cn" },
+	{ Name = "Chinese Traditional", Key = "zh-tw" },
+	{ Name = "Croatian", Key = "hr" },
+	{ Name = "Czech", Key = "cs" },
+	{ Name = "Danish", Key = "da" },
+	{ Name = "Dutch", Key = "nl" },
+	{ Name = "English", Key = "en" },
+	{ Name = "Esperanto", Key = "eo" },
+	{ Name = "Estonian", Key = "et" },
+	{ Name = "Filipino", Key = "tl" },
+	{ Name = "Finnish", Key = "fi" },
+	{ Name = "French", Key = "fr" },
+	{ Name = "Galician", Key = "gl" },
+	{ Name = "Georgian", Key = "ka" },
+	{ Name = "German", Key = "de" },
+	{ Name = "Greek", Key = "el" },
+	{ Name = "Gujarati", Key = "gu" },
+	{ Name = "Haitian Creole", Key = "ht" },
+	{ Name = "Hebrew", Key = "iw" },
+	{ Name = "Hindi", Key = "hi" },
+	{ Name = "Hungarian", Key = "hu" },
+	{ Name = "Icelandic", Key = "is" },
+	{ Name = "Indonesian", Key = "id" },
+	{ Name = "Irish", Key = "ga" },
+	{ Name = "Italian", Key = "it" },
+	{ Name = "Japanese", Key = "ja" },
+	{ Name = "Kannada", Key = "kn" },
+	{ Name = "Korean", Key = "ko" },
+	{ Name = "Latin", Key = "la" },
+	{ Name = "Latvian", Key = "lv" },
+	{ Name = "Lithuanian", Key = "lt" },
+	{ Name = "Macedonian", Key = "mk" },
+	{ Name = "Malay", Key = "ms" },
+	{ Name = "Maltese", Key = "mt" },
+	{ Name = "Norwegian", Key = "no" },
+	{ Name = "Persian", Key = "fa" },
+	{ Name = "Polish", Key = "pl" },
+	{ Name = "Portuguese", Key = "pt" },
+	{ Name = "Romanian", Key = "ro" },
+	{ Name = "Russian", Key = "ru" },
+	{ Name = "Serbian", Key = "sr" },
+	{ Name = "Slovak", Key = "sk" },
+	{ Name = "Slovenian", Key = "sl" },
+	{ Name = "Spanish", Key = "es" },
+	{ Name = "Swahili", Key = "sw" },
+	{ Name = "Swedish", Key = "sv" },
+	{ Name = "Tamil", Key = "ta" },
+	{ Name = "Telugu", Key = "te" },
+	{ Name = "Thai", Key = "th" },
+	{ Name = "Turkish", Key = "tr" },
+	{ Name = "Ukrainian", Key = "uk" },
+	{ Name = "Urdu", Key = "ur" },
+	{ Name = "Vietnamese", Key = "vi" },
+	{ Name = "Welsh", Key = "cy" },
+	{ Name = "Yiddish", Key = "yi" },
+}
+
+
+local LangKeys = {}
+local LangName = {}
+local LangIndexes = {}
+local LangLookupByName = {}
+local LangLookupByKey = {}
+local PlayerSpooflist = {}
+local PlayerSpoof = {}
+
+for i=1,#Languages do
+	local Language = Languages[i]
+	LangKeys[i] = Language.Name
+	LangName[i] = Language.Name
+	LangIndexes[Language.Key] = i
+	LangLookupByName[Language.Name] = Language.Key
+	LangLookupByKey[Language.Key] = Language.Name
+end
+
+table.sort(LangKeys)
+
+function do_label_preset(label, text)
+    menu.trigger_commands("addlabel " .. label)
+    local prep = "edit" .. string.gsub(label, "_", "") .. " " .. text
+    menu.trigger_commands(prep)
+
+    menu.trigger_commands("labelpresets")
+    util.toast("Label Set!")
+end
+
+function encode(text)
+	return string.gsub(text, "%s", "+")
+end
+function decode(text)
+	return string.gsub(text, "%+", " ")
+end
+
+    local chat_trans = menu.list(online, "Chat Translator")
+
+settingtrad = menu.list(chat_trans, "Settings For Translation")
+
+
+menu.text_input(settingtrad, "Custom label for ["..string.upper(util.get_label_text("MP_CHAT_TEAM")).."] translation message", {"labelteam"}, "leaving it blank will revert it to the original label", function(s, click_type)
+	if (s == "") then
+		teamchatlabel = util.get_label_text("MP_CHAT_TEAM")
+	else
+		teamchatlabel = s 
+	end
+	if not (click_type == 4) then
+		save()
+	end
+end)
+if not (teamchatlabel == util.get_label_text("MP_CHAT_TEAM")) then
+	menu.trigger_commands("labelteam "..teamchatlabel)
+end
+
+
+menu.text_input(settingtrad, "Custom label for ["..string.upper(util.get_label_text("MP_CHAT_ALL")).."] translation message", {"labelall"}, "leaving it blank will revert it to the original label", function(s, click_type)
+	if (s == "") then
+		allchatlabel = util.get_label_text("MP_CHAT_ALL")
+	else
+		allchatlabel = s 
+	end
+	if not (click_type == 4) then
+		save()
+	end
+end)
+if not (teamchatlabel == util.get_label_text("MP_CHAT_TEAM")) then
+	menu.trigger_commands("labelall "..allchatlabel)
+end
+
+targetlangaddict = menu.slider_text(chat_trans, "Target Language", {}, "You need to click to aply change", LangName, function(s)
+	targetlang = LangLookupByName[LangKeys[s]]
+end)
+
+tradlocaaddict = menu.slider_text(settingtrad, "Location of Translated Message", {}, "You need to click to apply change", {"Global Chat networked", "Global Chat not networked", "Team Chat not networked", "Team Chat networked", "notification"}, function(s)
+	Tradloca = s
+end)
+	
+traductself = false
+menu.toggle(settingtrad, "Translate Yourself", {}, "", function(on)
+	traductself = on	
+end)
+traductsamelang = false
+menu.toggle(settingtrad, "Translate even if the language is the same as the desired one", {}, "might not work correctly because google is dumb", function(on)
+	traductsamelang = on	
+end)
+oldway = false
+menu.toggle(settingtrad, "Use the old method", {}, players.get_name(players.user()).." [ALL] player_sender : their message", function(on)
+	oldway = on	
+end)
+traduct = false
+menu.toggle(chat_trans, "Translator On/Off", {}, "", function(on)
+	traduct = on
+end, false)
+
+traductmymessage = menu.list(chat_trans, "Send Translated Message")
+finallangaddict = menu.slider_text(traductmymessage, "Final Language", {"finallang"}, "Final Languge of your message.																	  You need to click to aply change", LangName, function(s)
+   targetlangmessagesend = LangLookupByName[LangKeys[s]]
+end)
+
+menu.action(traductmymessage, "Send Message", {"Sendmessage"}, "Input the text For your message", function(on_click)
+    util.toast("Please input your message")
+    menu.show_command_box("Sendmessage ")
+end, function(on_command)
+    mytext = on_command
+    async_http.init("translate.googleapis.com", "/translate_a/single?client=gtx&sl=auto&tl="..targetlangmessagesend.."&dt=t&q="..encode(mytext), function(Sucess)
+		if Sucess ~= "" then
+			translation, original, sourceLang = Sucess:match("^%[%[%[\"(.-)\",\"(.-)\",.-,.-,.-]],.-,\"(.-)\"")
+			for _, pId in ipairs(players.list()) do
+				chat.send_targeted_message(pId, players.user(), string.gsub(translation, "%+", " "), false)
+			end
+		end
+	end)
+    async_http.dispatch()
+end)
+botsend = false
+chat.on_message(function(packet_sender, message_sender, text, team_chat)
+	if not botsend then
+		if not traductself and (packet_sender == players.user()) then
+		else
+			if traduct then
+				async_http.init("translate.googleapis.com", "/translate_a/single?client=gtx&sl=auto&tl="..targetlang.."&dt=t&q="..encode(text), function(Sucess)
+					if Sucess ~= "" then
+						translation, original, sourceLang = Sucess:match("^%[%[%[\"(.-)\",\"(.-)\",.-,.-,.-]],.-,\"(.-)\"")
+						if not traductsamelang and (sourceLang == targetlang)then
+						
+						else
+							if oldway then
+								sender = players.get_name(players.user())
+								translationtext = players.get_name(packet_sender).." : "..decode(translation)
+								colorfinal = 1
+							else
+								sender = players.get_name(packet_sender)
+								translationtext = decode(translation)
+								colorfinal = colorselec
+							end
+							if (Tradloca == 1) then						
+								sfchat.ADD_MESSAGE(sender, translationtext, teamchatlabel, false, colorfinal)
+							end if (Tradloca == 2) then
+								botsend = true
+								chat.send_message(players.get_name(packet_sender).." : "..decode(translation), true, false, true)
+								sfchat.ADD_MESSAGE(sender, translationtext, teamchatlabel, false, colorfinal)
+							end if (Tradloca == 3) then
+								sfchat.ADD_MESSAGE(sender, translationtext, allchatlabel, false, colorfinal)
+							end if (Tradloca == 4) then
+								botsend = true
+								chat.send_message(players.get_name(packet_sender).." : "..decode(translation), false, false, true)
+								sfchat.ADD_MESSAGE(sender, translationtext, allchatlabel, false, colorfinal)
+							end if (Tradloca == 5) then
+								util.toast(players.get_name(packet_sender).." : "..decode(translation), TOAST_ALL)
+							end
+						end
+					end
+				end)
+				async_http.dispatch()
+			end
+		end
+	end
+	botsend = false
+end)
+
+
+run = 0
+while run<10 do 
+	Tradloca = menu.get_value(tradlocaaddict)
+	targetlangmessagesend = LangLookupByName[LangKeys[menu.get_value(finallangaddict)]]
+	targetlang = LangLookupByName[LangKeys[menu.get_value(targetlangaddict)]]
+	util.yield()
+	run = run+1
+end
 
     ------------------------------------------------------------------------------------------------------------------------------------------------------
     
@@ -8043,6 +8409,24 @@ menu.action(fun, "Broomstick Mk2", {""}, "Note: You will be invisible for other 
     ENTITY.SET_ENTITY_VISIBLE(veh, false, false)
     PED.SET_PED_INTO_VEHICLE(players.user_ped(), veh, -1)
     ENTITY.ATTACH_ENTITY_TO_ENTITY(obj, veh, 0, 0, 0, 0.3, -80.0, 0, 0, true, false, false, false, 0, true) -- thanks to chaos mod for doing the annoying rotation work for me :P
+end)
+
+local superman = menu.list(fun, "Super Man Options", {}, "")
+
+local jump = {height = 0.6 }
+menu.toggle_loop(superman, "Super Man", {}, "Keep going higher the longer you press jump (can also be used to fly), Make sure you disable lock parachutes.", function () -- Credits to Acjoker Script
+    menu.trigger_commands("paralock full")
+    if PAD.IS_CONTROL_PRESSED(22, 22) or PAD.IS_CONTROL_JUST_PRESSED(21, 21) then
+        PED.SET_PED_CAN_RAGDOLL(players.user_ped(), false)
+        ENTITY.APPLY_FORCE_TO_ENTITY_CENTER_OF_MASS(players.user_ped(), 1, 0.0, 0.6, jump.height, 0, 0, 0, 0, true, true, true, true)
+        if ENTITY.IS_ENTITY_IN_AIR(players.user_ped()) then
+            ENTITY.APPLY_FORCE_TO_ENTITY_CENTER_OF_MASS(players.user_ped(), 1, 0.0, 0.6, jump.height, 0, 0, 0, 0, true, true, true, true)
+        end
+    end
+end)
+
+menu.slider(superman, "Super Man Power", {"supermanpower"}, "Adjust the amount you move upwards. Make sure you disable lock parachutes.", 6, 1000, 6, 1, function (a) -- Credits to Acjoker Script
+    jump.height = a*0.1
 end)
 
 menu.toggle(fun, "Tesla Mode", {}, "", function(toggled)
