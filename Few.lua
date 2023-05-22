@@ -7,7 +7,7 @@ util.require_natives(1676318796)
 util.require_natives(1663599433)
 
 local response = false
-local localversion = 1.3
+local localversion = 1.3.1
 local localKs = false
 async_http.init("raw.githubusercontent.com", "/Fewdys/GTA5-FewMod/main/FewModVersion.lua", function(output)
     currentVer = tonumber(output)
@@ -5653,7 +5653,7 @@ menu.toggle(yoinkSettings, "Force Request Control", {"controlall"}, "", function
                         end
                     end
                 end
-                wait()
+                util.yield()
                 if YOINK_VEHICLES then
                     local vehTable = entities.get_all_vehicles_as_pointers()
                     for i = 1, #vehTable do
@@ -5664,7 +5664,7 @@ menu.toggle(yoinkSettings, "Force Request Control", {"controlall"}, "", function
                         end
                     end
                 end
-                wait()
+                util.yield()
                 if YOINK_OBJECTS then
                     local objTable = entities.get_all_objects_as_pointers()
                     for i = 1, #objTable do
@@ -5687,11 +5687,11 @@ menu.toggle(yoinkSettings, "Force Request Control", {"controlall"}, "", function
                 end
                 for i = 1, #BigTable do
                     NETWORK.NETWORK_REQUEST_CONTROL_OF_ENTITY(BigTable[i])
-                    wait()
+                    util.yield()
                 end
                 util.toast("Requested control of all")
                 ----
-                wait()
+                util.yield()
             end
             util.stop_thread()
         end)
