@@ -7,7 +7,7 @@ util.require_natives(1676318796)
 util.require_natives(1663599433)
 
 local response = false
-local localversion = 1.2
+local localversion = 1.3
 local localKs = false
 async_http.init("raw.githubusercontent.com", "/Fewdys/GTA5-FewMod/main/FewModVersion.lua", function(output)
     currentVer = tonumber(output)
@@ -9465,7 +9465,7 @@ end)
 --------------------------------------------------------------------------------------------------------------------------------
 -- Misc
 
-menu.action(misc, "Alternative Manual Update Script", {}, "Grabs The Newest Version Of Script From \nLink: https://github.com/Fewdys/GTA5-FewMod-Lua", function()
+menu.action(misc, "Alternative Manual Update FewMod", {}, "Grabs The Newest Version Of Script From \nLink: https://github.com/Fewdys/GTA5-FewMod-Lua", function()
     async_http.init('raw.githubusercontent.com','/Fewdys/GTA5-FewMod/main/Few.lua',function(a)
         local err = select(2,load(a))
         if err then
