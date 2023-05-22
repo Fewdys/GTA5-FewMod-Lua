@@ -9465,6 +9465,25 @@ end)
 --------------------------------------------------------------------------------------------------------------------------------
 -- Misc
 
+menu.action(menu.my_root(), "Alternative Manual Update Script", {}, "Grabs The Newest Version Of Script From \nLink: https://github.com/Fewdys/GTA5-FewMod-Lua", function()
+    async_http.init('raw.githubusercontent.com','/Fewdys/GTA5-FewMod/main/Few.lua',function(a)
+        local err = select(2,load(a))
+        if err then
+            util.toast("There was a issue updating FewMod, please update it manually from github.")
+            util.log("There was a issue updating FewMod, please update it manually from github.")
+            util.toast("Link: https://github.com/Fewdys/GTA5-FewMod-Lua")
+            util.log("Link: https://github.com/Fewdys/GTA5-FewMod-Lua")
+        return end
+        local f = io.open(filesystem.scripts_dir()..SCRIPT_RELPATH, "wb")
+        f:write(a)
+        f:close()
+        util.toast("FewMod Updated Successfully. Restarting Script")
+        util.log("FewMod Updated Successfully. Restarting Script")
+        util.restart_script()
+    end)
+    async_http.dispatch()
+end)
+
 menu.toggle_loop(misc, "Clear All Notifications", {"clearnotifs"}, "I recommend you use Console so you can see the log on screen when people try to crash you with this enabled.", function()
     Clear_Stand_Notifs = menu.ref_by_path("Stand>Clear Notifications")
     Clear_Minimap_Notifs = menu.ref_by_path("Game>Remove Notifications Above Minimap")
