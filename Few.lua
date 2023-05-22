@@ -10628,6 +10628,142 @@ function explodeAndDelete(entity, exploID, ownerPed, dmgscale, audible, invisibl
     FIRE.ADD_OWNED_EXPLOSION(ownerPed, ec.x, ec.y, ec.z, exploID, dmgscale, audible, invisible, camshake)
 end
 
+function Draw_Box_Peds()
+    if not ENTITY.DOES_ENTITY_EXIST(targetEntity) then
+        local flag = TraceFlag.peds | TraceFlag.vehicles | TraceFlag.pedsSimpleCollision | TraceFlag.objects
+        local raycastResult = get_raycast_result(500.0, flag)
+        if raycastResult.didHit and ENTITY.DOES_ENTITY_EXIST(raycastResult.hitEntity) then
+            targetEntity = raycastResult.hitEntity
+        end
+    else
+        for k, veh in pairs(entities.get_all_peds_as_handles()) do
+            NETWORK.NETWORK_REQUEST_CONTROL_OF_ENTITY(veh)
+            ENTITY.GET_ENTITY_COORDS(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(bh_target), true)
+            draw_bounding_box(veh, true, {r = 80, g = 0, b = 255, a = 80})
+            end
+            local myPos = players.get_position(players.user())
+            local entityPos = ENTITY.GET_ENTITY_COORDS(targetEntity, true)
+            local camDir = CAM.GET_GAMEPLAY_CAM_ROT(0):toDir()
+            local distance = myPos:distance(entityPos)
+            if distance > 30.0 then distance = 30.0
+            elseif distance < 10.0 then distance = 10.0 end
+            local targetPos = ENTITY.GET_ENTITY_COORDS(players.user_ped(), camDir, true)
+            targetPos:mul(distance)
+            targetPos:add(myPos)
+            local direction = ENTITY.GET_ENTITY_COORDS(players.user_ped(), targetPos, true)
+            direction:sub(entityPos)
+            direction:normalise()
+        if ENTITY.IS_ENTITY_A_PED(targetEntity) then
+            direction:mul(1.0)
+            local explosionPos = ENTITY.GET_ENTITY_COORDS(players.user_ped(), entityPos, true)
+            explosionPos:sub(direction)
+            draw_bounding_box(targetEntity, false, {r = 80, g = 0, b = 255, a = 255})
+        end
+    end
+end
+
+function Draw_Box_Pickups()
+    if not ENTITY.DOES_ENTITY_EXIST(targetEntity) then
+        local flag = TraceFlag.peds | TraceFlag.vehicles | TraceFlag.pedsSimpleCollision | TraceFlag.objects
+        local raycastResult = get_raycast_result(500.0, flag)
+        if raycastResult.didHit and ENTITY.DOES_ENTITY_EXIST(raycastResult.hitEntity) then
+            targetEntity = raycastResult.hitEntity
+        end
+    else
+        for k, veh in pairs(entities.get_all_pickups_as_handles()) do
+            NETWORK.NETWORK_REQUEST_CONTROL_OF_ENTITY(veh)
+            ENTITY.GET_ENTITY_COORDS(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(bh_target), true)
+            draw_bounding_box(veh, true, {r = 80, g = 0, b = 255, a = 80})
+            end
+            local myPos = players.get_position(players.user())
+            local entityPos = ENTITY.GET_ENTITY_COORDS(targetEntity, true)
+            local camDir = CAM.GET_GAMEPLAY_CAM_ROT(0):toDir()
+            local distance = myPos:distance(entityPos)
+            if distance > 30.0 then distance = 30.0
+            elseif distance < 10.0 then distance = 10.0 end
+            local targetPos = ENTITY.GET_ENTITY_COORDS(players.user_ped(), camDir, true)
+            targetPos:mul(distance)
+            targetPos:add(myPos)
+            local direction = ENTITY.GET_ENTITY_COORDS(players.user_ped(), targetPos, true)
+            direction:sub(entityPos)
+            direction:normalise()
+        if ENTITY.IS_ENTITY_A_PED(targetEntity) then
+            direction:mul(1.0)
+            local explosionPos = ENTITY.GET_ENTITY_COORDS(players.user_ped(), entityPos, true)
+            explosionPos:sub(direction)
+            draw_bounding_box(targetEntity, false, {r = 80, g = 0, b = 255, a = 255})
+        end
+    end
+end
+
+function Draw_Box_Objects()
+    if not ENTITY.DOES_ENTITY_EXIST(targetEntity) then
+        local flag = TraceFlag.peds | TraceFlag.vehicles | TraceFlag.pedsSimpleCollision | TraceFlag.objects
+        local raycastResult = get_raycast_result(500.0, flag)
+        if raycastResult.didHit and ENTITY.DOES_ENTITY_EXIST(raycastResult.hitEntity) then
+            targetEntity = raycastResult.hitEntity
+        end
+    else
+        for k, veh in pairs(entities.get_all_objects_as_handles()) do
+            NETWORK.NETWORK_REQUEST_CONTROL_OF_ENTITY(veh)
+            ENTITY.GET_ENTITY_COORDS(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(bh_target), true)
+            draw_bounding_box(veh, true, {r = 80, g = 0, b = 255, a = 80})
+            end
+            local myPos = players.get_position(players.user())
+            local entityPos = ENTITY.GET_ENTITY_COORDS(targetEntity, true)
+            local camDir = CAM.GET_GAMEPLAY_CAM_ROT(0):toDir()
+            local distance = myPos:distance(entityPos)
+            if distance > 30.0 then distance = 30.0
+            elseif distance < 10.0 then distance = 10.0 end
+            local targetPos = ENTITY.GET_ENTITY_COORDS(players.user_ped(), camDir, true)
+            targetPos:mul(distance)
+            targetPos:add(myPos)
+            local direction = ENTITY.GET_ENTITY_COORDS(players.user_ped(), targetPos, true)
+            direction:sub(entityPos)
+            direction:normalise()
+        if ENTITY.IS_ENTITY_A_PED(targetEntity) then
+            direction:mul(1.0)
+            local explosionPos = ENTITY.GET_ENTITY_COORDS(players.user_ped(), entityPos, true)
+            explosionPos:sub(direction)
+            draw_bounding_box(targetEntity, false, {r = 80, g = 0, b = 255, a = 255})
+        end
+    end
+end
+
+function Draw_Box_Vehicles()
+    if not ENTITY.DOES_ENTITY_EXIST(targetEntity) then
+        local flag = TraceFlag.peds | TraceFlag.vehicles | TraceFlag.pedsSimpleCollision | TraceFlag.objects
+        local raycastResult = get_raycast_result(500.0, flag)
+        if raycastResult.didHit and ENTITY.DOES_ENTITY_EXIST(raycastResult.hitEntity) then
+            targetEntity = raycastResult.hitEntity
+        end
+    else
+        for k, veh in pairs(entities.get_all_vehicles_as_handles()) do
+            NETWORK.NETWORK_REQUEST_CONTROL_OF_ENTITY(veh)
+            ENTITY.GET_ENTITY_COORDS(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(bh_target), true)
+            draw_bounding_box(veh, true, {r = 80, g = 0, b = 255, a = 80})
+            end
+            local myPos = players.get_position(players.user())
+            local entityPos = ENTITY.GET_ENTITY_COORDS(targetEntity, true)
+            local camDir = CAM.GET_GAMEPLAY_CAM_ROT(0):toDir()
+            local distance = myPos:distance(entityPos)
+            if distance > 30.0 then distance = 30.0
+            elseif distance < 10.0 then distance = 10.0 end
+            local targetPos = ENTITY.GET_ENTITY_COORDS(players.user_ped(), camDir, true)
+            targetPos:mul(distance)
+            targetPos:add(myPos)
+            local direction = ENTITY.GET_ENTITY_COORDS(players.user_ped(), targetPos, true)
+            direction:sub(entityPos)
+            direction:normalise()
+        if ENTITY.IS_ENTITY_A_PED(targetEntity) then
+            direction:mul(1.0)
+            local explosionPos = ENTITY.GET_ENTITY_COORDS(players.user_ped(), entityPos, true)
+            explosionPos:sub(direction)
+            draw_bounding_box(targetEntity, false, {r = 80, g = 0, b = 255, a = 255})
+        end
+    end
+end
+
 menu.toggle_loop(world2,"Nearby Vehicles Fly Away", {"flyawayvehicles"}, "", function()
     for k, veh in pairs(entities.get_all_vehicles_as_handles()) do
         ENTITY.APPLY_FORCE_TO_ENTITY_CENTER_OF_MASS(veh, 1, 0, 0, 100, true, false, true)
