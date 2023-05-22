@@ -7,7 +7,7 @@ util.require_natives(1676318796)
 util.require_natives(1663599433)
 
 local response = false
-local localversion = 1.28
+local localversion = 1.29
 local localKs = false
 async_http.init("raw.githubusercontent.com", "/Fewdys/GTA5-FewMod/main/FewModVersion.lua", function(output)
     currentVer = tonumber(output)
@@ -5511,7 +5511,8 @@ util.yield(5000)
 local selfc = menu.list(uwuself, "Main", {}, "Main Options.")
 local weapons = menu.list(uwuself, "Weapons", {}, "")
 local online = menu.list(uwuonline, "FewMod", {}, "Online mode options")
-local world = menu.list(uwuworld, "FewMod", {}, "Options around you")
+local world = menu.list(uwuworld, "FewMod QOL", {}, "Quality Of Life Options For The World")
+local world2 = menu.list(uwuworld, "FewMod Fun", {}, "Fun Options For The World")
 local detections = menu.list(uwuonline, "FewMod Detection", {}, "Lua Detections")
 local protects = menu.list(uwuonline, "FewMod Protections", {}, "Lua Protections")
 local vehicles = menu.list(uwuvehicle, "FewMod", {}, "Vehicle Options")
@@ -6200,6 +6201,80 @@ local interiors = {
             ENTITY.SET_ENTITY_COORDS_NO_OFFSET(players.user_ped(), location_coords.x, location_coords.y, location_coords.z, false, false, false)
         end)
     end
+
+    local FewModMisc = menu.list(uwuonline, FewMod Misc)
+
+menu.action(FewModMisc, "Anticrashcamera", {}, "Put this here for redundancy", function()
+        menu.trigger_commands("anticrashcam")
+end)
+
+menu.toggle(FewModMisc, "Toggle Anticrashcam", {"acc"}, "Put this here for redundancy", function(on_toggle)
+    if on_toggle then
+        menu.trigger_commands("anticrashcam on")
+        menu.trigger_commands("potatomode on")
+    else
+        menu.trigger_commands("anticrashcam off")
+        menu.trigger_commands("potatomode off")
+    end
+end)
+
+menu.toggle(FewModMisc, "Hide From Crashes", {}, "Tries to block crashes by Using some game natives and menu functions.", function(on_toggle)
+    local pos = ENTITY.GET_ENTITY_COORDS(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(players.user()))
+    local ped = PLAYER.GET_PLAYER_PED(players.user())
+    if on_toggle then
+        util.yield(300)
+        ENTITY.SET_ENTITY_COORDS(ped, 35.05--[[x]], 7690.07--[[y]], 2.68--[[z]], 1, false)
+        util.yield(600)
+        menu.trigger_commands("spoofpos ".."on")
+        util.toast("Spoofed Position")
+        menu.trigger_commands("potatomode on")
+        menu.trigger_commands("anticrashcamera on")
+        menu.trigger_commands("trafficpotato on")
+        util.yield(2000)
+        menu.trigger_commands("clearworld")
+    else        
+        menu.trigger_commands("spoofpos ".."off")
+        menu.trigger_commands("potatomode off")
+        menu.trigger_commands("anticrashcamera off")
+        menu.trigger_commands("trafficpotato off")
+        util.yield(800)
+        ENTITY.SET_ENTITY_COORDS(ped, pos.x, pos.y, pos.z, false)
+        util.yield(500)
+        menu.trigger_commands("clearworld")
+        util.yield(1000)
+        menu.trigger_commands("cleararea")
+    end
+end)
+
+menu.action(FewModMisc, "Restart Natives", {}, "Tries restarting some natives.", function()
+    --local playerpos = ENTITY.GET_ENTITY_COORDS(ped, false)
+    local player = PLAYER.PLAYER_PED_ID()
+    ENTITY.FREEZE_ENTITY_POSITION(player, false)
+    MISC.OVERRIDE_FREEZE_FLAGS()
+    menu.trigger_commands("rcleararea")
+end)
+
+menu.toggle(FewModMisc, "Panic Mode", {"panic"}, "This renders an anti-crash mode removing all kinds of events from the game at all costs.", function(on_toggle)
+    local BlockNetEvents = menu.ref_by_path("Online>Protections>Events>Raw Network Events>Any Event>Block>Enabled")
+    local UnblockNetEvents = menu.ref_by_path("Online>Protections>Events>Raw Network Events>Any Event>Block>Disabled")
+    local BlockIncSyncs = menu.ref_by_path("Online>Protections>Syncs>Incoming>Any Incoming Sync>Block>Enabled")
+    local UnblockIncSyncs = menu.ref_by_path("Online>Protections>Syncs>Incoming>Any Incoming Sync>Block>Disabled")
+    if on_toggle then
+        menu.trigger_commands("desyncall on")
+        menu.trigger_commands("potatomode on")
+        menu.trigger_commands("trafficpotato on")
+        menu.trigger_command(BlockIncSyncs)
+        menu.trigger_command(BlockNetEvents)
+        menu.trigger_commands("anticrashcamera on")
+    else
+        menu.trigger_commands("desyncall off")
+        menu.trigger_commands("potatomode off")
+        menu.trigger_commands("trafficpotato off")
+        menu.trigger_command(UnblockIncSyncs)
+        menu.trigger_command(UnblockNetEvents)
+        menu.trigger_commands("anticrashcamera off")
+    end
+end)
 
     menu.toggle_loop(uwuonline, "Bounty All Loop", {}, "Gives Everyone In The Session A Bounty", function()
         menu.trigger_commands("bountyall 10000")
@@ -7452,7 +7527,7 @@ OBJgun = menu.toggle_loop(objgun, "Custom Object Gun", {"objgun"}, "Fires the ob
         local camcoords = get_offset_from_gameplay_camera(13)
         objshots(hash, obj, camcoords)
         entities.delete_by_handle(obj.prev)
-        util.yield(20)
+        util.yield(10)
     end
 end)
 
@@ -7534,78 +7609,6 @@ menu.toggle_loop(protects, "Block Clones", {}, "Will block clones and delete the
     end
 end)
 
-menu.action(uwuonline, "Anticrashcamera", {}, "Put this here for redundancy", function()
-        menu.trigger_commands("anticrashcam")
-end)
-
-menu.toggle(uwuonline, "Toggle Anticrashcam", {"acc"}, "Put this here for redundancy", function(on_toggle)
-    if on_toggle then
-        menu.trigger_commands("anticrashcam on")
-        menu.trigger_commands("potatomode on")
-    else
-        menu.trigger_commands("anticrashcam off")
-        menu.trigger_commands("potatomode off")
-    end
-end)
-
-menu.toggle(uwuonline, "Hide From Crashes", {}, "Tries to block crashes by Using some game natives and menu functions.", function(on_toggle)
-    local pos = ENTITY.GET_ENTITY_COORDS(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(players.user()))
-    local ped = PLAYER.GET_PLAYER_PED(players.user())
-    if on_toggle then
-        util.yield(300)
-        ENTITY.SET_ENTITY_COORDS(ped, 35.05--[[x]], 7690.07--[[y]], 2.68--[[z]], 1, false)
-        util.yield(600)
-        menu.trigger_commands("spoofpos ".."on")
-        util.toast("Spoofed Position")
-        menu.trigger_commands("potatomode on")
-        menu.trigger_commands("anticrashcamera on")
-        menu.trigger_commands("trafficpotato on")
-        util.yield(2000)
-        menu.trigger_commands("clearworld")
-    else        
-        menu.trigger_commands("spoofpos ".."off")
-        menu.trigger_commands("potatomode off")
-        menu.trigger_commands("anticrashcamera off")
-        menu.trigger_commands("trafficpotato off")
-        util.yield(800)
-        ENTITY.SET_ENTITY_COORDS(ped, pos.x, pos.y, pos.z, false)
-        util.yield(500)
-        menu.trigger_commands("clearworld")
-        util.yield(1000)
-        menu.trigger_commands("cleararea")
-    end
-end)
-
-menu.action(uwuonline, "Restart Natives", {}, "Tries restarting some natives.", function()
-    --local playerpos = ENTITY.GET_ENTITY_COORDS(ped, false)
-    local player = PLAYER.PLAYER_PED_ID()
-    ENTITY.FREEZE_ENTITY_POSITION(player, false)
-    MISC.OVERRIDE_FREEZE_FLAGS()
-    menu.trigger_commands("rcleararea")
-end)
-
-menu.toggle(uwuonline, "Panic Mode", {"panic"}, "This renders an anti-crash mode removing all kinds of events from the game at all costs.", function(on_toggle)
-    local BlockNetEvents = menu.ref_by_path("Online>Protections>Events>Raw Network Events>Any Event>Block>Enabled")
-    local UnblockNetEvents = menu.ref_by_path("Online>Protections>Events>Raw Network Events>Any Event>Block>Disabled")
-    local BlockIncSyncs = menu.ref_by_path("Online>Protections>Syncs>Incoming>Any Incoming Sync>Block>Enabled")
-    local UnblockIncSyncs = menu.ref_by_path("Online>Protections>Syncs>Incoming>Any Incoming Sync>Block>Disabled")
-    if on_toggle then
-        menu.trigger_commands("desyncall on")
-        menu.trigger_commands("potatomode on")
-        menu.trigger_commands("trafficpotato on")
-        menu.trigger_command(BlockIncSyncs)
-        menu.trigger_command(BlockNetEvents)
-        menu.trigger_commands("anticrashcamera on")
-    else
-        menu.trigger_commands("desyncall off")
-        menu.trigger_commands("potatomode off")
-        menu.trigger_commands("trafficpotato off")
-        menu.trigger_command(UnblockIncSyncs)
-        menu.trigger_command(UnblockNetEvents)
-        menu.trigger_commands("anticrashcamera off")
-    end
-end)
-
 menu.toggle_loop(protects, "Block PTFX/Particle Lag", {}, "Note: This Will Remove Any Particles In A Range", function()
     local coords = ENTITY.GET_ENTITY_COORDS(players.user_ped() , false);
     GRAPHICS.REMOVE_PARTICLE_FX_IN_RANGE(coords.x, coords.y, coords.z, 500)
@@ -7627,6 +7630,176 @@ menu.toggle_loop(protects, "Anti Beast", {}, "Prevent them from turning you the 
         menu.trigger_command(menu.ref_by_path("Online>Session>Session Scripts>Hunt the Beast>Stop Scrip"))
     end
 end)
+
+--for oppressor Mk2 blacklist
+util.create_thread(function()
+	while true do
+		if oppressor_kick_players then
+			local cur_players = players.list(target_self,target_friends,true)
+			for k,v in pairs(cur_players) do
+				local ped = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(v)
+				local vehicle = PED.GET_VEHICLE_PED_IS_IN(ped, false)
+				if vehicle then
+					local hash = util.joaat("oppressor2")
+					if VEHICLE.IS_VEHICLE_MODEL(vehicle, hash) then
+						menu.trigger_commands("vehkick" .. PLAYER.GET_PLAYER_NAME(v))
+						if lock_vehicle then
+							VEHICLE.SET_VEHICLE_DOORS_LOCKED_FOR_ALL_PLAYERS(vehicle, true)
+						end
+					end
+				end
+			end
+		end
+		util.yield()
+	end
+end)
+
+--for oppressor blacklist
+util.create_thread(function()
+	while true do
+		if oppressormk2_kick_players then
+			local cur_players = players.list(target_self,target_friends,true)
+			for k,v in pairs(cur_players) do
+				local ped = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(v)
+				local vehicle = PED.GET_VEHICLE_PED_IS_IN(ped, false)
+				if vehicle then
+					local hash = util.joaat("oppressor")
+					if VEHICLE.IS_VEHICLE_MODEL(vehicle, hash) then
+						menu.trigger_commands("vehkick" .. PLAYER.GET_PLAYER_NAME(v))
+						if lock_vehicle then
+							VEHICLE.SET_VEHICLE_DOORS_LOCKED_FOR_ALL_PLAYERS(vehicle, true)
+						end
+					end
+				end
+			end
+		end
+		util.yield()
+	end
+end)
+
+--for lazer blacklist
+util.create_thread(function()
+	while true do
+		if lazer_kick_players then
+			local cur_players = players.list(target_self,target_friends,true)
+			for k,v in pairs(cur_players) do
+				local ped = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(v)
+				local vehicle = PED.GET_VEHICLE_PED_IS_IN(ped, false)
+				if vehicle then
+					local hash = util.joaat("lazer")
+					if VEHICLE.IS_VEHICLE_MODEL(vehicle, hash) then
+						menu.trigger_commands("vehkick" .. PLAYER.GET_PLAYER_NAME(v))
+						if lock_vehicle then
+							VEHICLE.SET_VEHICLE_DOORS_LOCKED_FOR_ALL_PLAYERS(vehicle, true)
+						end
+					end
+				end
+			end
+		end
+		util.yield()
+	end
+end)
+
+--for kosatka blacklist
+util.create_thread(function()
+	while true do
+		if kosatka_kick_players then
+			local cur_players = players.list(target_self,target_friends,true)
+			for k,v in pairs(cur_players) do
+				local ped = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(v)
+				local vehicle = PED.GET_VEHICLE_PED_IS_IN(ped, false)
+				if vehicle then
+					local hash = util.joaat("kosatka")
+					if VEHICLE.IS_VEHICLE_MODEL(vehicle, hash) then
+						menu.trigger_commands("vehkick" .. PLAYER.GET_PLAYER_NAME(v))
+						if lock_vehicle then
+							VEHICLE.SET_VEHICLE_DOORS_LOCKED_FOR_ALL_PLAYERS(vehicle, true)
+						end
+					end
+				end
+			end
+		end
+		util.yield()
+	end
+end)
+
+--for hydra blacklist
+util.create_thread(function()
+	while true do
+		if hydra_kick_players then
+			local cur_players = players.list(target_self,target_friends,true)
+			for k,v in pairs(cur_players) do
+				local ped = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(v)
+				local vehicle = PED.GET_VEHICLE_PED_IS_IN(ped, false)
+				if vehicle then
+					local hash = util.joaat("hydra")
+					if VEHICLE.IS_VEHICLE_MODEL(vehicle, hash) then
+						menu.trigger_commands("vehkick" .. PLAYER.GET_PLAYER_NAME(v))
+						if lock_vehicle then
+							VEHICLE.SET_VEHICLE_DOORS_LOCKED_FOR_ALL_PLAYERS(vehicle, true)
+						end
+					end
+				end
+			end
+		end
+		util.yield()
+	end
+end)
+
+--for khanjali blacklist
+util.create_thread(function()
+	while true do
+		if khanjali_kick_players then
+			local cur_players = players.list(target_self,target_friends,true)
+			for k,v in pairs(cur_players) do
+				local ped = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(v)
+				local vehicle = PED.GET_VEHICLE_PED_IS_IN(ped, false)
+				if vehicle then
+					local hash = util.joaat("khanjali")
+					if VEHICLE.IS_VEHICLE_MODEL(vehicle, hash) then
+						menu.trigger_commands("vehkick" .. PLAYER.GET_PLAYER_NAME(v))
+						if lock_vehicle then
+							VEHICLE.SET_VEHICLE_DOORS_LOCKED_FOR_ALL_PLAYERS(vehicle, true)
+						end
+					end
+				end
+			end
+		end
+		util.yield()
+	end
+end)
+
+local Anti_Veh = menu.list(protects, "Anti Annoying", {}, "Anti (Oppressors, Lazers, Kosatka's, Hydra's, Khanjali's Ect)")
+
+oppressor_kick_players = false
+menu.toggle(Anti_Veh, "Anti-Oppressor", {"antioppressor"}, "Automatically kicks players off oppressor", function(on)
+    oppressor_kick_players = on
+end, false)
+
+oppressormk2_kick_players = false
+menu.toggle(Anti_Veh, "Anti-Oppressor Mk2", {"antioppressor"}, "Automatically kicks players off oppressor Mk2's", function(on)
+    oppressormk2_kick_players = on
+end, false)
+
+lazer_kick_players = false
+menu.toggle(Anti_Veh, "Anti-Lazer", {"antilazer"}, "Automatically kicks players out lazers", function(on)
+    lazer_kick_players = on
+end, false)
+
+kosatka_kick_players = false
+menu.toggle(Anti_Veh, "Anti-Kosatka", {"antikosatka"}, "Automatically kicks players out kosatka", function(on)
+    kosatka_kick_players = on
+end, false)
+
+hydra_kick_players = false
+menu.toggle(Anti_Veh, "Anti-Hydra", {"antihydra"}, "Automatically kicks players out hydra", function(on)
+    hydra_kick_players = on
+end, false)
+
+khanjali_kick_players = false
+menu.toggle(Anti_Veh, "Anti-Khanjali", {"antikhanjali"}, "Automatically kicks players out khanjali", function(on)
+    khanjali_kick_players = on
+end, false)
 
 local values = {
     [0] = 0,
@@ -10217,8 +10390,101 @@ end
 ReadPositionsData()
 CreateBlipSettingsMenu()
 
-
 --------------------------------------------------------------------------------------------------------------------------------------------------------
+
+function explodeAndDelete(entity, exploID, ownerPed, dmgscale, audible, invisible, camshake)
+    local ec = getEntityCoords(entity)
+    FIRE.ADD_OWNED_EXPLOSION(ownerPed, ec.x, ec.y, ec.z, exploID, dmgscale, audible, invisible, camshake)
+end
+
+menu.toggle_loop(world2,"Nearby Vehicles Fly Away", {"flyawayvehicles"}, "", function()
+    for k, veh in pairs(entities.get_all_vehicles_as_handles()) do
+        ENTITY.APPLY_FORCE_TO_ENTITY_CENTER_OF_MASS(veh, 1, 0, 0, 100, true, false, true)
+        util.yield(10)
+    end
+end)
+
+local dont_stop = false
+	menu.toggle_loop(world2,"Blackhole Vehicles", {"blackholeveh"}, "", function(on)
+		for k, veh in pairs(entities.get_all_vehicles_as_handles()) do
+            local locspeed2 = speed
+            local holecoords = ENTITY.GET_ENTITY_COORDS(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(pid), true)
+                NETWORK.NETWORK_REQUEST_CONTROL_OF_ENTITY(veh)
+                ENTITY.GET_ENTITY_COORDS(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(bh_target), true)
+                vcoords = ENTITY.GET_ENTITY_COORDS(veh, true)
+                speed = 100
+                local x_vec = (holecoords['x']-vcoords['x'])*speed
+                local y_vec = (holecoords['y']-vcoords['y'])*speed
+                local z_vec = ((holecoords['z']+hole_zoff)-vcoords['z'])*speed
+                ENTITY.SET_ENTITY_INVINCIBLE(veh, true)
+                ENTITY.APPLY_FORCE_TO_ENTITY_CENTER_OF_MASS(veh, 1, x_vec, y_vec, z_vec, true, false, true, true)
+            if not dont_stop and not PAD.IS_CONTROL_PRESSED(2, 71) and not PAD.IS_CONTROL_PRESSED(2, 72) then
+                VEHICLE.SET_VEHICLE_FORWARD_SPEED(veh, 0.0);
+			end
+		end
+	end)
+
+    menu.toggle_loop(world2,"Blackhole Peds", {"pedblackhole"}, "", function(on)
+		for k, veh in pairs(entities.get_all_peds_as_handles()) do
+            local locspeed2 = speed
+            local holecoords = ENTITY.GET_ENTITY_COORDS(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(pid), true)
+                NETWORK.NETWORK_REQUEST_CONTROL_OF_ENTITY(veh)
+                ENTITY.GET_ENTITY_COORDS(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(bh_target), true)
+                vcoords = ENTITY.GET_ENTITY_COORDS(veh, true)
+                speed = 100
+                local x_vec = (holecoords['x']-vcoords['x'])*speed
+                local y_vec = (holecoords['y']-vcoords['y'])*speed
+                local z_vec = ((holecoords['z']+hole_zoff)-vcoords['z'])*speed
+                ENTITY.SET_ENTITY_INVINCIBLE(veh, true)
+                ENTITY.APPLY_FORCE_TO_ENTITY_CENTER_OF_MASS(veh, 1, x_vec, y_vec, z_vec, true, false, true, true)
+            if not dont_stop and not PAD.IS_CONTROL_PRESSED(2, 71) and not PAD.IS_CONTROL_PRESSED(2, 72) then
+                VEHICLE.SET_VEHICLE_FORWARD_SPEED(veh, 0.0);
+			end
+		end
+	end)
+
+    menu.toggle_loop(world2,"Blackhole Objects", {"objectblackhole"}, "", function(on)
+        Draw_Box_Objects()
+		for k, veh in pairs(entities.get_all_objects_as_handles()) do
+            local locspeed2 = speed
+            local holecoords = ENTITY.GET_ENTITY_COORDS(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(pid), true)
+                NETWORK.NETWORK_REQUEST_CONTROL_OF_ENTITY(veh)
+                ENTITY.GET_ENTITY_COORDS(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(bh_target), true)
+                vcoords = ENTITY.GET_ENTITY_COORDS(veh, true)
+                speed = 100
+                local x_vec = (holecoords['x']-vcoords['x'])*speed
+                local y_vec = (holecoords['y']-vcoords['y'])*speed
+                local z_vec = ((holecoords['z']+hole_zoff)-vcoords['z'])*speed
+                ENTITY.SET_ENTITY_INVINCIBLE(veh, true)
+                ENTITY.APPLY_FORCE_TO_ENTITY_CENTER_OF_MASS(veh, 1, x_vec, y_vec, z_vec, true, false, true, true)
+            if not dont_stop and not PAD.IS_CONTROL_PRESSED(2, 71) and not PAD.IS_CONTROL_PRESSED(2, 72) then
+                VEHICLE.SET_VEHICLE_FORWARD_SPEED(veh, 0.0);
+			end
+		end
+	end)
+
+	hole_zoff = 50
+    	menu.slider(world2, "Blackhole Offset", {"blackholeoffset"}, "", 0, 100, 50, 10, function(s)
+    	hole_zoff = s
+	end)
+
+    local getEntityCoords = ENTITY.GET_ENTITY_COORDS
+    local getPlayerPed = PLAYER.GET_PLAYER_PED
+
+menu.toggle_loop(world2, "All Cars Sink", {"sinkcars"}, "All Cars Sink.", function(on_toggle)
+    for k, veh in pairs(entities.get_all_vehicles_as_handles()) do
+        local locspeed2 = speed
+        local holecoords = ENTITY.GET_ENTITY_COORDS(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(pid), true)
+            NETWORK.NETWORK_REQUEST_CONTROL_OF_ENTITY(veh)
+            ENTITY.GET_ENTITY_COORDS(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(bh_target), true)
+            vcoords = ENTITY.GET_ENTITY_COORDS(veh, true)
+            VEHICLE.SET_DISABLE_MAP_COLLISION(veh, vcoords, true)
+        if not dont_stop and not PAD.IS_CONTROL_PRESSED(2, 71) and not PAD.IS_CONTROL_PRESSED(2, 72) then
+            VEHICLE.SET_VEHICLE_FORWARD_SPEED(veh, 0.0);
+        end
+    end
+end)
+
 --------------------------------------------------------------------------------------------------------------------------------------------------------
 --------------------------------------------------------------------------------------------------------------------------------------------------------
 --------------------------------------------------------------------------------------------------------------------------------------------------------
