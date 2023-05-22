@@ -7,7 +7,7 @@ util.require_natives(1676318796)
 util.require_natives(1663599433)
 
 local response = false
-local localversion = 1.29
+local localversion = 1.3
 local localKs = false
 async_http.init("raw.githubusercontent.com", "/Fewdys/GTA5-FewMod/main/FewModVersion.lua", function(output)
     currentVer = tonumber(output)
@@ -5830,9 +5830,239 @@ local BOUNTY_TIMER <constexpr> = 2359296 + 1 + (0 * 5568) + 5150 + 13
 inc_vehs = true
 local rbp = menu.ref_by_path
 
-menu.action(selfc, "Plutia", {"plutia"}, "Plutia From Neptunia \n(Ingnore If You Dont Have Neptunia DLC)", function()
-        menu.trigger_commands("outfitplutia")
+local outfits = menu.list(selfc, "Outfits", {}, "")
+menu.hyperlink(outfits, "https://github.com/Fewdys/GTA5-NeptuniaCharacters/tree/main", {}, "The Link To The Outfits")
+local neptunia = menu.list(outfits, "Neptunia Outfits", {}, "Outfits From Neptunia\n(Ingnore If You Dont Have Neptunia DLC)")
+local otheroutfits = menu.list(outfits, "Other Outfits", {}, "Other DLC Outfits")
+
+menu.action(neptunia, "Adult Neptune", {"adultneptune"}, "Adult Neptune From Neptunia \n(Ingnore If You Dont Have Neptunia DLC)", function()
+        menu.trigger_commands("afygenhot01")
         menu.trigger_commands("allguns")
+end)
+
+menu.action(neptunia, "AST", {"ast"}, "AST From Neptunia \n(Ingnore If You Dont Have Neptunia DLC)", function()
+    menu.trigger_commands("afyyoga01")
+    menu.trigger_commands("allguns")
+end)
+
+menu.action(neptunia, "AST Origami", {"astorigami"}, "AST Origami From Neptunia \n(Ingnore If You Dont Have Neptunia DLC)", function()
+    menu.trigger_commands("afytopless01")
+    menu.trigger_commands("allguns")
+end)
+
+menu.action(neptunia, "AST School Outfit", {"astschooloutfit"}, "AST School Outfit From Neptunia \n(Ingnore If You Dont Have Neptunia DLC)", function()
+    menu.trigger_commands("afyjuggalo01")
+    menu.trigger_commands("allguns")
+end)
+
+menu.action(neptunia, "Blanc", {"blanc"}, "Blanc From Neptunia \n(Ingnore If You Dont Have Neptunia DLC)", function()
+    menu.trigger_commands("igmarnie")
+    menu.trigger_commands("allguns")
+end)
+
+menu.action(neptunia, "B-Sha", {"bsha"}, "B-Sha From Neptunia \n(Ingnore If You Dont Have Neptunia DLC)", function()
+    menu.trigger_commands("afmprolhost01")
+    menu.trigger_commands("allguns")
+end)
+
+menu.action(neptunia, "Compa", {"compa"}, "Compa From Neptunia \n(Ingnore If You Dont Have Neptunia DLC)", function()
+    menu.trigger_commands("afysoucent01")
+    menu.trigger_commands("allguns")
+end)
+
+menu.action(neptunia, "C-Sha", {"csha"}, "C-Sha From Neptunia \n(Ingnore If You Dont Have Neptunia DLC)", function()
+    menu.trigger_commands("ummspyactor")
+    menu.trigger_commands("allguns")
+end)
+
+menu.action(neptunia, "Dengekiki", {"dengekiki"}, "Dengekiki From Neptunia \n(Ingnore If You Dont Have Neptunia DLC)", function()
+    menu.trigger_commands("sfycop01")
+    menu.trigger_commands("allguns")
+end)
+
+menu.action(neptunia, "Ethel", {"ethel"}, "Ethel From Neptunia \n(Ingnore If You Dont Have Neptunia DLC)", function()
+    menu.trigger_commands("afyvinewood02")
+    menu.trigger_commands("allguns")
+end)
+
+menu.action(neptunia, "Hatsumi Sega", {"hatsumisega"}, "Hatsumi Sega From Neptunia \n(Ingnore If You Dont Have Neptunia DLC)", function()
+    menu.trigger_commands("igmagenta")
+    menu.trigger_commands("allguns")
+end)
+
+menu.action(neptunia, "IF", {"if"}, "IF From Neptunia \n(Ingnore If You Dont Have Neptunia DLC)", function()
+    menu.trigger_commands("afyskater01")
+    menu.trigger_commands("allguns")
+end)
+
+menu.action(neptunia, "Kotori", {"kotori"}, "Kotori From Neptunia \n(Ingnore If You Dont Have Neptunia DLC)", function()
+    menu.trigger_commands("csbanton")
+    menu.trigger_commands("allguns")
+end)
+
+menu.action(neptunia, "K-Sha", {"ksha"}, "K-Sha From Neptunia \n(Ingnore If You Dont Have Neptunia DLC)", function()
+    menu.trigger_commands("afmeastsa01")
+    menu.trigger_commands("allguns")
+end)
+
+menu.action(neptunia, "Kurome", {"kurome"}, "Kurome From Neptunia \n(Ingnore If You Dont Have Neptunia DLC)", function()
+    menu.trigger_commands("smyswat01")
+    menu.trigger_commands("allguns")
+end)
+
+menu.action(neptunia, "Kurumi", {"kurumi"}, "Kurumi From Neptunia \n(Ingnore If You Dont Have Neptunia DLC)", function()
+    menu.trigger_commands("afybevhills01")
+    menu.trigger_commands("allguns")
+end)
+
+menu.action(neptunia, "Lily", {"lily"}, "Lily From Neptunia \n(Ingnore If You Dont Have Neptunia DLC)", function()
+    menu.trigger_commands("afmfatwhite01")
+    menu.trigger_commands("allguns")
+end)
+
+menu.action(neptunia, "Lola", {"lola"}, "Lola From Neptunia \n(Ingnore If You Dont Have Neptunia DLC)", function()
+    menu.trigger_commands("afyrurmeth01")
+    menu.trigger_commands("allguns")
+end)
+
+menu.action(neptunia, "Mai", {"mai"}, "Mai From Neptunia \n(Ingnore If You Dont Have Neptunia DLC)", function()
+    menu.trigger_commands("csbroccopelosi")
+    menu.trigger_commands("allguns")
+end)
+
+menu.action(neptunia, "Nepgear", {"nepgear"}, "Nepgear From Neptunia \n(Ingnore If You Dont Have Neptunia DLC)", function()
+    menu.trigger_commands("cslestercrest2")
+    menu.trigger_commands("allguns")
+end)
+
+menu.action(neptunia, "Neptune", {"neptune"}, "Neptune From Neptunia \n(Ingnore If You Dont Have Neptunia DLC)", function()
+    menu.trigger_commands("ufyspyactress")
+    menu.trigger_commands("allguns")
+end)
+
+menu.action(neptunia, "Nisa", {"nisa"}, "Nisa From Neptunia \n(Ingnore If You Dont Have Neptunia DLC)", function()
+    menu.trigger_commands("afygencaspat01")
+    menu.trigger_commands("allguns")
+end)
+
+menu.action(neptunia, "Noire", {"noire"}, "Noir From Neptunia \n(Ingnore If You Dont Have Neptunia DLC)", function()
+    menu.trigger_commands("afmbevhills01")
+    menu.trigger_commands("allguns")
+end)
+
+menu.action(neptunia, "Origami", {"origami"}, "Origami From Neptunia \n(Ingnore If You Dont Have Neptunia DLC)", function()
+    menu.trigger_commands("afmktown01")
+    menu.trigger_commands("allguns")
+end)
+
+menu.action(neptunia, "Peashy", {"peashy"}, "Peashy From Neptunia \n(Ingnore If You Dont Have Neptunia DLC)", function()
+    menu.trigger_commands("afmfatcult01")
+    menu.trigger_commands("allguns")
+end)
+
+menu.action(neptunia, "Plutia", {"plutia"}, "Plutia From Neptunia \n(Ingnore If You Dont Have Neptunia DLC)", function()
+    menu.trigger_commands("smmarmoured01")
+    menu.trigger_commands("allguns")
+end)
+
+menu.action(neptunia, "Ram", {"ram"}, "Ram From Neptunia \n(Ingnore If You Dont Have Neptunia DLC)", function()
+    menu.trigger_commands("afmsalton01")
+    menu.trigger_commands("allguns")
+end)
+
+menu.action(neptunia, "Red", {"red"}, "Red From Neptunia \n(Ingnore If You Dont Have Neptunia DLC)", function()
+    menu.trigger_commands("afmsoucent02")
+    menu.trigger_commands("allguns")
+end)
+
+menu.action(neptunia, "Rom", {"rom"}, "Rom From Neptunia \n(Ingnore If You Dont Have Neptunia DLC)", function()
+    menu.trigger_commands("afmtourist01")
+    menu.trigger_commands("allguns")
+end)
+
+menu.action(neptunia, "Rottie", {"rottie"}, "Rottie From Neptunia \n(Ingnore If You Dont Have Neptunia DLC)", function()
+    menu.trigger_commands("afoindian01")
+    menu.trigger_commands("allguns")
+end)
+
+menu.action(neptunia, "Shina", {"shina"}, "Shina From Neptunia \n(Ingnore If You Dont Have Neptunia DLC)", function()
+    menu.trigger_commands("afosoucent01")
+    menu.trigger_commands("allguns")
+end)
+
+menu.action(neptunia, "Tiara", {"tiara"}, "Tiara From Neptunia \n(Ingnore If You Dont Have Neptunia DLC)", function()
+    menu.trigger_commands("csbchef")
+    menu.trigger_commands("allguns")
+end)
+
+menu.action(neptunia, "Tohka", {"tohka"}, "Tohka From Neptunia \n(Ingnore If You Dont Have Neptunia DLC)", function()
+    menu.trigger_commands("afybeach01")
+    menu.trigger_commands("allguns")
+end)
+
+menu.action(neptunia, "Underling", {"underling"}, "Underling From Neptunia \n(Ingnore If You Dont Have Neptunia DLC)", function()
+    menu.trigger_commands("afyclubcust03")
+    menu.trigger_commands("allguns")
+end)
+
+menu.action(neptunia, "Uni", {"uni"}, "Uni From Neptunia \n(Ingnore If You Dont Have Neptunia DLC)", function()
+    menu.trigger_commands("igjanet")
+    menu.trigger_commands("allguns")
+end)
+
+menu.action(neptunia, "Uzume", {"uzume"}, "Uzume From Neptunia \n(Ingnore If You Dont Have Neptunia DLC)", function()
+    menu.trigger_commands("afybusiness04")
+    menu.trigger_commands("allguns")
+end)
+
+menu.action(neptunia, "Vert", {"vert"}, "Vert From Neptunia \n(Ingnore If You Dont Have Neptunia DLC)", function()
+    menu.trigger_commands("afyfemaleagent")
+    menu.trigger_commands("allguns")
+end)
+
+menu.action(neptunia, "Yoshino", {"yoshino"}, "Yoshino From Neptunia \n(Ingnore If You Dont Have Neptunia DLC)", function()
+    menu.trigger_commands("igjosef")
+    menu.trigger_commands("allguns")
+end)
+
+menu.action(otheroutfits, "Emote Guy (Joe)", {"emoteguy"}, "Emote Guy Also Known As Joe", function()
+    menu.trigger_commands("ammtranvest01")
+    menu.trigger_commands("allguns")
+end)
+
+menu.action(otheroutfits, "Fischer", {"fischer"}, "Fischer", function()
+    menu.trigger_commands("afysoucent03")
+    menu.trigger_commands("allguns")
+end)
+
+menu.action(otheroutfits, "Haku", {"haku"}, "Haku", function()
+    menu.trigger_commands("afyeastsa03")
+    menu.trigger_commands("allguns")
+end)
+
+menu.action(otheroutfits, "Inugami Korone", {"inugamikorone"}, "Inugami Korone", function()
+    menu.trigger_commands("afysmartcaspat01")
+    menu.trigger_commands("allguns")
+end)
+
+menu.action(otheroutfits, "KeQing", {"keqing"}, "KeQing", function()
+    menu.trigger_commands("afyscdressy01")
+    menu.trigger_commands("allguns")
+end)
+
+menu.action(otheroutfits, "Rimuru Tempest", {"rimurutempest"}, "Rimuru Tempest", function()
+    menu.trigger_commands("ammstlat02")
+    menu.trigger_commands("allguns")
+end)
+
+menu.action(otheroutfits, "Sally", {"sally"}, "Sally", function()
+    menu.trigger_commands("afytennis01")
+    menu.trigger_commands("allguns")
+end)
+
+menu.action(otheroutfits, "Six Little Nightmares", {"sixlittlenightmares"}, "Six Little Nightmares", function()
+    menu.trigger_commands("afmskidrow01")
+    menu.trigger_commands("allguns")
 end)
 
 local Noclip2T1 = menu.list(selfc, "2T1 Noclip", {}, "")
