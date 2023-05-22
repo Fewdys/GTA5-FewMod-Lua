@@ -6433,7 +6433,7 @@ local interiors = {
         end)
     end
 
-    local FewModMisc = menu.list(uwuonline, FewMod Misc)
+    local FewModMisc = menu.list(uwuonline, "FewMod Misc" {}, "")
 
 menu.action(FewModMisc, "Anticrashcamera", {}, "Put this here for redundancy", function()
         menu.trigger_commands("anticrashcam")
