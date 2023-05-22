@@ -7,7 +7,7 @@ util.require_natives(1676318796)
 util.require_natives(1663599433)
 
 local response = false
-local localversion = 1.3
+local localversion = 1.31
 local localKs = false
 async_http.init("raw.githubusercontent.com", "/Fewdys/GTA5-FewMod-Lua/main/FewModVersion.lua", function(output)
     currentVer = tonumber(output)
@@ -7526,6 +7526,14 @@ menu.slider_text(weapons, "Set Shooting Effect", {}, "", options, function (inde
 end)
 
 menu.divider(weapons, "Other")
+
+function wait_session_transition(yield_time)
+    yield_time = yield_time or 1000
+
+    while util.is_session_transition_active() do
+        util.yield(yield_time)
+    end
+end
 
 menu.toggle(weapons, "Autoload Weapons", {"autoloadweapons"}, "Autoload all the weapons everytime you join a new session.", function(state)
     if state then
