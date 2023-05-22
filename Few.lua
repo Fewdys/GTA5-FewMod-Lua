@@ -10,7 +10,7 @@ local response = false
 local localversion = 1.31
 local localKs = false
 async_http.init("raw.githubusercontent.com", "/Fewdys/GTA5-FewMod/main/FewModVersion.lua", function(output)
-    currentVer = tonumber(output)
+    currentVer = tostring(output)
     response = true
     if localversion ~= currentVer then
         util.toast("There is an update for FewMod available, use the Update Button to update it.")
