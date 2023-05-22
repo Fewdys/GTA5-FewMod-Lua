@@ -7766,7 +7766,6 @@ OBJgun = menu.toggle_loop(objgun, "Custom Object Gun", {"objgun"}, "Fires the ob
         local camcoords = get_offset_from_gameplay_camera(13)
         objshots(hash, obj, camcoords)
         entities.delete_by_handle(obj.prev)
-        util.yield(10)
     end
 end)
 
