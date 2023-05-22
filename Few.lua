@@ -5519,6 +5519,7 @@ local fun = menu.list(uwuself, "Fun", {}, "Fun Stuff To Mess With")
 local misc = menu.list(uwustand, "Misc", {}, "Useful and fast shortcuts")
 --local update = menu.action(menu.my_root(), "Github Link", {}, "Link To Github For Manual Updates")
 local running = menu.divider(menu.my_root(), "Script Running")
+local versionnumber = menu.divider(menu.my_root(), "Version: "..localversion)
 
 util.toast("FewMod Loaded")
 util.log("FewMod Loaded")
