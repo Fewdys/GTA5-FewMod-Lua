@@ -5832,7 +5832,7 @@ inc_vehs = true
 local rbp = menu.ref_by_path
 
 local outfits = menu.list(selfc, "Outfits", {}, "")
-menu.hyperlink(outfits, "https://github.com/Fewdys/GTA5-NeptuniaCharacters/tree/main", {}, "The Link To The Outfits")
+menu.hyperlink(outfits, "Outfits Link", "https://github.com/Fewdys/GTA5-NeptuniaCharacters/tree/main")
 local neptunia = menu.list(outfits, "Neptunia Outfits", {}, "Outfits From Neptunia\n(Ingnore If You Dont Have Neptunia DLC)")
 local otheroutfits = menu.list(outfits, "Other Outfits", {}, "Other DLC Outfits")
 
