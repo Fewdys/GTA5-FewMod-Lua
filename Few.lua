@@ -16,6 +16,7 @@ async_http.init("raw.githubusercontent.com", "/Fewdys/GTA5-FewMod/main/FewModVer
         util.toast("There is an update for FewMod available, use the Update Button to update it.")
         menu.action(menu.my_root(), "Update Script", {}, "This Should Only Appear If The Script Is Not Up To Date\nGrabs The Newest Version Of Script From\nLink: https://github.com/Fewdys/GTA5-FewMod-Lua", function()
             async_http.init('raw.githubusercontent.com','/Fewdys/GTA5-FewMod/main/Few.lua',function(a)
+                util.yield_once()
                 local err = select(2,load(a))
                 if err then
                     util.toast("There was a issue updating FewMod, please update it manually from github.")
