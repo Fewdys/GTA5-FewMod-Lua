@@ -10136,9 +10136,9 @@ end)
 --------------------------------------------------------------------------------------------------------------------------------
 -- Misc
 
-menu.hyperlink(misc, "Github Link For Manul Updating", "https://github.com/Fewdys/GTA5-FewMod-Lua")
+menu.hyperlink(misc, "Github Link For Manual Updating", "https://github.com/Fewdys/GTA5-FewMod-Lua")
 
-menu.action(misc, "Alternative Auto Update FewMod", {}, "Grabs The Newest Version Of Script From \nLink: https://github.com/Fewdys/GTA5-FewMod-Lua", function()
+menu.action(misc, "Alternative - Update FewMod", {}, "Grabs The Newest Version Of Script From \nLink: https://github.com/Fewdys/GTA5-FewMod-Lua", function()
     async_http.init('raw.githubusercontent.com','/Fewdys/GTA5-FewMod/main/Few.lua',function(a)
         local err = select(2,load(a))
         if err then
