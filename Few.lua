@@ -8054,6 +8054,8 @@ menu.text_input(objgun, "Custom Object", {"cusobj"}, "Enter the model name of an
     end
 end, 'prop_keg_01')
 
+menu.hyperlink(objgun, "Objects/Props", "https://gtahash.ru")
+
 --------------------------------------------------------------------------------------------------------------------------------
 --Protections
 
