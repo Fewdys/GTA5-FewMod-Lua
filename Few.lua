@@ -14,7 +14,7 @@ async_http.init("raw.githubusercontent.com", "/Fewdys/GTA5-FewMod-Lua/main/FewMo
     response = true
     if localversion ~= currentVer then
         util.toast("There is an update for FewMod available, use the Update Button to update it.")
-        menu.action(menu.my_root(), "Update Script", {}, "This Should Only Appear If The Script Is Not Up To Date\nGrabs The Newest Version Of Script From\nLink: https://github.com/Fewdys/GTA5-FewMod-Lua", function()
+        menu.action(menu.my_root(), "Update Script", {}, "This Should Only Appear If The Script Is Not Up To Date\nGrabs The Newest Version Of Script From\nLink: https://github.com/Fewdys/GTA5-FewMod-Lua\n(Ignore If Already Updated)", function()
             async_http.init('raw.githubusercontent.com', '/Fewdys/GTA5-FewMod-Lua/main/Few.lua', function(u)
                 util.yield_once()
                 local err = select(2,load(u))
@@ -10125,7 +10125,9 @@ end)
 --------------------------------------------------------------------------------------------------------------------------------
 -- Misc
 
-menu.action(misc, "Alternative Manual Update FewMod", {}, "Grabs The Newest Version Of Script From \nLink: https://github.com/Fewdys/GTA5-FewMod-Lua", function()
+menu.hyperlink(misc, "Github Link For Manul Updating", "https://github.com/Fewdys/GTA5-FewMod-Lua")
+
+menu.action(misc, "Alternative Auto Update FewMod", {}, "Grabs The Newest Version Of Script From \nLink: https://github.com/Fewdys/GTA5-FewMod-Lua", function()
     async_http.init('raw.githubusercontent.com','/Fewdys/GTA5-FewMod/main/Few.lua',function(a)
         local err = select(2,load(a))
         if err then
