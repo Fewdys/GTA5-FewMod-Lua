@@ -6504,6 +6504,7 @@ local interiors = {
     {"Safe Space [AFK Room]", {x=-158.71494, y=-982.75885, z=149.13135}},
     {"Fewdy's Safe Space [AFK Room]", {x=-1640.46, y=-2999.04, z=-78.12}},
     {"Fewdy's Hideout", {x=2696.41, y=-386.14, z=-55.34}},
+    {"House Garage", {x=-1372.51, y=-474.71, z=31.59}},
     {"Torture Room", {x=147.170, y=-2201.804, z=4.688}},
     {"Mining Tunnels", {x=-595.48505, y=2086.4502, z=131.38136}},
     {"Omegas Garage", {x=2330.2573, y=2572.3005, z=46.679367}},
