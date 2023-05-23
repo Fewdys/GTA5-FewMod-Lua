@@ -6692,11 +6692,11 @@ local interiors = {
 
     local fewmodmisc = menu.list(uwuonline, "FewMod Misc", {}, "")
 
-    menu.action(fewmodmisc, "Fix Mission/Jobs", {"fixmissions"}, "Fixes Options You Might Have Enabled To Allow You To Play Missions/Jobs \n(NoRistrictedAreas)" function()
+    menu.action(fewmodmisc, "Fix Mission/Jobs", {"fixmissions"}, "Fixes Options You Might Have Enabled To Allow You To Play Missions/Jobs \n(NoRistrictedAreas)", function()
         menu.trigger_commands("norestrictedareas ".."off")
     end)
 
-    menu.action(fewmodmisc, "Undo Fixes For Mission", {"fixmissions"}, "Re-Enables Options It Disabled From 'Fix Missions/Jobs' \n(NoRistrictedAreas)" function()
+    menu.action(fewmodmisc, "Undo Fixes For Mission", {"fixmissions"}, "Re-Enables Options It Disabled From 'Fix Missions/Jobs' \n(NoRistrictedAreas)", function()
         menu.trigger_commands("norestrictedareas ".."off")
     end)
 
