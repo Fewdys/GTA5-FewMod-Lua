@@ -3084,7 +3084,7 @@ menu.toggle_loop(crashes, "Fragment Crash V1", {"FragmentCrashv1"}, "Skidded Fro
     local modelc = menu.list(crashes, "Model Crashes", {}, "")
 
 
-    menu.action(modelc, "FragText", {"FragTestCrashv2"}, "", function()
+    menu.action(modelc, "FragTest", {"FragTestCrashv2"}, "", function()
         Fewd.BlockSyncs(player_id, function()
             local object = entities.create_object(util.joaat("prop_fragtest_cnst_04"), ENTITY.GET_ENTITY_COORDS(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)))
             OBJECT.BREAK_OBJECT_FRAGMENT_CHILD(object, 1, false)
