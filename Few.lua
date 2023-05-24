@@ -6502,8 +6502,7 @@ end
 
 local interiors = {
     {"Safe Space [AFK Room]", {x=-158.71494, y=-982.75885, z=149.13135}, ""},
-    {"Fewdy's Safe Space [AFK Room]", {x=-1640.46, y=-2999.04, z=-78.12}, "Must Own The NightClub Closest To The Main Airport For This One To Work"},
-    {"Fewdy's Hideout", {x=2696.41, y=-386.14, z=-55.34}, ""},
+    {"Hideout", {x=2696.41, y=-386.14, z=-55.34}, ""},
     {"Open Space", {x=360.54, y=-1011.98, z=29.31}, ""},
     {"Open Space v2", {x=1484.25, y=-1904.02, z=71.73}, ""},
     {"Leave Me Be", {x=-1599.43, y=5197.92, z=4.31}, ""},
