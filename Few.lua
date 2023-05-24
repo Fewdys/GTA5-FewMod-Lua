@@ -6507,6 +6507,7 @@ local interiors = {
     {"Open Space v2", {x=1484.25, y=-1904.02, z=71.73}, ""},
     {"Leave Me Be", {x=-1599.43, y=5197.92, z=4.31}, ""},
     {"Military Base Tower", {x=-2360.53, y=3244.87, z=92.90}, ""},
+    {"Broken FIB Building", {x=151.58, y=-741.82, z=254.15}, ""},
     {"Centry Manor Hotel Garage", {x=-69.80, y=356.14, z=112.44}, ""},
     {"Couch Place", {x=-1199.88, y=-180.54, z=39.33}, ""},
     {"Fleeca Bank", {x=146.10, y=-1038.33, z=29.36}, ""},
