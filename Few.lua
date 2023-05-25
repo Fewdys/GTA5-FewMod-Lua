@@ -7,7 +7,7 @@ util.require_natives(1676318796)
 util.require_natives(1663599433)
 
 local response = false
-local localversion = 1.35
+local localversion = 1.36
 local localKs = false
 async_http.init("raw.githubusercontent.com", "/Fewdys/GTA5-FewMod-Lua/main/FewModVersion.lua", function(output)
     currentVer = tonumber(output)
@@ -828,6 +828,37 @@ menu.action(Few, "Find In Player History", {""}, "Shortcut to Player History For
     end
 end)
 
+local function player_chat_options(player_id, menu_list)
+
+    menu.action(Few, "Send Private Chat Message", {"chatto"}, "Sends Message To This Player Only",
+        function (click_type)
+            menu.show_command_box_click_based(click_type, "chatto" .. players.get_name(player_id) .. " ")
+        end,
+        function (txt)
+            local from = players.user()
+            local me = players.user()
+            local to = player_id
+            local message = txt
+
+            chat.send_targeted_message(to, from, message, false)
+            chat.send_targeted_message(me, from, '(shows for you and ' .. players.get_name(to) .. ') ' .. message, false)
+        end
+    )
+
+    menu.action(Few, "Send Message To Everyone Except This Player", {"chatexcept"}, "Sends To Everyone But This Player",
+        function (click_type)
+            menu.show_command_box_click_based(click_type, "chatexcept" .. players.get_name(player_id) .. " ")
+        end,
+        function (txt)
+            for k,v in pairs(players.list(true, true, true)) do
+                if v ~= player_id then
+                    chat.send_targeted_message(v, players.user(), txt, false)
+                end
+            end
+        end
+    )
+end
+
     menu.action(menu.player_root(player_id), "Breakup Kick", {}, "Stand's Breakup Kick", function()
         menu.trigger_commands("breakup"..PLAYER.GET_PLAYER_NAME(player_id))
     end)
@@ -941,6 +972,63 @@ end)
             )
             menu.set_value(freeze_toggle, false)
         end
+    end)
+
+    local function load_weapon_asset(hash)
+        while not WEAPON.HAS_WEAPON_ASSET_LOADED(hash) do
+            WEAPON.REQUEST_WEAPON_ASSET(hash)
+            util.yield(50)
+        end
+    end
+
+    local function passive_mode_kill(player_id)
+        local ped = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)
+        local hash = 0x787F0BB
+    
+        local audible = true
+        local visible = true
+    
+        load_weapon_asset(hash)
+        
+        for i = 0, 50 do
+            if PLAYER.IS_PLAYER_DEAD(player_id) then
+                util.toast("Successfully Killed " .. players.get_name(player_id))
+                return
+            end
+    
+            local coords = ENTITY.GET_ENTITY_COORDS(ped)
+            MISC.SHOOT_SINGLE_BULLET_BETWEEN_COORDS(coords.x, coords.y, coords.z, coords.x, coords.y, coords.z - 2, 100, 0, hash, 0, audible, not visible, 2500)
+            
+            util.yield(10)
+        end
+    
+        util.toast("Could Not Kill " .. players.get_name(player_id) .. ". \nPlayer Either Can't Be Ragdolled Or Is In GodMode")
+    end
+
+    local function send_player_vehicle_flying(player_id)
+        local ped = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)
+        local vehicle = PED.GET_VEHICLE_PED_IS_IN(ped, false)
+    
+        if vehicle == 0 then
+            return
+        end
+    
+        NETWORK.NETWORK_REQUEST_CONTROL_OF_ENTITY(vehicle)
+    
+        if NETWORK.NETWORK_HAS_CONTROL_OF_ENTITY(vehicle) then
+            ENTITY.APPLY_FORCE_TO_ENTITY_CENTER_OF_MASS(vehicle, 1, 0, 100, 40, true, true, true, true)
+            util.toast("Launched" .. players.get_name(player_id) .. "'s Vehicle")
+        else
+            util.toast("Couln't Get Control Of " .. players.get_name(player_id) .. "'s Vehicle")
+        end
+    end
+
+    menu.action(trolling, "Passive Mode kill", {}, "(DOESN'T WORK ON NO RAGDOLL PLAYERS) Kills The Player in Passive Mode", function ()
+        passive_mode_kill(player_id)
+    end)
+
+    menu.action(trolling, "Launch Vehicle", {"vehiclefly"}, "Sends players vehicle flying", function()
+        send_player_vehicle_flying(player_id)
     end)
 
     menu.action(trolling, "Cage Vehicle", {"cage"}, "", function()
