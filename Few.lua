@@ -7,7 +7,7 @@ util.require_natives(1676318796)
 util.require_natives(1663599433)
 
 local response = false
-local localversion = 1.36
+local localversion = 1.37
 local localKs = false
 async_http.init("raw.githubusercontent.com", "/Fewdys/GTA5-FewMod-Lua/main/FewModVersion.lua", function(output)
     currentVer = tonumber(output)
@@ -794,6 +794,10 @@ local function get_blip_coords(blipId)
     return v3(0, 0, 0)
 end
 
+local function PM(player_id, message)
+    menu.trigger_commands("sendpm"..PLAYER.GET_PLAYER_NAME(player_id).." "..message)
+end
+
 players.on_join(function(player_id)
 
     menu.divider(menu.player_root(player_id), "Lua Shit")
@@ -808,9 +812,17 @@ players.on_join(function(player_id)
     local chats = menu.list(Few, "Chat Options", {}, "")
     util.yield_once()
 
-    menu.action(chats, "Send Private Chat Message", {"chat"}, "Sends Message To This Player Only", function()
-        menu.trigger_commands("sendpm"..PLAYER.GET_PLAYER_NAME(player_id))
-    end)
+    menu.action(chats, "Send Private Chat Message", {"PM"}, "Sends Message To This Player Only", 
+    function (click_type)
+        menu.show_command_box_click_based(click_type, "PM" .. PLAYER.GET_PLAYER_NAME(player_id) .. " ")
+    end,
+    function (txt)
+        local from = players.user()
+        local me = players.user()
+        local message = txt
+        PM(player_id, message)
+    end
+    )
 
 menu.action(Few, "Block Player / Player Join", {"block"}, "Shortcut to Blocking The Player Join Reaction", function()
     if player_id ~= players.user() then
