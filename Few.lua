@@ -8494,6 +8494,24 @@ function Changeneon(player_id, color)
 
 end
 
+local veh_speed = menu.list(uwuvehicle, "Vehicle Speed", {}, "Allows You To Edit Torque Of Vehicle Aka The Speed")
+
+local num_for_torque = 500 --default torque value
+menu.slider(veh_speed, "Torque Speed", {"torquespeed"}, "Default Is 500", 1, 2147483647, 500, 1, function(s)
+	num_for_torque = s
+end)
+
+menu.toggle_loop(veh_speed, "Torque Toggle", {"torquetoggle"}, "", function()
+    local veh = entities.get_user_vehicle_as_handle()
+    if veh ~= nil then
+        if not NETWORK.NETWORK_HAS_CONTROL_OF_ENTITY(veh) then
+            NETWORK.NETWORK_REQUEST_CONTROL_OF_ENTITY(veh)
+        end
+        VEHICLE.MODIFY_VEHICLE_TOP_SPEED(veh, num_for_torque)
+        ENTITY.SET_ENTITY_MAX_SPEED(veh, num_for_torque)
+    end
+end)
+
 local rgbvm = menu.list(vehicles, "RGB Vehicle", {}, "Allows For RGB Neons ect.")
 local rgb = {cus = 100}
 
