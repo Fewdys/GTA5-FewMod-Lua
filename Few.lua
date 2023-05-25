@@ -808,32 +808,8 @@ players.on_join(function(player_id)
     local chats = menu.list(Few, "Chat Options", {}, "")
     util.yield_once()
 
-    menu.action(chats, "Send Private Chat Message", {"chatto"}, "Sends Message To This Player Only",
-        function (click_type)
-            menu.show_command_box_click_based(click_type, "chatto" .. players.get_name(player_id) .. " ")
-        end,
-        function (txt)
-            local from = players.user()
-            local me = players.user()
-            local to = player_id
-            local message = txt
-
-            chat.send_targeted_message(to, from, message, false)
-            chat.send_targeted_message(me, from, '(shows for you and ' .. players.get_name(to) .. ') ' .. message, false)
-        end
-    )
-
-    menu.action(chats, "Send Message To Everyone Except This Player", {"chatexcept"}, "Sends To Everyone But This Player",
-        function (click_type)
-            menu.show_command_box_click_based(click_type, "chatexcept" .. players.get_name(player_id) .. " ")
-        end,
-        function (txt)
-            for k,v in pairs(players.list(true, true, true)) do
-                if v ~= player_id then
-                    chat.send_targeted_message(v, players.user(), txt, false)
-                end
-            end
-        end
+    menu.action(chats, "Send Private Chat Message", {"chat"}, "Sends Message To This Player Only",
+            trigger_commands("sendpm"..PLAYER.GET_PLAYER_NAME(player_id))
     )
 
 menu.action(Few, "Block Player / Player Join", {"block"}, "Shortcut to Blocking The Player Join Reaction", function()
