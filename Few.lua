@@ -809,7 +809,7 @@ players.on_join(function(player_id)
     util.yield_once()
 
     menu.action(chats, "Send Private Chat Message", {"chat"}, "Sends Message To This Player Only",
-            trigger_commands("sendpm"..PLAYER.GET_PLAYER_NAME(player_id))
+        menu.trigger_commands("sendpm"..PLAYER.GET_PLAYER_NAME(player_id))
     )
 
 menu.action(Few, "Block Player / Player Join", {"block"}, "Shortcut to Blocking The Player Join Reaction", function()
