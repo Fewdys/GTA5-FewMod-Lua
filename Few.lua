@@ -794,7 +794,6 @@ local function get_blip_coords(blipId)
     return v3(0, 0, 0)
 end
 
-util.yield_once()
 players.on_join(function(player_id)
 
     menu.divider(menu.player_root(player_id), "Lua Shit")
@@ -807,6 +806,7 @@ players.on_join(function(player_id)
     local attachc = menu.list(Few, "Misc")
 
     local chats = menu.list(Few, "Chat Options", {}, "")
+    util.yield_once()
 
     menu.action(chats, "Send Private Chat Message", {"chatto"}, "Sends Message To This Player Only",
         function (click_type)
