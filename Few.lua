@@ -7,7 +7,7 @@ util.require_natives(1676318796)
 util.require_natives(1663599433)
 
 local response = false
-local localversion = 1.34
+local localversion = 1.35
 local localKs = false
 async_http.init("raw.githubusercontent.com", "/Fewdys/GTA5-FewMod-Lua/main/FewModVersion.lua", function(output)
     currentVer = tonumber(output)
@@ -794,6 +794,22 @@ local function get_blip_coords(blipId)
     return v3(0, 0, 0)
 end
 
+EventData = memory.alloc(8*56)
+
+local ReadInt = memory.read_int
+local ReadShort = memory.read_short
+local ReadByte = memory.read_byte
+local ReadFloat = memory.read_float
+local ReadLong = memory.read_long
+local WriteInt = memory.write_int
+local WriteShort = memory.write_short
+local WriteByte = memory.write_byte
+local WriteFloat = memory.write_float
+local WriteLong = memory.write_float
+local Alloc = memory.alloc
+local SpoofScript = util.spoof_script
+
+util.yield_once()
 players.on_join(function(player_id)
 
     menu.divider(menu.player_root(player_id), "Lua Shit")
@@ -5903,6 +5919,28 @@ local veh_things = {
     "minitank",
     "rcbandito"
 }
+
+--[[BOOL (bool)]] local function GetEventData(--[[int]] eventGroup,--[[int]] eventIndex,--[[Any* (pointer)]] eventData,--[[int]] eventDataSize)native_invoker.begin_call()native_invoker.push_arg_int(eventGroup)native_invoker.push_arg_int(eventIndex)native_invoker.push_arg_pointer(eventData)native_invoker.push_arg_int(eventDataSize)native_invoker.end_call_2(0x2902843FCD2B2D79)return native_invoker.get_return_value_bool()end
+--[[int]] local function GetNumberOfEvents(--[[int]] eventGroup)native_invoker.begin_call()native_invoker.push_arg_int(eventGroup)native_invoker.end_call_2(0x5F92A689A06620AA)return native_invoker.get_return_value_int()end
+--[[int]] local function GetEventAtIndex(--[[int]] eventGroup,--[[int]] eventIndex)native_invoker.begin_call()native_invoker.push_arg_int(eventGroup)native_invoker.push_arg_int(eventIndex)native_invoker.end_call_2(0xD8F66A3A60C62153)return native_invoker.get_return_value_int()end
+
+local desync_detect
+        desync_detect = menu.toggle_loop(detections, "Desync Kick", {}, "Detects when another player in the session is desync kicked by a modder (may not be accurate 100% of the time)", function()
+            for i = 0, GetNumberOfEvents(1) do
+                local event = GetEventAtIndex(1, i)
+                if event == 154 and GetEventData(1, i, EventData, 56) then
+                    local args = {}
+                    for i = 0, 56 do
+                        table.insert(args, ReadInt(EventData + i * 8))                
+                    end
+    
+                    if args[56] == -32765 then
+                        Fewd.DesyncData.Active = desync_detect.value
+                        Fewd.DesyncData.Detected = true
+                    end
+                end
+            end
+        end)
 
 menu.toggle_loop(detections, "Non-Buyable/Unreleased/Modded Vehicles", {}, "Detects if a player has a Non-Buyable, Unreleased or Modded Vehicle", function()
     for _, player_id in ipairs(players.list(false, true, true)) do
