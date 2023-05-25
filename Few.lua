@@ -808,9 +808,9 @@ players.on_join(function(player_id)
     local chats = menu.list(Few, "Chat Options", {}, "")
     util.yield_once()
 
-    menu.action(chats, "Send Private Chat Message", {"chat"}, "Sends Message To This Player Only",
+    menu.action(chats, "Send Private Chat Message", {"chat"}, "Sends Message To This Player Only", function()
         menu.trigger_commands("sendpm"..PLAYER.GET_PLAYER_NAME(player_id))
-    )
+    end)
 
 menu.action(Few, "Block Player / Player Join", {"block"}, "Shortcut to Blocking The Player Join Reaction", function()
     if player_id ~= players.user() then
