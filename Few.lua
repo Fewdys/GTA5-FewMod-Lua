@@ -16509,8 +16509,8 @@ elseif filesystem.exists(resources_dir) then
         tachometer_y_pos = s * 0.001
     end)
 
-    gear_x_pos = 0.814
-    menu.slider_float(Speedometer, "Gears-X", {}, "", 0, 1000, 814, 1, function(s)
+    gear_x_pos = 0.809
+    menu.slider_float(Speedometer, "Gears-X", {}, "", 0, 1000, 809, 1, function(s)
         gear_x_pos = s * 0.001
     end)
 
