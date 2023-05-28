@@ -16570,7 +16570,7 @@ elseif filesystem.exists(resources_dir) then
                 -- rpm needle
                 directx.draw_texture(needle, 0.023, 0.023, 0.88, 0.125, tachometer_x_pos, tachometer_y_pos, tach_rotation, white)
                 -- rpm text
-                directx.draw_text(tachometer_x_pos, tachometer_y_pos+0.05, math.ceil(rpm*6000), 5, 0.8, white, true)
+                directx.draw_text(tachometer_x_pos, tachometer_y_pos+0.05, math.ceil(rpm*6756), 5, 0.8, white, true)
                 -- gear text 
                 gear = entities.get_current_gear(v_hdl)
                 if gear == 0 and vecs.y < 0 then
