@@ -10286,9 +10286,40 @@ menu.toggle(misc, "Stand ID", {}, "It makes you invisible to other stand users, 
 end)
 
 util.on_stop(function ()
+    VEHICLE.SET_VEHICLE_REDUCE_GRIP(veh, false)
     VEHICLE.SET_VEHICLE_GRAVITY(veh, true)
     ENTITY.SET_ENTITY_COLLISION(veh, true, true);
     util.toast("Cleaning...")
+    local ct = 0
+        for k,ent in pairs(entities.get_all_vehicles_as_handles()) do
+            local driver = VEHICLE.GET_PED_IN_VEHICLE_SEAT(ent, -1)
+            if not PED.IS_PED_A_PLAYER(driver) then
+                entities.delete_by_handle(ent)
+                ct += 1
+            end
+        end
+        for k,ent in pairs(entities.get_all_peds_as_handles()) do
+            if not PED.IS_PED_A_PLAYER(ent) then
+                entities.delete_by_handle(ent)
+            end
+            ct += 1
+        end
+        for k,ent in pairs(entities.get_all_objects_as_handles()) do
+            entities.delete_by_handle(ent)
+            ct += 1
+        end
+        for i, entity in pairs(entities.get_all_objects_as_handles()) do
+            request_control2(entity)
+            entities.delete_by_handle(entity) 
+        end
+        local rope_alloc = memory.alloc(4)
+        for i=0, 100 do 
+            memory.write_int(rope_alloc, i)
+            if PHYSICS.DOES_ROPE_EXIST(rope_alloc) then   
+                PHYSICS.DELETE_ROPE(rope_alloc)
+                ct += 1
+            end
+        end
 end)
 
 -------------------------------------------------------------------------------------------------------------------------------------------------------
