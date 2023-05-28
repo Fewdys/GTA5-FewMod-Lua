@@ -7,7 +7,7 @@ util.require_natives(1676318796)
 util.require_natives(1663599433)
 
 local response = false
-local localversion = 1.37
+local localversion = 1.38
 local localKs = false
 async_http.init("raw.githubusercontent.com", "/Fewdys/GTA5-FewMod-Lua/main/FewModVersion.lua", function(output)
     currentVer = tonumber(output)
@@ -8532,7 +8532,7 @@ end)
 --------------------------------------------------------------------------------------------------------------------------------
 
  --==Vehicles==-- 
-menu.toggle_loop(uwuvehicle, "Object Collision", {"ghostobjects"}, "Disables collisions with objects", function()
+menu.toggle_loop(uwuvehicle, "Object Collision", {"ghostobjects"}, "Disables collisions with objects \nPlease Note: This Might Effect Constructor Related Things Aswell", function()
     local user = players.user_ped()
     local veh = PED.GET_VEHICLE_PED_IS_USING(user)
     local my_ents = {user, veh}
@@ -16372,8 +16372,246 @@ menu.action(uwuself, "Stop all sounds", {"stopsounds"}, "", function()
 end)
 
 --------------------------------------------------------------------------------------------------------------------------------------------------------
+
+local resources_dir = filesystem.scripts_dir() .. '\\FewMod\\'.. '\\textures\\'
+local needletexture = filesystem.scripts_dir() .. '\\FewMod\\'.. '\\textures\\'.. '\\needle.png'
+local speedometercasetex = filesystem.scripts_dir() .. '\\FewMod\\'.. '\\textures\\'.. '\\speedometer_case.png'
+local checkenginelighttex = filesystem.scripts_dir() .. '\\FewMod\\'.. '\\textures\\'.. '\\check_engine.png'
+local tachcasetex = filesystem.scripts_dir() .. '\\FewMod\\'.. '\\textures\\'.. '\\tach_case.png'
+local highbeamtexture = filesystem.scripts_dir() .. '\\FewMod\\'.. '\\textures\\'.. '\\highbeam.png'
+local lowbeamtexture = filesystem.scripts_dir() .. '\\FewMod\\'.. '\\textures\\'.. '\\lowbeam.png'
+local tpmstexture = filesystem.scripts_dir() .. '\\FewMod\\'.. '\\textures\\'.. '\\tpms.png'
+local tractiontexture = filesystem.scripts_dir() .. '\\FewMod\\'.. '\\textures\\'.. '\\traction.png'
+
+Speedometer = menu.list(uwuvehicle, "Speedometer", {}, "", function();end)
+
+white = {
+    r = 1,
+    g = 1,
+    b = 1,
+    a = 1.0
+}
+
+orange = {
+    r = 1.0,
+    g = 0.5,
+    b = 0,
+    a = 1
+}
+
+blue = {
+    r = 0, 
+    g = 0, 
+    b = 1, 
+    a = 1
+}
+
+green = {
+    r = 0, 
+    g = 1, 
+    b = 0, 
+    a = 1
+}
+
+if not filesystem.exists(resources_dir) then
+    util.toast("You Are Missing The FewMod Folder & or Required Textures, Please Install It From Github Using The Hyperlink Found In Stand>Misc \nhttps://github.com/Fewdys/GTA5-FewMod-Lua")
+    util.log("You Are Missing The FewMod Folder & or Required Textures, Please Install It From Github Using The Hyperlink Found In Stand>Misc \nhttps://github.com/Fewdys/GTA5-FewMod-Lua")
+    util.yield(300)
+    goto posextention
+elseif filesystem.exists(resources_dir) then
+
+    if not filesystem.exists(needletexture) then
+        util.toast("You Are Missing The Texture 'needle.png' in FewMod/textures Please Ensure To Install It. \nhttps://github.com/Fewdys/GTA5-FewMod-Lua")
+        util.log("You Are Missing The Texture 'needle.png' in FewMod/textures Please Ensure To Install It. \nhttps://github.com/Fewdys/GTA5-FewMod-Lua")
+    elseif filesystem.exists(needletexture) then
+    needle = directx.create_texture(resources_dir .. 'needle.png')
+    end
+
+    if not filesystem.exists(speedometercasetex) then
+        util.toast("You Are Missing The Texture 'speedometer_case.png' in FewMod/textures Please Ensure To Install It. \nhttps://github.com/Fewdys/GTA5-FewMod-Lua")
+        util.log("You Are Missing The Texture 'speedometer_case.png' in FewMod/textures Please Ensure To Install It. \nhttps://github.com/Fewdys/GTA5-FewMod-Lua")
+    elseif filesystem.exists(speedometercasetex) then
+    speedometer_case = directx.create_texture(resources_dir .. 'speedometer_case.png')
+    end
+
+    if not filesystem.exists(checkenginelighttex) then
+        util.toast("You Are Missing The Texture 'check_engine.png' in FewMod/textures Please Ensure To Install It. \nhttps://github.com/Fewdys/GTA5-FewMod-Lua")
+        util.log("You Are Missing The Texture 'check_engine.png' in FewMod/textures Please Ensure To Install It. \nhttps://github.com/Fewdys/GTA5-FewMod-Lua")
+    elseif filesystem.exists(checkenginelighttex) then
+    check_engine_light = directx.create_texture(resources_dir .. 'check_engine.png')
+    end
+
+    if not filesystem.exists(checkenginelighttex) then
+        util.toast("You Are Missing The Texture 'check_engine.png' in FewMod/textures Please Ensure To Install It. \nhttps://github.com/Fewdys/GTA5-FewMod-Lua")
+        util.log("You Are Missing The Texture 'check_engine.png' in FewMod/textures Please Ensure To Install It. \nhttps://github.com/Fewdys/GTA5-FewMod-Lua")
+    elseif filesystem.exists(checkenginelighttex) then
+    check_engine_light = directx.create_texture(resources_dir .. 'check_engine.png')
+    end
+
+    if not filesystem.exists(tachcasetex) then
+        util.toast("You Are Missing The Texture 'tach_case.png' in FewMod/textures Please Ensure To Install It. \nhttps://github.com/Fewdys/GTA5-FewMod-Lua")
+        util.log("You Are Missing The Texture 'tach_case.png' in FewMod/textures Please Ensure To Install It. \nhttps://github.com/Fewdys/GTA5-FewMod-Lua")
+    elseif filesystem.exists(tachcasetex) then
+    tach_case = directx.create_texture(resources_dir .. 'tach_case.png')
+    end
+
+    if not filesystem.exists(highbeamtexture) then
+        util.toast("You Are Missing The Texture 'highbeam.png' in FewMod/textures Please Ensure To Install It. \n https://github.com/Fewdys/GTA5-FewMod-Lua")
+        util.log("You Are Missing The Texture 'highbeam.png' in FewMod/textures Please Ensure To Install It. \n https://github.com/Fewdys/GTA5-FewMod-Lua")
+    elseif filesystem.exists(highbeamtexture) then
+    high_beam = directx.create_texture(resources_dir .. 'highbeam.png')
+    end
+
+    if not filesystem.exists(lowbeamtexture) then
+        util.toast("You Are Missing The Texture 'lowbeam.png' in FewMod/textures Please Ensure To Install It. \nhttps://github.com/Fewdys/GTA5-FewMod-Lua")
+        util.log("You Are Missing The Texture 'lowbeam.png' in FewMod/textures Please Ensure To Install It. \nhttps://github.com/Fewdys/GTA5-FewMod-Lua")
+    elseif filesystem.exists(lowbeamtexture) then
+    low_beam = directx.create_texture(resources_dir .. 'lowbeam.png')
+    end
+
+    if not filesystem.exists(tpmstexture) then
+        util.toast("You Are Missing The Texture 'tpms.png' in FewMod/textures Please Ensure To Install It. \nhttps://github.com/Fewdys/GTA5-FewMod-Lua")
+        util.log("You Are Missing The Texture 'tpms.png' in FewMod/textures Please Ensure To Install It. \nhttps://github.com/Fewdys/GTA5-FewMod-Lua")
+    elseif filesystem.exists(tpmstexture) then
+    tpms = directx.create_texture(resources_dir .. 'tpms.png')
+    end
+
+    if not filesystem.exists(tractiontexture) then
+        util.toast("You Are Missing The Texture 'traction.png' in FewMod/textures Please Ensure To Install It. \nhttps://github.com/Fewdys/GTA5-FewMod-Lua")
+        util.log("You Are Missing The Texture 'traction.png' in FewMod/textures Please Ensure To Install It. \nhttps://github.com/Fewdys/GTA5-FewMod-Lua")
+    elseif filesystem.exists(tractiontexture) then
+    traction_control = directx.create_texture(resources_dir .. 'traction.png')
+    end
+
+    unit = 1
+    menu.list_select(Speedometer, "Units", {"units"}, "", {"MPH", "KPH"}, 1, function(index)
+        unit = index 
+    end)
+
+    speedometer_x_pos = 0.750
+    menu.slider_float(Speedometer, "MPH-X", {}, "", 0, 1000, 750, 1, function(s)
+        speedometer_x_pos = s * 0.001
+    end)
+
+    speedometer_y_pos = 0.800
+    menu.slider_float(Speedometer, "MPY-Y", {}, "", 0, 1000, 800, 1, function(s)
+        speedometer_y_pos = s * 0.001
+    end)
+
+
+    tachometer_x_pos = 0.870
+    menu.slider_float(Speedometer, "RPM-X", {}, "", 0, 1000, 870, 1, function(s)
+        tachometer_x_pos = s * 0.001
+    end)
+
+    tachometer_y_pos = 0.818
+    menu.slider_float(Speedometer, "RPM-Y", {}, "", 0, 1000, 818, 1, function(s)
+        tachometer_y_pos = s * 0.001
+    end)
+
+    gear_x_pos = 0.814
+    menu.slider_float(Speedometer, "Gears-X", {}, "", 0, 1000, 814, 1, function(s)
+        gear_x_pos = s * 0.001
+    end)
+
+    gear_y_pos = 0.870
+    menu.slider_float(Speedometer, "Gears-Y", {}, "", 0, 1000, 870, 1, function(s)
+        gear_y_pos = s * 0.001
+    end)
+
+    lights_x_pos = 0.710
+    menu.slider_float(Speedometer, "Blinkers/Lights-X", {}, "", 0, 1000, 710, 1, function(s)
+        lights_x_pos = s * 0.001
+    end)
+
+    lights_y_pos = 0.920
+    menu.slider_float(Speedometer, "Blinkers/Lights-Y", {}, "", 0, 1000, 920, 1, function(s)
+        lights_y_pos = s * 0.001
+    end)
+
+    menu.toggle(Speedometer, "Speedometer", {"speedmeter"}, "", function(state)
+        UItoggle = state
+        local lights, high_lights = memory.alloc_int(), memory.alloc_int()
+        while UItoggle do 
+            vehicle = PED.GET_VEHICLE_PED_IS_IN(players.user_ped(), false)
+            if vehicle ~= 0 and PED.IS_PED_IN_ANY_VEHICLE(players.user_ped(), true) then 
+                local vecs = ENTITY.GET_ENTITY_SPEED_VECTOR(vehicle, true)
+                local v_hdl = entities.handle_to_pointer(vehicle)
+                local speed = ENTITY.GET_ENTITY_SPEED(vehicle)
+                local mph = speed * 2.236936
+                local kph = speed * 3.6
+                local max = VEHICLE.GET_VEHICLE_ESTIMATED_MAX_SPEED(vehicle)
+                local max_mph = max * 2.236936
+                local max_kph = max * 3.6
+
+                if unit == 1 then 
+                    measured_speed = mph 
+                    measured_max = max_mph
+                else
+                    measured_speed = kph 
+                    measured_max = max_kph
+                end
+                local speed_rotation = (measured_speed/measured_max)*0.32
+                if speed_rotation >= 0.75 then 
+                    speed_rotation = 0.75
+                end
+                local rpm = entities.get_rpm(v_hdl)
+                if rpm == 1 then 
+                    -- rev limiter simulation
+                    rpm = rpm + math.random(-2, 2)*0.01
+                end
+                local tach_rotation = rpm*0.45
+                directx.draw_texture(speedometer_case, 0.05, 0.05, 0.5, 0.5, speedometer_x_pos, speedometer_y_pos, 0, white)
+                directx.draw_texture(needle, 0.023, 0.023, 0.88, 0.125, speedometer_x_pos, speedometer_y_pos+0.015, speed_rotation, white)
+                -- speed text also i guess what
+                directx.draw_text(speedometer_x_pos, speedometer_y_pos+0.065, math.ceil(measured_speed), 5, 0.8, white, true)
+                -- rpm gauge
+                directx.draw_texture(tach_case, 0.05, 0.05, 0.5, 0.5, tachometer_x_pos, tachometer_y_pos-0.015, 0, white)
+                -- rpm needle
+                directx.draw_texture(needle, 0.023, 0.023, 0.88, 0.125, tachometer_x_pos, tachometer_y_pos, tach_rotation, white)
+                -- rpm text
+                directx.draw_text(tachometer_x_pos, tachometer_y_pos+0.05, math.ceil(rpm*6000), 5, 0.8, white, true)
+                -- gear text 
+                gear = entities.get_current_gear(v_hdl)
+                if gear == 0 and vecs.y < 0 then
+                    gear = "R"
+                end
+                if VEHICLE.GET_VEHICLE_ENGINE_HEALTH(vehicle) < 1000 then
+                    directx.draw_texture(check_engine_light, 0.01, 0.01, 0.5, 0.5, lights_x_pos, lights_y_pos, 0, orange)
+                end
+                VEHICLE.GET_VEHICLE_LIGHTS_STATE(vehicle, lights, high_lights)
+                if memory.read_byte(lights) == 1 then 
+                    if memory.read_byte(high_lights) == 1 then 
+                        directx.draw_texture(high_beam, 0.01, 0.01, 0.5, 0.5, lights_x_pos + 0.04, lights_y_pos, 0, blue)
+                    else
+                        directx.draw_texture(low_beam, 0.01, 0.01, 0.5, 0.5, lights_x_pos + 0.03, lights_y_pos, 0, green)
+                    end
+                end
+                any_tires_burst = false 
+                for i = 1, 4 do 
+                    if VEHICLE.IS_VEHICLE_TYRE_BURST(vehicle, i, false) then 
+                        any_tires_burst = true 
+                    end
+                end
+                if any_tires_burst then 
+                    directx.draw_texture(tpms, 0.01, 0.01, 0.5, 0.5, lights_x_pos + 0.08, lights_y_pos, 0, orange)
+                end
+
+                directx.draw_text(gear_x_pos, gear_y_pos, gear, 5, 1.2, white, true)
+                if VEHICLE.IS_VEHICLE_IN_BURNOUT(vehicle) or math.abs(vecs.x) > 3 then 
+                    directx.draw_texture(traction_control, 0.01, 0.01, 0.5, 0.5, lights_x_pos + 0.11, lights_y_pos, 0, orange)
+                end
+        
+            end
+            util.yield()
+        end
+    end)
+end
+
 --------------------------------------------------------------------------------------------------------------------------------------------------------
 --------------------------------------------------------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------------------------------------------------------------
+::posextention::
 
 menu.divider(path, "Random Warping")
 
@@ -16416,7 +16654,7 @@ end)
 --------------------------------------------------------------------------------------------------------------------------------------------------------
 --------------------------------------------------------------------------------------------------------------------------------------------------------
 
-menu.divider(path, "Slight Offse")
+menu.divider(path, "Slight Offset")
 
 menu.toggle_loop(path, "Offset Position", {"offsetpos"}, "spoofs your position a slight offset from your actual ped when ADS'ing", function ()
 
