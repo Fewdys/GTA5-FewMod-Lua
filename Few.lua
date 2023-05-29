@@ -6647,7 +6647,7 @@ function infoverplaytoggle()
                 {
                     {"Model", util.reverse_joaat(ENTITY.GET_ENTITY_MODEL(ped))},
                     {"Area", util.get_label_text(ZONE.GET_NAME_OF_ZONE(player_pos.x, player_pos.y, player_pos.z))},
-                    {"Arms", hashToWeapon(WEAPON.GET_SELECTED_PED_WEAPON(ped))},
+                    {"Weapon", hashToWeapon(WEAPON.GET_SELECTED_PED_WEAPON(ped))},
                     {"Vehicle", checkValue(util.get_label_text(players.get_vehicle_model(pid)))}
                 }
             },
