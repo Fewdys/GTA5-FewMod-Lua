@@ -7,7 +7,7 @@ util.require_natives(1676318796)
 util.require_natives(1663599433)
 
 local response = false
-local localversion = 1.40
+local localversion = 1.39
 local localKs = false
 async_http.init("raw.githubusercontent.com", "/Fewdys/GTA5-FewMod-Lua/main/FewModVersion.lua", function(output)
     currentVer = tonumber(output)
@@ -10592,6 +10592,19 @@ attach_self = menu.list(pmenu, "Attach Stuff", {})
     end)
     menu.toggle(attach_self, "Offer Flower", {}, "", function(on)
         offer_flower(on)
+    end)
+
+    menu.toggle(pmenu, "Become A Cat", {}, "Change Into A Cat", function(on)
+        if on then
+            menu.trigger_commands("noguns")
+            util.yield(200)
+            menu.trigger_commands("accat01")
+        else
+            menu.trigger_commands("outfit1candydinka")
+            util.yield(0500)
+            menu.trigger_commands("randomoutfit")
+            menu.trigger_commands("allguns")
+        end
     end)
 
 menu.toggle(pmenu, "Become A Monekey", {}, "Change Into A Money", function(on)
