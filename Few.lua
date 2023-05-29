@@ -7,7 +7,7 @@ util.require_natives(1676318796)
 util.require_natives(1663599433)
 
 local response = false
-local localversion = 1.38
+local localversion = 1.39
 local localKs = false
 async_http.init("raw.githubusercontent.com", "/Fewdys/GTA5-FewMod-Lua/main/FewModVersion.lua", function(output)
     currentVer = tonumber(output)
@@ -6426,6 +6426,350 @@ menu.action(Noclip2T1, "Apply Recommended Profile", {}, "Apply changes to the le
     menu.set_value(rbp("Self>Movement>Levitation>Movement Ignores Pitch"), false)
 end)
 
+-----------------------------------------------------------------------------------------------------------------------
+
+--client resolution/aspect ratio
+local res_x, res_y = directx.get_client_size()
+local ASPECT_RATIO <const> = res_x/res_y
+
+--set position
+gui_x = 0
+gui_y = 0
+
+--settings element sizing & spacing
+name_h = 0.022
+padding = 0.008
+spacing = 0.003
+gui_w = 0.16
+
+--settings text sizing & spacing
+name_size = 0.52
+text_size = 0.41
+line_spacing = 0.0032
+
+local playerinformation = filesystem.scripts_dir() .. '\\FewMod\\'.. '\\textures\\'
+local maptex = filesystem.scripts_dir() .. '\\FewMod\\'.. '\\textures\\'.. '\\Map.png'
+local bliptex = filesystem.scripts_dir() .. '\\FewMod\\'.. '\\textures\\'.. '\\Blip.png'
+
+if not filesystem.exists(playerinformation) then
+    util.toast("You Are Missing The FewMod Folder & or Required Textures, Please Install It From Github Using The Hyperlink Found In Stand>Misc \nhttps://github.com/Fewdys/GTA5-FewMod-Lua")
+    util.log("You Are Missing The FewMod Folder & or Required Textures, Please Install It From Github Using The Hyperlink Found In Stand>Misc \nhttps://github.com/Fewdys/GTA5-FewMod-Lua")
+    util.yield(300)
+    goto skipplayerinformation
+elseif filesystem.exists(playerinformation) then
+
+    if not filesystem.exists(maptex) and not filesystem.exists(bliptex) then
+        util.toast("You Are Missing Textures For PlayerInformation in FewMod/textures Please Ensure To Install It. \nhttps://github.com/Fewdys/GTA5-FewMod-Lua")
+        util.log("You Are Missing Textures For PlayerInformation in FewMod/textures Please Ensure To Install It. \nhttps://github.com/Fewdys/GTA5-FewMod-Lua")
+    elseif filesystem.exists(maptex) and filesystem.exists(bliptex) then
+        textures = {
+            map = directx.create_texture(filesystem.scripts_dir() .. "FewMod/textures/Map.png"),
+            blip = directx.create_texture(filesystem.scripts_dir() .. "FewMod/textures/Blip.png")
+        }
+    end
+
+function drawRect(x, y, w, h, colour)
+    directx.draw_rect(x, y, w, h, 
+    {r = colour.r * colour.a, g = colour.g * colour.a, b = colour.b * colour.a, a = colour.a})
+end
+
+--settings border
+border_width = 0
+function border_widthd(on_change)
+    border_width = on_change/1000
+end
+
+--set infocolours
+infocolour = {
+    title_bar = {r = 0, g = 0, b = 0, a = 1},
+    background = {r = 0, g = 0, b = 0, a = 130/255},
+    health_bar = {r = 114/255, g = 204/255, b = 114/255, a = 150/255},
+    armour_bar = {r = 70/255, g = 136/255, b = 171/255, a = 150/255},
+    blip = {r = 1, g = 0, b = 0, a = 1},
+    map = {r = 1, g = 1, b = 1, a = 191/255},
+    name = {r = 1, g = 1, b = 1, a = 1},
+    label = {r = 1, g = 1, b = 1, a = 1},
+    info = {r = 1, g = 1, b = 1, a = 1},
+    border = {r = 1, g = 0, b = 1, a = 1}
+}
+
+function title_bar_color(on_change)
+    infocolour.title_bar = on_change
+end
+
+function drawBorder(x, y, width, height)
+    local border_x = border_width/ASPECT_RATIO
+    drawRect(x - border_x, y, width + border_x * 2, -border_width, infocolour.border) --top
+    drawRect(x, y, -border_x, height, infocolour.border) --left
+    drawRect(x + width, y, border_x, height, infocolour.border) --right
+    drawRect(x - border_x, y + height, width + border_x * 2, border_width, infocolour.border) --bottom
+end
+
+function roundNum(num, decimals)
+    local mult = 10^(decimals or 0)
+    return math.floor(num * mult + 0.5) / mult
+end
+
+--weapon function
+all_weapons = {}
+local temp_weapons = util.get_weapons()
+for a, b in pairs(temp_weapons) do
+    all_weapons[#all_weapons + 1] = {hash = b["hash"], label_key = b["label_key"]}
+end
+function hashToWeapon(hash) 
+    for k, v in pairs(all_weapons) do 
+        if v.hash == hash then 
+            return util.get_label_text(v.label_key)
+        end
+    end
+    return "Unarmed"
+end
+--boolean function
+function boolText(bool)
+    if bool then return "Yes" else return "No" end
+end
+--check function
+function checkValue(pInfo)
+    if pInfo == "" or pInfo == 0 or pInfo == nil or pInfo == "NULL" then return "None" else return pInfo end 
+end
+--format money
+function formatMoney(money)
+    local order = math.ceil(string.len(tostring(money))/3 - 1)
+    if order == 0 then return money end
+    return roundNum(money/(1000^order), 1)..({"K", "M", "B"})[order]
+end
+
+NETWORK1={
+    ["_NETWORK_SET_ENTITY_INVISIBLE_TO_NETWORK"]=function(--[[Entity (int)]] entity,--[[BOOL (bool)]] toggle)native_invoker.begin_call();native_invoker.push_arg_int(entity);native_invoker.push_arg_bool(toggle);native_invoker.end_call("F1CA12B18AEF5298");end,
+    ["_GET_ONLINE_VERSION"]=function()native_invoker.begin_call();native_invoker.end_call("FCA9373EF340AC0A");return native_invoker.get_return_value_string();end,
+    ["_NETWORK_GET_AVERAGE_LATENCY_FOR_PLAYER"]=--[[float]] function(--[[Player (int)]] player)native_invoker.begin_call();native_invoker.push_arg_int(player);native_invoker.end_call("D414BE129BB81B32");return native_invoker.get_return_value_float();end,
+    ["_SHUTDOWN_AND_LOAD_MOST_RECENT_SAVE"]=--[[BOOL (bool)]] function()native_invoker.begin_call();native_invoker.end_call("9ECA15ADFE141431");return native_invoker.get_return_value_bool();end,
+    ["NETWORK_GET_AVERAGE_LATENCY"]=function(...)return native_invoker.uno_float(0xD414BE129BB81B32,...)end,
+}
+
+function dec_to_ipv4(ip)
+	return string.format(
+		"%i.%i.%i.%i", 
+		ip >> 24 & 0xFF, 
+		ip >> 16 & 0xFF, 
+		ip >> 8  & 0xFF, 
+		ip 		 & 0xFF
+	)
+end
+
+handle_ptr = memory.alloc(13*8)
+
+local function pid_to_handle(player_id)
+    NETWORK.NETWORK_HANDLE_FROM_PLAYER(player_id, handle_ptr, 13)
+    return handle_ptr
+end
+
+function encode(text)
+	return string.gsub(text, "%s", "+")
+end
+
+function decode(text)
+	return string.gsub(text, "%+", " ")
+end
+
+local function ipcheckself(player_id)
+    if player_id == players.user() then return "Hidden" else return dec_to_ipv4(players.get_connect_ip(player_id)) end
+end
+
+local function interiorcheck(player_id)
+    if not players.is_in_interior(player_id) then return "Not In Interior" elseif players.is_in_interior(player_id) then return Fewd.get_interior_player_is_in(player_id) end
+end
+
+---@param player Player
+---@return boolean
+function is_player_passive(player)
+	if player ~= players.user() then
+		local address = memory.script_global(1894573 + (player * 608 + 1) + 8)
+		if address ~= NULL then return memory.read_byte(address) == 1 end
+	else
+		local address = memory.script_global(1574582)
+		if address ~= NULL then return memory.read_int(address) == 1 end
+	end
+	return false
+end
+
+local function is_player_modder(pid)
+    local suffix = players.is_marked_as_modder(pid) and " has set off modder detections." or " hasn't set off modder detections."
+    chat.send_message(players.get_name(pid) .. suffix,
+    true, -- is team chat
+    true, -- is in local history
+    false -- is networked
+    )
+end
+
+----main function
+function infoverplaytoggle()
+    local focused = players.get_focused()
+    if ((focused[1] ~= nil and focused[2] == nil) or render_window) and menu.is_open() then
+        --general info grabbing locals
+        local pid = focused[1]
+        local hdl = pid_to_handle(pid)
+        if render_window then pid = players.user() end
+        local ped = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(pid)
+        local my_pos, player_pos = players.get_position(players.user()), players.get_position(pid)
+    
+        --general element drawing locals
+        local spacing_x = spacing/ASPECT_RATIO
+        local padding_x = padding/ASPECT_RATIO
+        local player_list_y = gui_y + name_h + spacing
+        local total_w = gui_w + padding_x * 4
+        local heading = ENTITY.GET_ENTITY_HEADING(ped)
+        local regions = 
+        {
+            {
+                width = total_w/2,
+                content =
+                {
+                    {"Rank", players.get_rank(pid)},
+                    {"K/D", roundNum(players.get_kd(pid), 2)},
+                    {"Wallet", "$"..formatMoney(players.get_wallet(pid))},
+                    {"Bank", "$"..formatMoney(players.get_bank(pid))}
+                }
+            },
+            {
+                width = total_w/2,
+                content =
+                {
+                    {"Language", ({"English","French","German","Italian","Spanish","Brazilian","Polish","Russian","Korean","Traditional Chinese","Japanese","Mexican","Simplified Chinese"})[players.get_language(pid) + 1]},
+                    {"Controller", boolText(players.is_using_controller(pid))},
+                    {"Ping", math.floor(NETWORK1._NETWORK_GET_AVERAGE_LATENCY_FOR_PLAYER(pid) + 0.5).." ms"},
+                    {"Host Sequence", "#"..players.get_host_queue_position(pid)},
+                }
+            },
+            {
+                width = total_w + spacing_x,
+                content =
+                {
+                    {"Model", util.reverse_joaat(ENTITY.GET_ENTITY_MODEL(ped))},
+                    {"Area", util.get_label_text(ZONE.GET_NAME_OF_ZONE(player_pos.x, player_pos.y, player_pos.z))},
+                    {"Arms", hashToWeapon(WEAPON.GET_SELECTED_PED_WEAPON(ped))},
+                    {"Vehicle", checkValue(util.get_label_text(players.get_vehicle_model(pid)))}
+                }
+            },
+            {
+                width = total_w/2,
+                content =
+                {
+                    {"Distance", math.floor(MISC.GET_DISTANCE_BETWEEN_COORDS(player_pos.x, player_pos.y, player_pos.z, my_pos.x, my_pos.y, my_pos.z)).." m"},
+                    {"Speed", math.floor(ENTITY.GET_ENTITY_SPEED(ped) * 3.6).." km/h"},
+                    {"Torward", ({"North","West","South","East","West"})[math.ceil((heading + 45)/90)]..", "..math.ceil(heading).."°"}
+                }
+            },
+            {
+                width = total_w/2,
+                content =
+                {
+                    {"Organization", ({"None","CEO","MC"})[players.get_org_type(pid) + 2]},
+                    {"Wanted", PLAYER.GET_PLAYER_WANTED_LEVEL(pid).."/5"},
+                    {"Cutscene", boolText(NETWORK.IS_PLAYER_IN_CUTSCENE(pid))}
+                }
+            },
+            {
+                width = total_w + spacing_x,
+                content =
+                {
+                    {"Interior", boolText(players.is_in_interior(pid))},
+                    {"Interior ID", interiorcheck(pid)},
+                    {"Rockstar ID", checkValue(players.get_rockstar_id(pid))},
+                    {"Tags/Labels", checkValue(players.get_tags_string(pid))},
+                    {"IP", ipcheckself(pid)}
+                }
+            },
+            {
+                width = total_w/2,
+                content =
+                {
+                    {"GodMode", boolText(players.is_godmode(pid))},
+                    {"Passive Mode", boolText(is_player_passive(pid))},
+                    {"Attacked You", boolText(players.is_marked_as_attacker(pid))},
+                    {"Modder", boolText(players.is_marked_as_modder(pid))}
+                }
+            },
+            {
+                width = total_w/2,
+                content =
+                {
+                    {"Friend", boolText(NETWORK.NETWORK_IS_FRIEND(hdl))},
+                    {"Host", boolText(pid == players.get_host())},
+                    {"Script Host", boolText(pid == players.get_script_host())},
+                    {"Off The Radar", boolText(players.is_otr(pid))}
+                }
+            },
+        }
+
+        local font_w, font_h = directx.get_text_size("ABCDEFG", text_size)
+        local offset_x = 0
+        local offset_y = 0
+        for k, region in ipairs(regions) do
+            local count = 0
+            for _ in region.content do count = count + 1 end
+            local dict_h = count * (font_h + line_spacing) - line_spacing + padding * 2
+            drawBorder(gui_x + offset_x, player_list_y + offset_y, region.width, dict_h)
+            drawRect(gui_x + offset_x, player_list_y + offset_y, region.width, dict_h, infocolour.background)
+            local line_count = 0
+            for _, v in ipairs(region.content) do
+                directx.draw_text(
+                gui_x + offset_x + padding_x - 0.001, 
+                player_list_y + offset_y + padding + line_count * (font_h + line_spacing), 
+                v[1]..": ",
+                ALIGN_TOP_LEFT, 
+                text_size, 
+                infocolour.label
+                )
+                directx.draw_text(
+                gui_x + offset_x + region.width - padding_x - 0.001, 
+                player_list_y + offset_y + padding + line_count * (font_h + line_spacing), 
+                v[2], 
+                ALIGN_TOP_RIGHT, 
+                text_size, 
+                infocolour.info
+                )
+                line_count += 1
+            end
+            offset_x += region.width + spacing_x
+            if offset_x >= total_w then
+                offset_y += dict_h + spacing
+                offset_x = 0
+            end
+        end
+
+        local gui_h = offset_y - spacing
+        local bar_w = gui_h/50
+        local map_x = gui_x + total_w + spacing_x * 2
+        local map_w = gui_h/(898/590)/ASPECT_RATIO + 0.001
+        local map_w_total = map_w + padding_x * 3 + bar_w
+
+        drawBorder(gui_x, gui_y, total_w + spacing_x, name_h)
+        drawRect(gui_x, gui_y, total_w + spacing_x, name_h, infocolour.title_bar)
+        directx.draw_text(gui_x + total_w/2, gui_y + name_h/2, players.get_name(pid), ALIGN_CENTRE, name_size, infocolour.name)
+        drawBorder(map_x, gui_y, map_w_total, name_h)
+        drawRect(map_x, gui_y, map_w_total, name_h, infocolour.title_bar)
+        drawBorder(map_x, player_list_y, map_w_total, gui_h)
+        drawRect(map_x, player_list_y, map_w_total, gui_h, infocolour.background)
+        directx.draw_texture(textures.map, map_w/2, gui_h, 0.5, 0.5, map_x + padding_x * 2 + bar_w + map_w/2 , player_list_y + gui_h/2, 0, infocolour.map)
+        directx.draw_texture(textures.blip, 0.004, 0, 0.5, 0.5, map_x + padding_x * 2 + bar_w + ((player_pos.x + 4000)/8500) * map_w, player_list_y + (1 - (player_pos.y + 4000)/12000) * gui_h, (360 - heading)/360, infocolour.blip)
+
+        local armour_perc = PED.GET_PED_ARMOUR(ped)/PLAYER.GET_PLAYER_MAX_ARMOUR(pid)
+        local armour_bar_bg = {r = infocolour.armour_bar.r/2, g = infocolour.armour_bar.g/2, b = infocolour.armour_bar.b/2, a = infocolour.armour_bar.a}
+        drawRect(map_x + padding_x, player_list_y + gui_h/2 - padding/2, bar_w, -((gui_h - padding * 3)/2 * armour_perc), infocolour.armour_bar) --foreground
+        drawRect(map_x + padding_x, player_list_y + padding, bar_w, (gui_h - padding * 3)/2 * (1 - armour_perc), armour_bar_bg) --background
+
+        local health_min = ENTITY.GET_ENTITY_HEALTH(ped) - 100
+        if health_min < 0 then health_min = 0 end
+
+        local health_perc = health_min/(ENTITY.GET_ENTITY_MAX_HEALTH(ped) - 100)
+        local health_bar_bg = {r = infocolour.health_bar.r/2, g = infocolour.health_bar.g/2, b = infocolour.health_bar.b/2, a = infocolour.health_bar.a}
+
+        drawRect(map_x + padding_x, player_list_y + gui_h - padding, bar_w, -((gui_h - padding * 3)/2 * health_perc), infocolour.health_bar) --foreground
+        drawRect(map_x + padding_x, player_list_y + gui_h/2 + padding/2, bar_w, (gui_h - padding * 3)/2 * (1 - health_perc), health_bar_bg) --background
+    end
+end
+
 menu.toggle_loop(selfc, "Fast Roll", {"fastroll"}, "", function()
     STATS.STAT_SET_INT(util.joaat("MP"..util.get_char_slot().."_SHOOTING_ABILITY"), 350, true)
 end)
@@ -6652,10 +6996,10 @@ local interiors = {
     end)
 
     block_blaming = menu.ref_by_path("Online>Protections>Block Blaming")
-    menu.toggle_loop(online, "Disable Block Blaming While Shooting", {}, "Still keep the benefits of block blaming but also be able to deal damage to other players.", function()
+    menu.toggle_loop(online, "Disable Block Blaming While Shooting", {"blameaim"}, "Still keep the benefits of block blaming but also be able to deal damage to other players.", function(blame)
         if PLAYER.IS_PLAYER_FREE_AIMING(players.user()) then
             block_blaming.value = false
-        else
+        elseif not blame then
             block_blaming.value = true
         end
     end)
@@ -7057,14 +7401,7 @@ function do_label_preset(label, text)
     util.toast("Label Set!")
 end
 
-function encode(text)
-	return string.gsub(text, "%s", "+")
-end
-function decode(text)
-	return string.gsub(text, "%+", " ")
-end
-
-    local chat_trans = menu.list(online, "Chat Translator")
+local chat_trans = menu.list(online, "Chat Translator")
 
 settingtrad = menu.list(chat_trans, "Settings For Translation")
 
@@ -7198,6 +7535,88 @@ while run<10 do
 	util.yield()
 	run = run+1
 end
+
+play_info = menu.list(online, "Player Information Overlay", {}, "")
+players_info = menu.toggle_loop(play_info,"Toggle",{},"Turns The Player Information Overlay On\nUse Save Config For Other Options",function()
+    infoverplaytoggle()
+end)
+menu.set_value(players_info, config_active6)
+infoverplay = menu.list(play_info, "Options", {}, "")
+    menu.divider(infoverplay, "Location")
+    menu.slider_float(infoverplay, "X:", {"overlayx"}, "X Position Of The Overlay.", 0, 1000, 0, 1, function(s)
+        gui_x = s/1000
+    end)
+    menu.slider_float(infoverplay, "Y:", {"overlayy"}, "Y Position Of The Overlay.", 0, 1000, 0, 1, function(s)
+        gui_y = s/1000
+    end)
+    menu.divider(infoverplay, "Appearance")
+    colours = menu.list(infoverplay, "Overlay Color", {}, "")
+        menu.divider(colours, "Elements")
+        menu.colour(colours, "Title Color", {"overlaytitle_bar"}, "Color Of The Title.", infocolour.title_bar, true, function(on_change)
+            title_bar_color(on_change)
+        end)
+        menu.colour(colours, "Overlay Background Color", {"overlaybg"}, "Color Of The Background.", infocolour.background, true, function(on_change)
+            infocolour.background = on_change
+        end)
+        menu.colour(colours, "Health Color", {"overlayhealth_bar"}, "Color Of The Health.", infocolour.health_bar, true, function(on_change)
+            infocolour.health_bar = on_change
+        end)
+        menu.colour(colours, "Armour Color", {"overlayarmour_bar"}, "Color Of The Armour.", infocolour.armour_bar, true, function(on_change)
+            infocolour.armour_bar = on_change
+        end)
+        menu.colour(colours, "Blip Color", {"overlayblip"}, "Color Of The Blip.", infocolour.blip, true, function(on_change)
+            infocolour.blip = on_change
+        end)
+        menu.colour(colours, "Map Colour", {"overlaymap"}, "Colour of the map.", infocolour.map, true, function(on_change)
+            infocolour.map = on_change
+        end)
+        menu.divider(colours, "Text")
+        menu.colour(colours, "Name Color", {"overlayname"}, "Color Of The Name Text.", infocolour.name, true, function(on_change)
+            infocolour.name = on_change
+        end)
+        menu.colour(colours, "Label Color", {"overlaylabel"}, "Color Of The Label Text.", infocolour.label, true, function(on_change)
+            infocolour.label = on_change
+        end)
+        menu.colour(colours, "Informantion Color", {"overlayinfo"}, "Color Of The Info Text.", infocolour.info, true, function(on_change)
+            infocolour.info = on_change
+        end)
+    element_dim = menu.list(infoverplay, "Component Size & Spacing", {}, "")
+        menu.divider(element_dim, "Component Size & Spacing")
+        menu.slider(element_dim, "Title Bar Hieght", {}, "The Height of The Title Bar.", 0, 100, 22, 1, function(on_change)
+            name_h = on_change/1000
+        end)
+        menu.slider(element_dim, "Information Display Column Width", {}, "The Width Of The Text Window Minus The Width Of The Padding.", 0, 50, 16, 1, function(on_change)
+            gui_w = on_change/100
+        end)
+        menu.slider(element_dim, "Filling", {}, "Padding Around Info Text.", 0, 30, 8, 1, function(on_change)
+            padding = on_change/1000
+        end)
+        menu.slider(element_dim, "Interval", {}, "Spacing Between Different Elements.", 0, 20, 3, 1, function(on_change)
+            spacing = on_change/1000
+        end)
+    text_dim = menu.list(infoverplay, "Text Size & Spacing", {}, "")
+        menu.divider(text_dim, "Text Size & Spacing")
+        menu.slider_float(text_dim, "Name", {}, "Player Name Text Size.", 0, 100, 52, 1, function(on_change)
+            name_size = on_change/100
+        end)
+        menu.slider_float(text_dim, "Message Text", {}, "Information Text Size.", 0, 100, 41, 1, function(on_change)
+            text_size = on_change/100
+        end)
+        menu.slider(text_dim, "Line Spacing", {}, "Spacing Between Lines of Info Text.", 0, 100, 32, 1, function(on_change)
+            line_spacing = on_change/10000
+        end)
+    border = menu.list(infoverplay, "Border", {}, "")
+        menu.divider(border, "Border Settings")
+        menu.slider(border, "Width", {}, "The Width Of The Border Rendered Around The Element.", 0, 20, 0, 1, function(on_change)
+            border_widthd(on_change)
+        end)
+        local border_c_slider = menu.colour(border, "Color", {"overlayborder"}, "Color Of The Rendered Border.", infocolour.border, true, function(on_change)
+            infocolour.border = on_change
+        end)
+        menu.rainbow(border_c_slider)
+end
+
+::skipplayerinformation::
 
     ------------------------------------------------------------------------------------------------------------------------------------------------------
     
@@ -7664,12 +8083,6 @@ end
 
 --------------------------------------------------------------------------------------------------------------------------------
 --Weapons
-handle_ptr = memory.alloc(13*8)
-
-local function pid_to_handle(player_id)
-    NETWORK.NETWORK_HANDLE_FROM_PLAYER(player_id, handle_ptr, 13)
-    return handle_ptr
-end
 
 menu.divider(weapons, "Aimbot")
 
@@ -9864,7 +10277,322 @@ end, function()
     custom_pet = nil
 end)
 
+--------------------------------------------------------------------------------------------------------
+
+function Play_guitar(on)
+    while not STREAMING.HAS_ANIM_DICT_LOADED("amb@world_human_musician@guitar@male@idle_a") do 
+        STREAMING.REQUEST_ANIM_DICT("amb@world_human_musician@guitar@male@idle_a")
+        util.yield()
+    end
+    if on then
+    local pos = ENTITY.GET_ENTITY_COORDS(players.user_ped(),true)
+    guitar = OBJECT.CREATE_OBJECT(util.joaat("prop_acc_guitar_01"), pos.x, pos.y, pos.z, true, true, false)
+    NETWORK.NETWORK_REQUEST_CONTROL_OF_ENTITY(players.user_ped())
+    TASK.TASK_PLAY_ANIM(players.user_ped(), "amb@world_human_musician@guitar@male@idle_a", "idle_b", 3, 3, -1, 51, 0, false, false, false) --play anim 
+    ENTITY.ATTACH_ENTITY_TO_ENTITY(guitar, players.user_ped(), PED.GET_PED_BONE_INDEX(players.user_ped(), 24818), -0.1,0.31,0.1,0.0,20.0,150.0, false, true, false, true, 1, true)
+    PED.SET_ENABLE_HANDCUFFS(players.user_ped(),on)
+    else
+        TASK.CLEAR_PED_TASKS_IMMEDIATELY(players.user_ped())
+        PED.SET_ENABLE_HANDCUFFS(players.user_ped(),off)
+        entities.delete_by_handle(guitar)
+    end
+end
+
+function Palm_spin_ball(on)
+    while not STREAMING.HAS_ANIM_DICT_LOADED("anim@mp_player_intincarfreakoutstd@ps@") do 
+        STREAMING.REQUEST_ANIM_DICT("anim@mp_player_intincarfreakoutstd@ps@")
+        util.yield()
+    end
+    if on then
+    local pos = ENTITY.GET_ENTITY_COORDS(players.user_ped(),true)
+    guitar = OBJECT.CREATE_OBJECT(util.joaat("prop_bowling_ball"), pos.x, pos.y, pos.z, true, true, false)
+    NETWORK.NETWORK_REQUEST_CONTROL_OF_ENTITY(players.user_ped())
+    TASK.TASK_PLAY_ANIM(players.user_ped(), "anim@mp_player_intincarfreakoutstd@ps@", "idle_a_fp", 10, 3, -1, 51, 5, false, false, false)
+    ENTITY.ATTACH_ENTITY_TO_ENTITY(guitar, players.user_ped(), PED.GET_PED_BONE_INDEX(players.user_ped(), 24818), 0.30,0.53,0,0.2,70,340, false, true, false, true, 1, true)
+    PED.SET_ENABLE_HANDCUFFS(players.user_ped(),on)
+    else
+        TASK.CLEAR_PED_TASKS_IMMEDIATELY(players.user_ped())
+        PED.SET_ENABLE_HANDCUFFS(players.user_ped(),off)
+        entities.delete_by_handle(guitar)
+    end
+end
+
+function seek_help(on)
+    while not STREAMING.HAS_ANIM_DICT_LOADED("amb@world_human_bum_freeway@male@base") do 
+        STREAMING.REQUEST_ANIM_DICT("amb@world_human_bum_freeway@male@base")
+        util.yield()
+    end
+    if on then
+    local pos = ENTITY.GET_ENTITY_COORDS(players.user_ped(),true)
+    beggers = OBJECT.CREATE_OBJECT(util.joaat("prop_beggers_sign_03"), pos.x, pos.y, pos.z, true, true, false)
+    NETWORK.NETWORK_REQUEST_CONTROL_OF_ENTITY(players.user_ped())
+    TASK.TASK_PLAY_ANIM(players.user_ped(), "amb@world_human_bum_freeway@male@base", "base", 3, 3, -1, 51, 0, false, false, false) --play anim 
+    ENTITY.ATTACH_ENTITY_TO_ENTITY(beggers, players.user_ped(), PED.GET_PED_BONE_INDEX(players.user_ped(), 58868), 0.19,0.18,0.0,5.0,0.0,40.0, false, true, false, true, 1, true)
+    PED.SET_ENABLE_HANDCUFFS(players.user_ped(),on)
+    else
+        TASK.CLEAR_PED_TASKS_IMMEDIATELY(players.user_ped())
+        PED.SET_ENABLE_HANDCUFFS(players.user_ped(),off)
+        entities.delete_by_handle(beggers)
+    end
+end
+
+function offer_flower(on)
+    while not STREAMING.HAS_ANIM_DICT_LOADED("anim@heists@humane_labs@finale@keycards") do 
+        STREAMING.REQUEST_ANIM_DICT("anim@heists@humane_labs@finale@keycards")
+        util.yield()
+    end
+    if on then
+    local pos = ENTITY.GET_ENTITY_COORDS(players.user_ped(),true)
+    rose = OBJECT.CREATE_OBJECT(util.joaat("prop_single_rose"), pos.x, pos.y, pos.z, true, true, false)
+    NETWORK.NETWORK_REQUEST_CONTROL_OF_ENTITY(players.user_ped())
+    TASK.TASK_PLAY_ANIM(players.user_ped(), "anim@heists@humane_labs@finale@keycards", "ped_a_enter_loop", 3, 3, -1, 51, 0, false, false, false) --play anim 
+    ENTITY.ATTACH_ENTITY_TO_ENTITY(rose, players.user_ped(), PED.GET_PED_BONE_INDEX(players.user_ped(), 18905), 0.13,0.15,0.0,-100.0,0.0,-20.0, false, true, false, true, 1, true)
+    PED.SET_ENABLE_HANDCUFFS(players.user_ped(),on)
+    else
+        TASK.CLEAR_PED_TASKS_IMMEDIATELY(players.user_ped())
+        PED.SET_ENABLE_HANDCUFFS(players.user_ped(),off)
+        entities.delete_by_handle(rose)
+    end
+end
+
+function Out_body(toggle)
+    if toggle then
+        all_peds = entities.get_all_peds_as_handles()
+        user_ped = players.user_ped()
+        clone = PED.CLONE_PED(user_ped,true, true, true)
+        pos = ENTITY.GET_ENTITY_COORDS(clone, false)
+        ENTITY.SET_ENTITY_COORDS(user_ped, pos.x-2, pos.y, pos.z)
+        ENTITY.SET_ENTITY_ALPHA(players.user_ped(), 87, false)
+        ENTITY.SET_ENTITY_INVINCIBLE(clone,true)
+        menu.trigger_commands("invisibility remote")
+        util.create_tick_handler(function()
+        STREAMING.REQUEST_ANIM_DICT("move_crawl")
+        PED.SET_PED_MOVEMENT_CLIPSET(clone, "move_crawl", -1)
+        mod_uses("ped", if on then 1 else -1)
+        PED.SET_BLOCKING_OF_NON_TEMPORARY_EVENTS(clone, true)
+        TASK.TASK_SET_BLOCKING_OF_NON_TEMPORARY_EVENTS(clone, true)
+        return ghost
+        end)
+        else
+            clonepedpos = ENTITY.GET_ENTITY_COORDS(clone, false)
+            ENTITY.SET_ENTITY_COORDS(user_ped, clonepedpos.x,clonepedpos.y,clonepedpos.z, false, false)
+            entities.delete_by_handle(clone)
+            ENTITY.SET_ENTITY_ALPHA(user_ped, 255, false)
+            menu.trigger_commands("invisibility off")
+        end
+end
+
+flags_fmt = {}
+country_flags = {
+    "apa_prop_flag_argentina", 
+    "apa_prop_flag_australia", 
+    "apa_prop_flag_austria", 
+    "apa_prop_flag_belgium", 
+    "apa_prop_flag_brazil", 
+    "apa_prop_flag_canada_yt", 
+    "apa_prop_flag_china", 
+    "apa_prop_flag_columbia", 
+    "apa_prop_flag_croatia", 
+    "apa_prop_flag_czechrep", 
+    "apa_prop_flag_denmark", 
+    "apa_prop_flag_england", 
+    "apa_prop_flag_eu_yt", 
+    "apa_prop_flag_finland", 
+    "apa_prop_flag_france", 
+    "apa_prop_flag_german_yt", 
+    "apa_prop_flag_hungary", 
+    "apa_prop_flag_ireland", 
+    "apa_prop_flag_israel", 
+    "apa_prop_flag_italy", 
+    "apa_prop_flag_jamaica", 
+    "apa_prop_flag_japan_yt", 
+    "apa_prop_flag_lstein", 
+    "apa_prop_flag_malta", 
+    "apa_prop_flag_mexico_yt", 
+    "apa_prop_flag_netherlands", 
+    "apa_prop_flag_newzealand", 
+    "apa_prop_flag_nigeria", 
+    "apa_prop_flag_norway", 
+    "apa_prop_flag_palestine", 
+    "apa_prop_flag_poland", 
+    "apa_prop_flag_portugal", 
+    "apa_prop_flag_puertorico", 
+    "apa_prop_flag_russia_yt", 
+    "apa_prop_flag_scotland_yt", 
+    "apa_prop_flag_script", 
+    "apa_prop_flag_slovakia", 
+    "apa_prop_flag_slovenia", 
+    "apa_prop_flag_southafrica", 
+    "apa_prop_flag_southkorea", 
+    "apa_prop_flag_spain", 
+    "apa_prop_flag_sweden", 
+    "apa_prop_flag_switzerland", 
+    "apa_prop_flag_turkey", 
+    "apa_prop_flag_uk_yt", 
+    "apa_prop_flag_us_yt", 
+    "apa_prop_flag_wales"
+}
+
+function first_to_upper(str)
+    return (str:gsub("^%l", string.upper))
+end
+for _, flag in pairs(country_flags) do 
+    table.insert(flags_fmt, first_to_upper(flag:gsub('apa_prop_flag_', ''):gsub('_yt', '')))
+end
+
+function attach_to_player(hash, bone, x, y, z, xrot, yrot, zrot)           
+    local user_ped = PLAYER.PLAYER_PED_ID()
+    hash = util.joaat(hash)
+    STREAMING.REQUEST_MODEL(hash)
+    while not STREAMING.HAS_MODEL_LOADED(hash) do		
+        util.yield()
+    end
+    STREAMING.SET_MODEL_AS_NO_LONGER_NEEDED(hash)
+    local object = OBJECT.CREATE_OBJECT(hash, 0.0,0.0,0, true, true, false)
+    ENTITY.ATTACH_ENTITY_TO_ENTITY(object, user_ped, PED.GET_PED_BONE_INDEX(PLAYER.PLAYER_PED_ID(), bone), x, y, z, xrot, yrot, zrot, false, false, false, false, 2, true) 
+end
+function delete_object(model)
+    local hash = util.joaat(model)
+    for k, object in pairs(entities.get_all_objects_as_handles()) do
+        if ENTITY.GET_ENTITY_MODEL(object) == hash then
+            ENTITY.SET_ENTITY_AS_MISSION_ENTITY(object, false, false) 
+            entities.delete_by_handle(object)
+        end
+    end
+end
+
+function get_model_size(hash)
+    local minptr = memory.alloc(24)
+    local maxptr = memory.alloc(24)
+    MISC.GET_MODEL_DIMENSIONS(hash, minptr, maxptr)
+    min = memory.read_vector3(minptr)
+    max = memory.read_vector3(maxptr)
+    local size = {}
+    size['x'] = max['x'] - min['x']
+    size['y'] = max['y'] - min['y']
+    size['z'] = max['z'] - min['z']
+    size['max'] = math.max(size['x'], size['y'], size['z'])
+    return size
+end
+
 local pmenu = menu.list(fun, "Player Stuff", {}, "Change Into Some Fun Stuff \n(Only Use One At A Time)")
+
+attach_self = menu.list(pmenu, "Attach Stuff", {})
+    menu.toggle(attach_self, "Snowman",{""}, "",function(on)
+        local zhangzi = "prop_gumball_03"
+        local sonwman = "prop_prlg_snowpile"
+        if on then
+            attach_to_player(sonwman, 0, 0.0, 0, 0, 0, 0,0)
+            attach_to_player(sonwman, 0, 0.0, 0, -0.5, 0, 0,0)
+            attach_to_player(sonwman, 0, 0.0, 0, -1, 0, 0,0)
+            attach_to_player(zhangzi, 0, 0.0, 0, 0, 0, 50,0)
+            attach_to_player(zhangzi, 0, 0.0, 0, 0, 0, 125,0)
+            attach_to_player(zhangzi, 0, 0.0, 0, 0, 0, -50,0)
+            attach_to_player(zhangzi, 0, 0.0, 0, 0, 0, -125,0)
+        else
+            delete_object(sonwman)
+            delete_object(zhangzi)
+        end
+    end)
+    menu.toggle(attach_self, "Katana's", {""}, "", function(state)
+        local obj = "prop_cs_katana_01"
+        if state then
+            attach_to_player(obj, 0, 0, -0.13, 0.5, 0, -150,0)
+            attach_to_player(obj, 0, 0, -0.13, 0.5, 0, 150,0)
+            attach_to_player(obj, 0, 0.23, 0, 0, 0, -180,100)
+        else
+            delete_object(obj)
+        end
+    end)
+    menu.toggle(attach_self, "666",{}, "",function(on)
+        obj = "prop_mp_num_6"
+        if on then     
+            attach_to_player(obj, 0, 0, 0, 1.7, 0, 0, 180)
+            attach_to_player(obj, 0, 1, 0, 1.7, 0, 0, 180)
+            attach_to_player(obj, 0, -1, 0, 1.7, 0, 0, 180)
+        else
+            delete_object(obj)
+        end
+    end)
+    menu.toggle(attach_self, "999",{}, "",function(on)
+        obj = "prop_mp_num_9"
+        if on then     
+            attach_to_player(obj, 0, 0, 0, 1.7, 0, 0, 180)
+            attach_to_player(obj, 0, 1, 0, 1.7, 0, 0, 180)
+            attach_to_player(obj, 0, -1, 0, 1.7, 0, 0, 180)
+        else
+            delete_object(obj)
+        end
+    end)
+    menu.toggle(attach_self, "Surfboard",{}, "",function(on)
+        obj = "prop_surf_board_ldn_03"
+        if on then     
+            attach_to_player(obj, 0, 0, -0.2, 0.25, 0, -30,0)
+        else
+            delete_object(obj)
+        end
+    end)
+    menu.toggle(attach_self, "Small School Bag",{}, "",function(on)
+        obj = "tr_prop_tr_bag_djlp_01a"
+        if on then     
+            attach_to_player(obj, 0, 0, -0.2, 0.1, 0, 0,0)
+        else
+            delete_object(obj)
+        end
+    end)
+    menu.toggle(attach_self, "Lifeboard",{}, "",function(on)
+        obj = "prop_beach_ring_01"
+        if on then     
+            attach_to_player(obj, 0, 0, 0, 0, 0, 0,0)
+        else
+            delete_object(obj)
+        end
+    end)
+    guitar_obj = menu.list(attach_self, "Guitar")
+        menu.toggle(guitar_obj, "Guitar 1",{}, "",function(on)
+            local obj = "prop_acc_guitar_01"
+            if on then     
+                attach_to_player(obj, 0, 0, -0.15, 0.25, 0, -50,0)
+            else
+                delete_object(obj)
+            end
+        end)
+        menu.toggle(guitar_obj, "Guitar 2",{}, "",function(on)
+            local obj = "prop_el_guitar_03"
+            if on then     
+                attach_to_player(obj, 0, 0, -0.15, 0.25, 0, -50,0)
+            else
+                delete_object(obj)
+            end
+        end)
+        menu.toggle(guitar_obj, "Guitar 3",{}, "",function(on)
+            local obj = "prop_el_guitar_01"
+            if on then     
+                attach_to_player(obj, 0, 0, -0.15, 0.25, 0, -50,0)
+            else
+                delete_object(obj)
+            end
+        end)
+        menu.toggle(guitar_obj, "Guitar 4",{}, "",function(on)
+            local obj = "prop_el_guitar_02"
+            if on then     
+                attach_to_player(obj, 0, 0, -0.15, 0.25, 0, -50,0)
+            else
+                delete_object(obj)
+            end
+        end)
+    menu.toggle(attach_self, "Play The Guitar", {}, "", function(on)
+        Play_guitar(on)
+    end)
+    menu.toggle(attach_self, "Palm Spin", {}, "", function(on)
+        Palm_spin_ball(on)
+    end)
+    menu.toggle(attach_self, "Ask For Help", {}, "", function(on)
+        seek_help(on)
+    end)
+    menu.toggle(attach_self, "Offer Flower", {}, "", function(on)
+        offer_flower(on)
+    end)
 
 menu.toggle(pmenu, "Become A Monekey", {}, "Change Into A Money", function(on)
     if on then
