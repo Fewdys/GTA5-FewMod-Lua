@@ -7,7 +7,7 @@ util.require_natives(1676318796)
 util.require_natives(1663599433)
 
 local response = false
-local localversion = 1.40
+local localversion = 1.41
 local localKs = false
 async_http.init("raw.githubusercontent.com", "/Fewdys/GTA5-FewMod-Lua/main/FewModVersion.lua", function(output)
     currentVer = tonumber(output)
@@ -9105,6 +9105,89 @@ end)
 
 menu.click_slider(vehicles, "Dirt level", {"dirt"}, "Makes your vehicle dirty.", 0, 15, 0, 1, function(dirtAmount)
 	VEHICLE.SET_VEHICLE_DIRT_LEVEL(vehicle, dirtAmount)
+end)
+
+local licenseplate = menu.list(vehicles, "License Plate Options", {}, "")
+
+local Utils = {}
+
+function Utils.emptyFunction()
+end
+
+local text = 'FewMod'
+local animatedtext = ''
+local animatedtext2 = ''
+local animatedtext3 = ''
+local animatedtext4 = ''
+local animatedtext5 = ''
+local animatedtext6 = ''
+local animatedtext7 = ''
+local animatedtext8 = ''
+
+local plateTextInput = menu.text_input(licenseplate, "Custom License Plate Text", {"platetext"}, "License plate will be changed to this text when the below option is toggled.", function(platetext)
+    text = platetext 
+end, text)
+menu.toggle_loop(licenseplate, "Enable Custom License Plate", {"plateenable"}, "Your license plate will be changed to the text you input above on every vehicle you are in.", function()
+	menu.trigger_commands("plate "..text)
+end)
+
+local animatedplate = menu.list(licenseplate, "Antimated License Plate", {}, "")
+
+
+local anispeed = 300
+menu.slider(animatedplate, "Animated Speed", {}, "", 1, 5000, 300, 1, function(plateanimatedspeed) 
+    anispeed = plateanimatedspeed
+end)
+
+local animateinput1 = menu.text_input(animatedplate, "Text 1", {"anitext1"}, "Animated Text 1", function(anitext1)
+    animatedtext = anitext1 
+end, animatedtext)
+
+local animateinput2 = menu.text_input(animatedplate, "Text 2", {"anitext12"}, "Animated Text 2", function(anitext2)
+    animatedtext2 = anitext2 
+end, animatedtext2)
+
+local animateinput3 = menu.text_input(animatedplate, "Text 3", {"anitext3"}, "Animated Text 3", function(anitext3)
+    animatedtext3 = anitext3
+end, animatedtext3)
+
+local animateinput4 = menu.text_input(animatedplate, "Text 4", {"anitext4"}, "Animated Text 4", function(anitext4)
+    animatedtext4 = anitext4 
+end, animatedtext4)
+
+local animateinput5 = menu.text_input(animatedplate, "Text 5", {"anitext5"}, "Animated Text 5", function(anitext5)
+    animatedtext5 = anitext5
+end, animatedtext5)
+
+local animateinput6 = menu.text_input(animatedplate, "Text 6", {"anitext6"}, "Animated Text 6", function(anitext6)
+    animatedtext6 = anitext6
+end, animatedtext6)
+
+local animateinput7 = menu.text_input(animatedplate, "Text 7", {"anitext7"}, "Animated Text 7", function(anitext7)
+    animatedtext7 = anitext7
+end, animatedtext7)
+
+local animateinput8 = menu.text_input(animatedplate, "Text 8", {"anitext8"}, "Animated Text 8", function(anitext8)
+    animatedtext8 = anitext8
+end, animatedtext8)
+
+menu.toggle_loop(animatedplate, "Animate Plate", {"animateplate"}, "Your license plate will be changed to the text you input above on every vehicle you are in.", function()
+	menu.trigger_commands("plate "..animatedtext)
+    util.yield(anispeed)
+    menu.trigger_commands("plate "..animatedtext2)
+    util.yield(anispeed)
+    menu.trigger_commands("plate "..animatedtext3)
+    util.yield(anispeed)
+    menu.trigger_commands("plate "..animatedtext4)
+    util.yield(anispeed)
+    menu.trigger_commands("plate "..animatedtext5)
+    util.yield(anispeed)
+    menu.trigger_commands("plate "..animatedtext6)
+    util.yield(anispeed)
+    menu.trigger_commands("plate "..animatedtext7)
+    util.yield(anispeed)
+    menu.trigger_commands("plate "..animatedtext8)
+    util.yield(anispeed)
 end)
 
 local windows_root = menu.list(uwuvehicle, "Windows", {vcwindows}, "Roll down/disable windows.")
