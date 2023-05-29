@@ -7494,7 +7494,7 @@ chat.on_message(function(packet_sender, message_sender, text, team_chat)
 						else
 							if oldway then
 								sender = players.get_name(players.user())
-								translationtext = players.get_name(packet_sender).." : "..decode(translation)
+								translationtext = "[Translation] "..players.get_name(packet_sender).." : "..decode(translation)
 								colorfinal = 1
 							else
 								sender = players.get_name(packet_sender)
@@ -7505,16 +7505,16 @@ chat.on_message(function(packet_sender, message_sender, text, team_chat)
 								sfchat.ADD_MESSAGE(sender, translationtext, teamchatlabel, false, colorfinal)
 							end if (Tradloca == 2) then
 								botsend = true
-								chat.send_message(players.get_name(packet_sender).." : "..decode(translation), true, false, true)
+								chat.send_message("[Translation] "..players.get_name(packet_sender).." : "..decode(translation), true, false, true)
 								sfchat.ADD_MESSAGE(sender, translationtext, teamchatlabel, false, colorfinal)
 							end if (Tradloca == 3) then
 								sfchat.ADD_MESSAGE(sender, translationtext, allchatlabel, false, colorfinal)
 							end if (Tradloca == 4) then
 								botsend = true
-								chat.send_message(players.get_name(packet_sender).." : "..decode(translation), false, false, true)
+								chat.send_message("[Translation] "..players.get_name(packet_sender).." : "..decode(translation), false, false, true)
 								sfchat.ADD_MESSAGE(sender, translationtext, allchatlabel, false, colorfinal)
 							end if (Tradloca == 5) then
-								util.toast(players.get_name(packet_sender).." : "..decode(translation), TOAST_ALL)
+								util.toast("[Translation] "..players.get_name(packet_sender).." : "..decode(translation), TOAST_ALL)
 							end
 						end
 					end
