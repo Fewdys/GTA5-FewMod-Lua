@@ -7,7 +7,7 @@ util.require_natives(1676318796)
 util.require_natives(1663599433)
 
 local response = false
-local localversion = 1.41
+local localversion = 1.40
 local localKs = false
 async_http.init("raw.githubusercontent.com", "/Fewdys/GTA5-FewMod-Lua/main/FewModVersion.lua", function(output)
     currentVer = tonumber(output)
@@ -9123,71 +9123,174 @@ local animatedtext5 = ''
 local animatedtext6 = ''
 local animatedtext7 = ''
 local animatedtext8 = ''
+local animatedtext9 = ''
+local animatedtext10 = ''
+local animatedtext11 = ''
+local animatedtext12 = ''
+local animatedtext13 = ''
+local animatedtext14 = ''
 
 local plateTextInput = menu.text_input(licenseplate, "Custom License Plate Text", {"platetext"}, "License plate will be changed to this text when the below option is toggled.", function(platetext)
     text = platetext 
 end, text)
 menu.toggle_loop(licenseplate, "Enable Custom License Plate", {"plateenable"}, "Your license plate will be changed to the text you input above on every vehicle you are in.", function()
+    if string.len(text) > 8 then
+        text = ''
+        util.toast("Text Is Too Long For Custom License Plate")
+    else
 	menu.trigger_commands("plate "..text)
+    end
 end)
 
 local animatedplate = menu.list(licenseplate, "Antimated License Plate", {}, "")
 
 
 local anispeed = 300
-menu.slider(animatedplate, "Animated Speed", {}, "", 1, 5000, 300, 1, function(plateanimatedspeed) 
+menu.slider_float(animatedplate, "Animated Speed", {}, "", 0, 10000, 300, 1, function(plateanimatedspeed) 
     anispeed = plateanimatedspeed
 end)
 
-local animateinput1 = menu.text_input(animatedplate, "Text 1", {"anitext1"}, "Animated Text 1", function(anitext1)
+local animateinput1 = menu.text_input(animatedplate, "Text 1", {"anitext1"}, "Animated Text 1 \nMust Be Less Then 8 Characters - Including Spaces", function(anitext1)
     animatedtext = anitext1 
 end, animatedtext)
 
-local animateinput2 = menu.text_input(animatedplate, "Text 2", {"anitext2"}, "Animated Text 2", function(anitext2)
+local animateinput2 = menu.text_input(animatedplate, "Text 2", {"anitext2"}, "Animated Text 2 \nMust Be Less Then 8 Characters - Including Spaces", function(anitext2)
     animatedtext2 = anitext2 
 end, animatedtext2)
 
-local animateinput3 = menu.text_input(animatedplate, "Text 3", {"anitext3"}, "Animated Text 3", function(anitext3)
+local animateinput3 = menu.text_input(animatedplate, "Text 3", {"anitext3"}, "Animated Text 3 \nMust Be Less Then 8 Characters - Including Spaces", function(anitext3)
     animatedtext3 = anitext3
 end, animatedtext3)
 
-local animateinput4 = menu.text_input(animatedplate, "Text 4", {"anitext4"}, "Animated Text 4", function(anitext4)
+local animateinput4 = menu.text_input(animatedplate, "Text 4", {"anitext4"}, "Animated Text 4 \nMust Be Less Then 8 Characters - Including Spaces", function(anitext4)
     animatedtext4 = anitext4 
 end, animatedtext4)
 
-local animateinput5 = menu.text_input(animatedplate, "Text 5", {"anitext5"}, "Animated Text 5", function(anitext5)
+local animateinput5 = menu.text_input(animatedplate, "Text 5", {"anitext5"}, "Animated Text 5 \nMust Be Less Then 8 Characters - Including Spaces", function(anitext5)
     animatedtext5 = anitext5
 end, animatedtext5)
 
-local animateinput6 = menu.text_input(animatedplate, "Text 6", {"anitext6"}, "Animated Text 6", function(anitext6)
+local animateinput6 = menu.text_input(animatedplate, "Text 6", {"anitext6"}, "Animated Text 6 \nMust Be Less Then 8 Characters - Including Spaces", function(anitext6)
     animatedtext6 = anitext6
 end, animatedtext6)
 
-local animateinput7 = menu.text_input(animatedplate, "Text 7", {"anitext7"}, "Animated Text 7", function(anitext7)
+local animateinput7 = menu.text_input(animatedplate, "Text 7", {"anitext7"}, "Animated Text 7 \nMust Be Less Then 8 Characters - Including Spaces", function(anitext7)
     animatedtext7 = anitext7
 end, animatedtext7)
 
-local animateinput8 = menu.text_input(animatedplate, "Text 8", {"anitext8"}, "Animated Text 8", function(anitext8)
+local animateinput8 = menu.text_input(animatedplate, "Text 8", {"anitext8"}, "Animated Text 8 \nMust Be Less Then 8 Characters - Including Spaces", function(anitext8)
     animatedtext8 = anitext8
 end, animatedtext8)
 
+local animateinput9 = menu.text_input(animatedplate, "Text 9", {"anitext9"}, "Animated Text 9 \nMust Be Less Then 8 Characters - Including Spaces", function(anitext9)
+    animatedtext9 = anitext9
+end, animatedtext9)
+
+local animateinput10 = menu.text_input(animatedplate, "Text 10", {"anitext10"}, "Animated Text 10 \nMust Be Less Then 8 Characters - Including Spaces", function(anitext10)
+    animatedtext10 = anitext10
+end, animatedtext10)
+
+local animateinput11 = menu.text_input(animatedplate, "Text 11", {"anitext11"}, "Animated Text 11 \nMust Be Less Then 8 Characters - Including Spaces", function(anitext11)
+    animatedtext11 = anitext11
+end, animatedtext11)
+
+local animateinput12 = menu.text_input(animatedplate, "Text 12", {"anitext10"}, "Animated Text 12 \nMust Be Less Then 8 Characters - Including Spaces", function(anitext12)
+    animatedtext12 = anitext12
+end, animatedtext12)
+
+local animateinput13 = menu.text_input(animatedplate, "Text 13", {"anitext10"}, "Animated Text 13 \nMust Be Less Then 8 Characters - Including Spaces", function(anitext13)
+    animatedtext13 = anitext13
+end, animatedtext13)
+
+local animateinput14 = menu.text_input(animatedplate, "Text 14", {"anitext14"}, "Animated Text 14 \nMust Be Less Then 8 Characters - Including Spaces", function(anitext14)
+    animatedtext14 = anitext14
+end, animatedtext14)
+
 menu.toggle_loop(animatedplate, "Animate Plate", {"animateplate"}, "Your license plate will be changed to the text you input above on every vehicle you are in.", function()
+    if string.len(animatedtext) > 8 then
+        animatedtext = ''
+    elseif not string.len(animatedtext) > 8 then
 	menu.trigger_commands("plate "..animatedtext)
     util.yield(anispeed)
-    menu.trigger_commands("plate "..animatedtext2)
+    end
+    if string.len(animatedtext2) > 8 then
+        animatedtext2 = ''
+    elseif not string.len(animatedtext2) > 8 then
+	menu.trigger_commands("plate "..animatedtext2)
     util.yield(anispeed)
-    menu.trigger_commands("plate "..animatedtext3)
+    end
+    if string.len(animatedtext3) > 8 then
+        animatedtext3 = ''
+    elseif not string.len(animatedtext3) > 8 then
+	menu.trigger_commands("plate "..animatedtext3)
     util.yield(anispeed)
-    menu.trigger_commands("plate "..animatedtext4)
+    end
+    if string.len(animatedtext4) > 8 then
+        animatedtext4 = ''
+    elseif not string.len(animatedtext4) > 8 then
+	menu.trigger_commands("plate "..animatedtext4)
     util.yield(anispeed)
-    menu.trigger_commands("plate "..animatedtext5)
+    end
+    if string.len(animatedtext5) > 8 then
+        animatedtext5 = ''
+    elseif not string.len(animatedtext5) > 8 then
+	menu.trigger_commands("plate "..animatedtext5)
     util.yield(anispeed)
-    menu.trigger_commands("plate "..animatedtext6)
+    end
+    if string.len(animatedtext6) > 8 then
+        animatedtext6 = ''
+    elseif not string.len(animatedtext6) > 8 then
+	menu.trigger_commands("plate "..animatedtext6)
     util.yield(anispeed)
-    menu.trigger_commands("plate "..animatedtext7)
+    end
+    if string.len(animatedtext7) > 8 then
+        animatedtext7 = ''
+    elseif not string.len(animatedtext7) > 8 then
+	menu.trigger_commands("plate "..animatedtext7)
     util.yield(anispeed)
-    menu.trigger_commands("plate "..animatedtext8)
+    end
+    if string.len(animatedtext8) > 8 then
+        animatedtext8 = ''
+    elseif not string.len(animatedtext8) > 8 then
+	menu.trigger_commands("plate "..animatedtext8)
     util.yield(anispeed)
+    end
+    if string.len(animatedtext9) > 8 then
+        animatedtext9 = ''
+    elseif not string.len(animatedtext9) > 8 then
+	menu.trigger_commands("plate "..animatedtext9)
+    util.yield(anispeed)
+    end
+    if string.len(animatedtext10) > 8 then
+        animatedtext10 = ''
+    elseif not string.len(animatedtext10) > 8 then
+	menu.trigger_commands("plate "..animatedtext10)
+    util.yield(anispeed)
+    end
+    if string.len(animatedtext11) > 8 then
+        animatedtext11 = ''
+    elseif not string.len(animatedtext11) > 8 then
+	menu.trigger_commands("plate "..animatedtext11)
+    util.yield(anispeed)
+    end
+    if string.len(animatedtext12) > 8 then
+        animatedtext12 = ''
+    elseif not string.len(animatedtext12) > 8 then
+	menu.trigger_commands("plate "..animatedtext12)
+    util.yield(anispeed)
+    end
+    if string.len(animatedtext13) > 8 then
+        animatedtext13 = ''
+    elseif not string.len(animatedtext13) > 8 then
+	menu.trigger_commands("plate "..animatedtext13)
+    util.yield(anispeed)
+    end
+    if string.len(animatedtext14) > 8 then
+        animatedtext14 = ''
+    elseif not string.len(animatedtext14) > 8 then
+	menu.trigger_commands("plate "..animatedtext14)
+    util.yield(anispeed)
+    end
 end)
 
 local windows_root = menu.list(uwuvehicle, "Windows", {vcwindows}, "Roll down/disable windows.")
