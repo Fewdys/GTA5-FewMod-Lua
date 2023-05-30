@@ -7,7 +7,7 @@ util.require_natives(1676318796)
 util.require_natives(1663599433)
 
 local response = false
-local localversion = 1.42
+local localversion = 1.43
 local localKs = false
 async_http.init("raw.githubusercontent.com", "/Fewdys/GTA5-FewMod-Lua/main/FewModVersion.lua", function(output)
     currentVer = tonumber(output)
@@ -6769,6 +6769,40 @@ function infoverplaytoggle()
         drawRect(map_x + padding_x, player_list_y + gui_h/2 + padding/2, bar_w, (gui_h - padding * 3)/2 * (1 - health_perc), health_bar_bg) --background
     end
 end
+
+    --Taken From JerryScript
+    local ragdolloptions = menu.list(selfc, "Ragdoll Options", {}, "")
+
+    menu.toggle_loop(ragdolloptions, "Better clumsiness", {"extraclumsy"}, "Like stands clumsiness, but you can get up after you fall.", function()
+        if PED.IS_PED_RAGDOLL(players.user_ped()) then 
+            util.yield(3000)
+        end
+        PED.SET_PED_RAGDOLL_ON_COLLISION(players.user_ped(), true)
+    end)
+
+    menu.action(ragdolloptions, "Stumble", {"selfstumble"}, "Makes you stumble with a good chance of falling over.", function()
+        local vector = ENTITY.GET_ENTITY_FORWARD_VECTOR(players.user_ped())
+        PED.SET_PED_TO_RAGDOLL_WITH_FALL(players.user_ped(), 1500, 2000, 2, vector.x, -vector.y, vector.z, 1, 0, 0, 0, 0, 0, 0)
+    end)
+
+    -- credit to LAZScript for inspiring this
+    local fallTimeout = false
+    menu.toggle(ragdolloptions, "Fall over", {"fallOver"}, "Makes you stumble, fall over and prevents you from getting back up.", function(toggle)
+        if toggle then
+            local vector = ENTITY.GET_ENTITY_FORWARD_VECTOR(players.user_ped())
+            PED.SET_PED_TO_RAGDOLL_WITH_FALL(players.user_ped(), 1500, 2000, 2, vector.x, -vector.y, vector.z, 1, 0, 0, 0, 0, 0, 0)
+        end
+        fallTimeout = toggle
+        while fallTimeout do
+            PED.RESET_PED_RAGDOLL_TIMER(players.user_ped())
+            util.yield_once()
+        end
+    end)
+
+    -- credit to aaron for telling me this :p
+    menu.toggle_loop(ragdolloptions, "Ragdoll", {"ragdollmyself"}, "Just Makes You Ragdoll.", function()
+        PED.SET_PED_TO_RAGDOLL(players.user_ped(), 2000, 2000, 0, true, true, true)
+    end)
 
 menu.toggle_loop(selfc, "Fast Roll", {"fastroll"}, "", function()
     STATS.STAT_SET_INT(util.joaat("MP"..util.get_char_slot().."_SHOOTING_ABILITY"), 350, true)
