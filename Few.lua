@@ -6990,7 +6990,7 @@ end)
 
 menu.toggle_loop(selfc, "Mod Max Armour", {"modarmour"}, "Theoretically This Should Work", function ()
 	SetEntityMaxArmour(players.user_ped(), moddedArmour)
-    menu.trigger_commands("maxarmor")
+    menu.trigger_commands("maxarmour")
 end, function ()
 	SetEntityMaxArmour(players.user_ped(), defaultArmour)
 	menu.set_value(armourslider, defaultArmour)
