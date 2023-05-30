@@ -9143,7 +9143,7 @@ local animateinput1 = menu.text_input(animatedplate, "Text 1", {"anitext1"}, "An
     animatedtext = anitext1 
 end, animatedtext)
 
-local animateinput2 = menu.text_input(animatedplate, "Text 2", {"anitext12"}, "Animated Text 2", function(anitext2)
+local animateinput2 = menu.text_input(animatedplate, "Text 2", {"anitext2"}, "Animated Text 2", function(anitext2)
     animatedtext2 = anitext2 
 end, animatedtext2)
 
