@@ -9756,11 +9756,6 @@ menu.slider(pool_limiter, "Object Limit", {"objlimi"}, "", 0, 2500, 600, 1, func
     obj_limit = amount
 end)
 
-local projectile_limit = 15
-menu.slider(pool_limiter, "Projectile Limit", {"projlimi"}, "", 0, 125, 40, 1, function(amount)
-    projectile_limit = amount
-end)
-
  --==Seperated For Reason Of Enabling/Disabling Certain Limiters==-- 
 menu.toggle_loop(pool_limiter, "Enable Ped Limiter", {}, "", function()
     local ped_count = 0
