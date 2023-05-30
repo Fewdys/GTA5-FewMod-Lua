@@ -7,7 +7,7 @@ util.require_natives(1676318796)
 util.require_natives(1663599433)
 
 local response = false
-local localversion = 1.46
+local localversion = 1.47
 local localKs = false
 async_http.init("raw.githubusercontent.com", "/Fewdys/GTA5-FewMod-Lua/main/FewModVersion.lua", function(output)
     currentVer = tonumber(output)
@@ -10639,8 +10639,14 @@ end
 --------------------------------------------------------------------------------------------------------------------------------
 -- Fun Stuff
 
-menu.action(fun, "Random Outfit", {}, "Gives You A Random Outfit \n(Can Be Used To Leave Any Bird You Switch Into)", function()
+menu.action(fun, "Random Female Outfit", {}, "Gives You A Random Outfit \n(Can Be Used To Leave Any Bird You Switch Into)", function()
     menu.trigger_commands("mpfemale")
+    util.yield(0800)
+    menu.trigger_commands("randomoutfit")
+end)
+
+menu.action(fun, "Random Male Outfit", {}, "Gives You A Random Outfit \n(Can Be Used To Leave Any Bird You Switch Into)", function()
+    menu.trigger_commands("mpmale")
     util.yield(0800)
     menu.trigger_commands("randomoutfit")
 end)
@@ -11166,8 +11172,6 @@ attach_self = menu.list(pmenu, "Attach Stuff", {})
             menu.trigger_commands("accat01")
         else
             menu.trigger_commands("mpfemale")
-            util.yield(0500)
-            menu.trigger_commands("randomoutfit")
             menu.trigger_commands("allguns")
         end
     end)
@@ -11177,8 +11181,6 @@ menu.toggle(pmenu, "Become A Monekey", {}, "Change Into A Money", function(on)
         menu.trigger_commands("acchimp02")
     else
         menu.trigger_commands("mpfemale")
-        util.yield(0500)
-        menu.trigger_commands("randomoutfit")
     end
 end)
 
@@ -11193,7 +11195,6 @@ menu.toggle(pmenu, "Become A KillerWhale", {}, "Change Into A KillerWhale", func
         menu.trigger_commands("allguns")
         menu.trigger_commands("mpfemale")
         util.yield(0500)
-        menu.trigger_commands("randomoutfit")
         menu.trigger_commands("tpmazehelipad")
     end
 end)
@@ -11207,8 +11208,6 @@ menu.toggle(pmenu, "Become A Rat", {}, "Change Into A Rat", function(on)
         menu.trigger_commands("walkstyle poshfemale")
         menu.trigger_commands("mpfemale")
         menu.trigger_commands("allguns")
-        util.yield(0500)
-        menu.trigger_commands("randomoutfit")
     end
 end)
 
@@ -11221,8 +11220,6 @@ menu.toggle(pmenu, "Become A Mountain Lion", {}, "Change Into A Mountain Lion", 
         menu.trigger_commands("walkstyle poshfemale")
         menu.trigger_commands("mpfemale")
         menu.trigger_commands("allguns")
-        util.yield(0500)
-        menu.trigger_commands("randomoutfit")
     end
 end)
 
@@ -11235,8 +11232,6 @@ menu.toggle(pmenu, "Become A Panther", {}, "Change Into A Panther", function(on)
         menu.trigger_commands("walkstyle poshfemale")
         menu.trigger_commands("mpfemale")
         menu.trigger_commands("allguns")
-        util.yield(0500)
-        menu.trigger_commands("randomoutfit")
     end
 end)
 
@@ -11249,8 +11244,6 @@ menu.toggle(pmenu, "Become Westy (Dog)", {}, "Change Into Westy (Dog)", function
         menu.trigger_commands("walkstyle poshfemale")
         menu.trigger_commands("mpfemale")
         menu.trigger_commands("allguns")
-        util.yield(0500)
-        menu.trigger_commands("randomoutfit")
     end
 end)
 
@@ -11263,8 +11256,6 @@ menu.toggle(pmenu, "Become A GermanShepherd (Dog)", {}, "Change Into A GermanShe
         menu.trigger_commands("walkstyle poshfemale")
         menu.trigger_commands("mpfemale")
         menu.trigger_commands("allguns")
-        util.yield(0500)
-        menu.trigger_commands("randomoutfit")
     end
 end)
 
@@ -11277,8 +11268,6 @@ menu.toggle(pmenu, "Become A Rottweiler (Dog)", {}, "Change Into A Rottweiler (D
         menu.trigger_commands("walkstyle poshfemale")
         menu.trigger_commands("mpfemale")
         menu.trigger_commands("allguns")
-        util.yield(0500)
-        menu.trigger_commands("randomoutfit")
     end
 end)
 
@@ -11291,8 +11280,6 @@ menu.toggle(pmenu, "Become A Poodle (Dog)", {}, "Change Into A Poodle (Dog)", fu
         menu.trigger_commands("walkstyle poshfemale")
         menu.trigger_commands("mpfemale")
         menu.trigger_commands("allguns")
-        util.yield(0500)
-        menu.trigger_commands("randomoutfit")
     end
 end)
 
@@ -11305,8 +11292,6 @@ menu.toggle(pmenu, "Become A Boar", {}, "Change Into A Boar", function(on)
         menu.trigger_commands("walkstyle poshfemale")
         menu.trigger_commands("mpfemale")
         menu.trigger_commands("allguns")
-        util.yield(0500)
-        menu.trigger_commands("randomoutfit")
     end
 end)
 
@@ -11319,8 +11304,6 @@ menu.toggle(pmenu, "Become Pug (Dog)", {}, "Change Into Pug (Dog)", function(on)
         menu.trigger_commands("walkstyle poshfemale")
         menu.trigger_commands("mpfemale")
         menu.trigger_commands("allguns")
-        util.yield(0500)
-        menu.trigger_commands("randomoutfit")
     end
 end)
 
@@ -11333,8 +11316,6 @@ menu.toggle(pmenu, "Become Chop (Dog)", {}, "Change Into Chop (Dog)", function(o
         menu.trigger_commands("walkstyle poshfemale")
         menu.trigger_commands("mpfemale")
         menu.trigger_commands("allguns")
-        util.yield(0500)
-        menu.trigger_commands("randomoutfit")
     end
 end)
 
@@ -11347,8 +11328,6 @@ menu.toggle(pmenu, "Become A Coyote", {}, "Change Into A Coyote", function(on)
         menu.trigger_commands("walkstyle poshfemale")
         menu.trigger_commands("mpfemale")
         menu.trigger_commands("allguns")
-        util.yield(0500)
-        menu.trigger_commands("randomoutfit")
     end
 end)
 
@@ -11361,8 +11340,6 @@ menu.toggle(pmenu, "Become A Deer", {}, "Change Into A Deer", function(on)
         menu.trigger_commands("walkstyle poshfemale")
         menu.trigger_commands("mpfemale")
         menu.trigger_commands("allguns")
-        util.yield(0500)
-        menu.trigger_commands("randomoutfit")
     end
 end)
 
@@ -11375,8 +11352,6 @@ menu.action(pmenu, "Become A Chickenhawk", {"chickenhawktoggle"}, "Change Into A
     else
         menu.trigger_commands("reducedcollision" .. " off")
         menu.trigger_commands("mpfemale")
-        util.yield(0500)
-        menu.trigger_commands("randomoutfit")
         menu.trigger_commands("allguns")
     end
 end)
@@ -11390,8 +11365,6 @@ menu.action(pmenu, "Become A Pigeon", {"pigeontoggle"}, "Change Into A Pigeon", 
     else
         menu.trigger_commands("reducedcollision" .. " off")
         menu.trigger_commands("mpfemale")
-        util.yield(0500)
-        menu.trigger_commands("randomoutfit")
         menu.trigger_commands("allguns")
     end
 end)
@@ -11405,8 +11378,6 @@ menu.action(pmenu, "Become A Cormorant", {"cormoranttoggle"}, "Change Into A Cor
     else
         menu.trigger_commands("reducedcollision" .. " off")
         menu.trigger_commands("mpfemale")
-        util.yield(0500)
-        menu.trigger_commands("randomoutfit")
         menu.trigger_commands("allguns")
     end
 end)
@@ -11420,8 +11391,6 @@ menu.action(pmenu, "Become A Crow", {"crowtoggle"}, "Change Into A Crow", functi
     else
         menu.trigger_commands("reducedcollision" .. " off")
         menu.trigger_commands("mpfemale")
-        util.yield(0500)
-        menu.trigger_commands("randomoutfit")
         menu.trigger_commands("allguns")
     end
 end)
@@ -11435,8 +11404,6 @@ menu.toggle(pmenu, "Become A Pig", {}, "Change Into A Pig", function(on)
         menu.trigger_commands("walkstyle poshfemale")
         menu.trigger_commands("mpfemale")
         menu.trigger_commands("allguns")
-        util.yield(0500)
-        menu.trigger_commands("randomoutfit")
     end
 end)
 
@@ -11449,8 +11416,6 @@ menu.toggle(pmenu, "Become A Rabbit", {}, "Change Into A Rabbit", function(on)
         menu.trigger_commands("walkstyle poshfemale")
         menu.trigger_commands("mpfemale")
         menu.trigger_commands("allguns")
-        util.yield(0500)
-        menu.trigger_commands("randomoutfit")
     end
 end)
 
@@ -11463,8 +11428,6 @@ menu.toggle(pmenu, "Become A Big Rabbit", {}, "Change Into A Big Rabbit", functi
         menu.trigger_commands("walkstyle poshfemale")
         menu.trigger_commands("mpfemale")
         menu.trigger_commands("allguns")
-        util.yield(0500)
-        menu.trigger_commands("randomoutfit")
     end
 end)
 
@@ -11475,8 +11438,6 @@ menu.toggle(pmenu, "Become A Furry", {}, "Change Into A Furry lol", function(on)
     else
         menu.trigger_commands("walkstyle poshfemale")
         menu.trigger_commands("mpfemale")
-        util.yield(0500)
-        menu.trigger_commands("randomoutfit")
     end
 end)
 
@@ -11487,8 +11448,6 @@ menu.toggle(pmenu, "Become Yule Monster", {}, "Change Into Yule Monster", functi
     else
         menu.trigger_commands("walkstyle poshfemale")
         menu.trigger_commands("mpfemale")
-        util.yield(0500)
-        menu.trigger_commands("randomoutfit")
     end
 end)
 
@@ -11499,8 +11458,6 @@ menu.toggle(pmenu, "Become Bigfoot", {}, "Change Into Bigfoot", function(on)
     else
         menu.trigger_commands("otr")
         menu.trigger_commands("mpfemale")
-        util.yield(0500)
-        menu.trigger_commands("randomoutfit")
     end
 end)
 
@@ -11510,8 +11467,7 @@ menu.toggle(pmenu, "Become Trevor", {}, "Change Into Trevor", function(on)
         menu.trigger_commands("walkstyle verydrunk")
     else
         menu.trigger_commands("walkstyle poshfemale")
-        util.yield(0500)
-        menu.trigger_commands("randomoutfit")
+        menu.trigger_commands("mpfemale")
     end
 end)
 
@@ -11521,8 +11477,7 @@ menu.toggle(pmenu, "Become Micheal", {}, "Change Into Micheal", function(on)
         menu.trigger_commands("walkstyle Micheal")
     else
         menu.trigger_commands("walkstyle poshfemale")
-        util.yield(0500)
-        menu.trigger_commands("randomoutfit")
+        menu.trigger_commands("mpfemale")
     end
 end)
 
@@ -11532,8 +11487,7 @@ menu.toggle(pmenu, "Become Franklin", {}, "Change Into Franklin", function(on)
         menu.trigger_commands("walkstyle Franklin")
     else
         menu.trigger_commands("walkstyle poshfemale")
-        util.yield(0500)
-        menu.trigger_commands("randomoutfit")
+        menu.trigger_commands("mpfemale")
     end
 end)
 
