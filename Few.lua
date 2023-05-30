@@ -5,6 +5,7 @@
 util.keep_running()
 util.require_natives(1676318796)
 util.require_natives(1663599433)
+util.ensure_package_is_installed('lua/quaternionLib')
 
 local response = false
 local localversion = 1.47
@@ -6801,6 +6802,7 @@ function infoverplaytoggle()
     end
 end
 
+----------------------------------------------------------------------------------------------------------------------------------
     --Taken From JerryScript
     local ragdolloptions = menu.list(selfc, "Ragdoll Options", {}, "Superman Options & Gracefulness Must Be Off")
 
@@ -6832,6 +6834,9 @@ end
     menu.toggle_loop(ragdolloptions, "Ragdoll", {"ragdollmyself"}, "Just Makes You Ragdoll. \nSuperman Options & Gracefulness Must Be Off", function()
         PED.SET_PED_TO_RAGDOLL(players.user_ped(), 2000, 2000, 0, true, true, true)
     end)
+
+----------------------------------------------------------------------------------------------------------------------------------
+
 
 menu.toggle_loop(selfc, "Fast Roll", {"fastroll"}, "", function()
     STATS.STAT_SET_INT(util.joaat("MP"..util.get_char_slot().."_SHOOTING_ABILITY"), 350, true)
@@ -12253,13 +12258,8 @@ menu.toggle(misc, "Stand ID", {}, "It makes you invisible to other stand users, 
     end
 end)
 
-util.on_stop(function ()
+util.on_pre_stop(function()
     VEHICLE.SET_VEHICLE_REDUCE_GRIP(veh, false)
-    VEHICLE.SET_VEHICLE_GRAVITY(veh, true)
-    ENTITY.SET_ENTITY_COLLISION(veh, true, true);
-    if driveOnWaterEntity then
-        entities.delete_by_handle(driveOnWaterEntity)
-    end
     util.toast("Cleaning...")
     local ct = 0
         for k,ent in pairs(entities.get_all_vehicles_as_handles()) do
@@ -12291,6 +12291,13 @@ util.on_stop(function ()
                 ct += 1
             end
         end
+end)
+
+util.on_stop(function()
+    VEHICLE.SET_VEHICLE_REDUCE_GRIP(veh, false)
+    VEHICLE.SET_VEHICLE_GRAVITY(veh, true)
+    ENTITY.SET_ENTITY_COLLISION(veh, true, true);
+    util.toast("Cleaned, Bye <3")
 end)
 
 -------------------------------------------------------------------------------------------------------------------------------------------------------
