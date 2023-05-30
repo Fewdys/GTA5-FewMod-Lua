@@ -679,7 +679,6 @@ Fewd = {
         util.toast("You crashed " .. PLAYER.GET_PLAYER_NAME(player_id))
     end
 }
-util.yield_once()
 
 request_model = function(hash, timeout)
     timeout = timeout or 3
@@ -809,7 +808,6 @@ players.on_join(function(player_id)
     local friendly = menu.list(Few, "Friendly")
     local vehicle = menu.list(Few, "Vehicle")
     local attachc = menu.list(Few, "Misc")
-
     local chats = menu.list(Few, "Chat Options", {}, "")
     util.yield_once()
 
@@ -5708,7 +5706,6 @@ end)
 end)
 
 players.dispatch_on_join()
-util.yield_once()
 
 -------------------------------------------------------------------------------------------------------------------------------------------------
 
