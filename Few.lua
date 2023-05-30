@@ -6996,7 +6996,7 @@ end, function ()
 	menu.set_value(armourslider, defaultArmour)
 end)
 
-armourslider = menu.slider(selfc, "Set Max Armour", {"moddedarmour"}, "", 0, 9000, defaultArmour, 10, function(value, prev, click)
+armourslider = menu.slider(selfc, "Set Max Armour", {"moddedarmour"}, "", 100, 9000, defaultArmour, 10, function(value, prev, click)
 	moddedHealth = value
 end)
 
