@@ -8825,20 +8825,20 @@ function ent_func.get_weapon_name_from_hash(hash)
             return util.get_label_text(v.label_key)
         end
     end
-    return T("Unarmed")
+    return "Unarmed"
 end
 
 function ent_func.bool(bool)
     if bool then
-        return T("Yes")
+        return "Yes"
     else
-        return T("No")
+        return "No"
     end
 end
 
 function ent_func.check(info)
     if info == nil or info == "NULL" or info == 0 or info == " " then
-        return T("None")
+        return "None"
     else
         return info
     end
@@ -8854,7 +8854,7 @@ end
 
 function ent_func.org(org_type)
     if org_type == -1 then
-        return T("Isn't in any")
+        return "Isn't in any"
     elseif org_type == 0 then
         return "CEO"
     else
