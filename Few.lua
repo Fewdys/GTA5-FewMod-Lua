@@ -6771,23 +6771,23 @@ function infoverplaytoggle()
 end
 
     --Taken From JerryScript
-    local ragdolloptions = menu.list(selfc, "Ragdoll Options", {}, "")
+    local ragdolloptions = menu.list(selfc, "Ragdoll Options", {}, "Superman Options Must Be Off To Use These")
 
-    menu.toggle_loop(ragdolloptions, "Better clumsiness", {"extraclumsy"}, "Like stands clumsiness, but you can get up after you fall.", function()
+    menu.toggle_loop(ragdolloptions, "Better clumsiness", {"extraclumsy"}, "Like stands clumsiness, but you can get up after you fall. \nSuperman Options Must Be Off", function()
         if PED.IS_PED_RAGDOLL(players.user_ped()) then 
             util.yield(3000)
         end
         PED.SET_PED_RAGDOLL_ON_COLLISION(players.user_ped(), true)
     end)
 
-    menu.action(ragdolloptions, "Stumble", {"selfstumble"}, "Makes you stumble with a good chance of falling over.", function()
+    menu.action(ragdolloptions, "Stumble", {"selfstumble"}, "Makes you stumble with a good chance of falling over. \nSuperman Options Must Be Off", function()
         local vector = ENTITY.GET_ENTITY_FORWARD_VECTOR(players.user_ped())
         PED.SET_PED_TO_RAGDOLL_WITH_FALL(players.user_ped(), 1500, 2000, 2, vector.x, -vector.y, vector.z, 1, 0, 0, 0, 0, 0, 0)
     end)
 
     -- credit to LAZScript for inspiring this
     local fallTimeout = false
-    menu.toggle(ragdolloptions, "Fall over", {"fallOver"}, "Makes you stumble, fall over and prevents you from getting back up.", function(toggle)
+    menu.toggle(ragdolloptions, "Fall over", {"fallOver"}, "Makes you stumble, fall over and prevents you from getting back up. \nSuperman Options Must Be Off", function(toggle)
         if toggle then
             local vector = ENTITY.GET_ENTITY_FORWARD_VECTOR(players.user_ped())
             PED.SET_PED_TO_RAGDOLL_WITH_FALL(players.user_ped(), 1500, 2000, 2, vector.x, -vector.y, vector.z, 1, 0, 0, 0, 0, 0, 0)
@@ -6800,7 +6800,7 @@ end
     end)
 
     -- credit to aaron for telling me this :p
-    menu.toggle_loop(ragdolloptions, "Ragdoll", {"ragdollmyself"}, "Just Makes You Ragdoll.", function()
+    menu.toggle_loop(ragdolloptions, "Ragdoll", {"ragdollmyself"}, "Just Makes You Ragdoll. \nSuperman Options Must Be Off", function()
         PED.SET_PED_TO_RAGDOLL(players.user_ped(), 2000, 2000, 0, true, true, true)
     end)
 
