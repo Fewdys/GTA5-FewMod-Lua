@@ -12293,7 +12293,6 @@ util.on_pre_stop(function()
 end)
 
 util.on_stop(function()
-    VEHICLE.SET_VEHICLE_REDUCE_GRIP(veh, false)
     VEHICLE.SET_VEHICLE_GRAVITY(veh, true)
     ENTITY.SET_ENTITY_COLLISION(veh, true, true);
     util.toast("Cleaned, Bye <3")
