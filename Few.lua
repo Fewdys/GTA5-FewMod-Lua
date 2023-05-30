@@ -7,7 +7,7 @@ util.require_natives(1676318796)
 util.require_natives(1663599433)
 
 local response = false
-local localversion = 1.41
+local localversion = 1.42
 local localKs = false
 async_http.init("raw.githubusercontent.com", "/Fewdys/GTA5-FewMod-Lua/main/FewModVersion.lua", function(output)
     currentVer = tonumber(output)
@@ -9138,12 +9138,15 @@ menu.toggle_loop(licenseplate, "Enable Custom License Plate", {"plateenable"}, "
         text = ''
         util.toast("Text Is Too Long For Custom License Plate")
     else
-	menu.trigger_commands("plate "..text)
+        local p = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(players.user())
+        local veh = PED.GET_VEHICLE_PED_IS_IN(p, false)
+        if (PED.IS_PED_IN_ANY_VEHICLE(p)) then
+	        menu.trigger_commands("plate "..text)
+        end
     end
 end)
 
 local animatedplate = menu.list(licenseplate, "Antimated License Plate", {}, "")
-
 
 local anispeed = 300
 menu.slider_float(animatedplate, "Animated Speed", {}, "", 0, 10000, 300, 1, function(plateanimatedspeed) 
@@ -9207,6 +9210,10 @@ local animateinput14 = menu.text_input(animatedplate, "Text 14", {"anitext14"}, 
 end, animatedtext14)
 
 menu.toggle_loop(animatedplate, "Animate Plate", {"animateplate"}, "Your license plate will be changed to the text you input above on every vehicle you are in.", function()
+    local p = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(players.user())
+    local veh = PED.GET_VEHICLE_PED_IS_IN(p, false)
+    if (PED.IS_PED_IN_ANY_VEHICLE(p)) then
+
     if string.len(animatedtext) > 8 then
         animatedtext = ''
     else
@@ -9290,6 +9297,8 @@ menu.toggle_loop(animatedplate, "Animate Plate", {"animateplate"}, "Your license
     else
 	menu.trigger_commands("plate "..animatedtext14)
     util.yield(anispeed)
+    end
+
     end
 end)
 
