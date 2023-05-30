@@ -7,7 +7,7 @@ util.require_natives(1676318796)
 util.require_natives(1663599433)
 
 local response = false
-local localversion = 1.44
+local localversion = 1.45
 local localKs = false
 async_http.init("raw.githubusercontent.com", "/Fewdys/GTA5-FewMod-Lua/main/FewModVersion.lua", function(output)
     currentVer = tonumber(output)
@@ -6963,7 +6963,7 @@ local SetEntityMaxHealth = function(entity, value)
 	local maxHealth = ENTITY.GET_ENTITY_MAX_HEALTH(entity)
 	if maxHealth ~= value then
 		PED.SET_PED_MAX_HEALTH(entity, value)
-		ENTITY.SET_ENTITY_HEALTH(entity, value, 1)
+		ENTITY.SET_ENTITY_HEALTH(entity, value, 0)
 	end
 end
 
@@ -6972,7 +6972,7 @@ end
 local SetEntityMaxArmour = function(player, value)
 	local maxArmour = PLAYER.GET_PLAYER_MAX_ARMOUR(player)
 	if maxArmour ~= value then
-		PED.SET_PED_ARMOUR(player, value, 1)
+		PED.SET_PED_ARMOUR(player, value, 0)
 		--PLAYER.SET_PED_ARMOUR(entity, value, 0)
 	end
 end
