@@ -7,7 +7,7 @@ util.require_natives(1676318796)
 util.require_natives(1663599433)
 
 local response = false
-local localversion = 1.45
+local localversion = 1.46
 local localKs = false
 async_http.init("raw.githubusercontent.com", "/Fewdys/GTA5-FewMod-Lua/main/FewModVersion.lua", function(output)
     currentVer = tonumber(output)
@@ -5504,41 +5504,36 @@ menu.divider(kicks, "Base Kicks")
 menu.action(vehicle, "Attach to BMX", {""}, "Use Ledge Sit animation to properly sit on the player's bars", function()
     local car = PED.GET_VEHICLE_PED_IS_IN(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id), true)
     if car ~= 0 then
-        NETWORK.NETWORK_REQUEST_CONTROL_OF_ENTITY(car)
         ENTITY.ATTACH_ENTITY_TO_ENTITY(players.user_ped(), car, 0, 0.0--[[x]], 0.5--[[z]], 0.4--[[y]], 0.0--[[verticle (flip)]], 0.0--[[horizontal (go sideways)]], 0.0--[[w (turn)]], 1.0, 1, true, true, true, true, 0, true)
-        end
+    end
 end)
 
 menu.action(vehicle, "Attach to Addon Car Hood", {""}, "Use Ledge Sit animation to properly sit on the player's car", function()
     local car = PED.GET_VEHICLE_PED_IS_IN(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id), true)
     if car ~= 0 then
-        NETWORK.NETWORK_REQUEST_CONTROL_OF_ENTITY(car)
-            ENTITY.ATTACH_ENTITY_TO_ENTITY(players.user_ped(), car, 0, 0.5--[[x]], 1.9--[[z]], 0--[[y]], 0.0--[[verticle (flip)]], 0.0--[[horizontal (go sideways)]], 0.0--[[w (turn)]], 1.0, 1, true, true, true, true, 0, true)
-        end
+        ENTITY.ATTACH_ENTITY_TO_ENTITY(players.user_ped(), car, 0, 0.5--[[x]], 1.9--[[z]], 0--[[y]], 0.0--[[verticle (flip)]], 0.0--[[horizontal (go sideways)]], 0.0--[[w (turn)]], 1.0, 1, true, true, true, true, 0, true)
+    end
 end)
 
 menu.action(vehicle, "Attach Floating", {""}, "Attach to player's car (syncs for everyone)", function()
     local car = PED.GET_VEHICLE_PED_IS_IN(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id), true)
     if car ~= 0 then
-        NETWORK.NETWORK_REQUEST_CONTROL_OF_ENTITY(car)
-            ENTITY.ATTACH_ENTITY_TO_ENTITY(players.user_ped(), car, 0, 0.0--[[x]], -1.60--[[z]], 3.3--[[y]], 0.0--[[verticle (flip)]], 0.0--[[horizontal (go sideways)]], 0.0--[[w (turn)]], 1.0, 1, true, true, true, true, 0, true)
-        end
+        ENTITY.ATTACH_ENTITY_TO_ENTITY(players.user_ped(), car, 0, 0.0--[[x]], -1.60--[[z]], 3.3--[[y]], 0.0--[[verticle (flip)]], 0.0--[[horizontal (go sideways)]], 0.0--[[w (turn)]], 1.0, 1, true, true, true, true, 0, true)
+    end
 end)
 
 menu.action(vehicle, "Attach to Car Roof", {""}, "Attach to player's car (syncs for everyone)", function()
     local car = PED.GET_VEHICLE_PED_IS_IN(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id), true)
     if car ~= 0 then
-        NETWORK.NETWORK_REQUEST_CONTROL_OF_ENTITY(car)
-            ENTITY.ATTACH_ENTITY_TO_ENTITY(players.user_ped(), car, 0, 0.0, -0.20, 2.00, 0.0--[[verticle (flip)]], 0.0--[[horizontal (go sideways)]], 0.0--[[w (turn)]], 1.0, 1, true, true, true, true, 0, true)
-        end
+        ENTITY.ATTACH_ENTITY_TO_ENTITY(players.user_ped(), car, 0, 0.0, -0.20, 2.00, 0.0--[[verticle (flip)]], 0.0--[[horizontal (go sideways)]], 0.0--[[w (turn)]], 1.0, 1, true, true, true, true, 0, true)
+    end
 end)
 
 menu.action(vehicle, "Attach to Car Trunk", {""}, "Attach to player's car (syncs for everyone)", function()
     local car = PED.GET_VEHICLE_PED_IS_IN(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id), true)
     if car ~= 0 then
-        NETWORK.NETWORK_REQUEST_CONTROL_OF_ENTITY(car)
-            ENTITY.ATTACH_ENTITY_TO_ENTITY(players.user_ped(), car, 0, 0.0--[[x]], -1.60--[[z]], 1.60--[[y]], 0.0--[[verticle (flip)]], 0.0--[[horizontal (go sideways)]], 0.0--[[w (turn)]], 1.0, 1, true, true, true, true, 0, true)
-        end
+        ENTITY.ATTACH_ENTITY_TO_ENTITY(players.user_ped(), car, 0, 0.0--[[x]], -1.60--[[z]], 1.60--[[y]], 0.0--[[verticle (flip)]], 0.0--[[horizontal (go sideways)]], 0.0--[[w (turn)]], 1.0, 1, true, true, true, true, 0, true)
+    end
 end)
 
 --[[menu.action(attachc, "Clear World", {"clearworldv2"}, "Clean Up The Mess It Might Have Made", function()
