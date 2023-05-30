@@ -5,7 +5,6 @@
 util.keep_running()
 util.require_natives(1676318796)
 util.require_natives(1663599433)
-util.ensure_package_is_installed('lua/quaternionLib')
 
 local response = false
 local localversion = 1.47
