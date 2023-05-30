@@ -7,7 +7,7 @@ util.require_natives(1676318796)
 util.require_natives(1663599433)
 
 local response = false
-local localversion = 1.47
+local localversion = 1.48
 local localKs = false
 async_http.init("raw.githubusercontent.com", "/Fewdys/GTA5-FewMod-Lua/main/FewModVersion.lua", function(output)
     currentVer = tonumber(output)
@@ -6978,6 +6978,7 @@ end
 
 menu.toggle_loop(selfc, "Mod Max Health", {"modhealth"}, "", function ()
 	SetEntityMaxHealth(players.user_ped(), moddedHealth)
+    menu.trigger_commands("maxhealth")
 end, function ()
 	SetEntityMaxHealth(players.user_ped(), defaultHealth)
 	menu.set_value(healthslider, defaultHealth)
