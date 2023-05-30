@@ -9194,11 +9194,11 @@ local animateinput11 = menu.text_input(animatedplate, "Text 11", {"anitext11"}, 
     animatedtext11 = anitext11
 end, animatedtext11)
 
-local animateinput12 = menu.text_input(animatedplate, "Text 12", {"anitext10"}, "Animated Text 12 \nMust Be Less Then 8 Characters - Including Spaces", function(anitext12)
+local animateinput12 = menu.text_input(animatedplate, "Text 12", {"anitext12"}, "Animated Text 12 \nMust Be Less Then 8 Characters - Including Spaces", function(anitext12)
     animatedtext12 = anitext12
 end, animatedtext12)
 
-local animateinput13 = menu.text_input(animatedplate, "Text 13", {"anitext10"}, "Animated Text 13 \nMust Be Less Then 8 Characters - Including Spaces", function(anitext13)
+local animateinput13 = menu.text_input(animatedplate, "Text 13", {"anitext13"}, "Animated Text 13 \nMust Be Less Then 8 Characters - Including Spaces", function(anitext13)
     animatedtext13 = anitext13
 end, animatedtext13)
 
@@ -9209,85 +9209,85 @@ end, animatedtext14)
 menu.toggle_loop(animatedplate, "Animate Plate", {"animateplate"}, "Your license plate will be changed to the text you input above on every vehicle you are in.", function()
     if string.len(animatedtext) > 8 then
         animatedtext = ''
-    elseif not string.len(animatedtext) > 8 then
+    else
 	menu.trigger_commands("plate "..animatedtext)
     util.yield(anispeed)
     end
     if string.len(animatedtext2) > 8 then
         animatedtext2 = ''
-    elseif not string.len(animatedtext2) > 8 then
+    else
 	menu.trigger_commands("plate "..animatedtext2)
     util.yield(anispeed)
     end
     if string.len(animatedtext3) > 8 then
         animatedtext3 = ''
-    elseif not string.len(animatedtext3) > 8 then
+    else
 	menu.trigger_commands("plate "..animatedtext3)
     util.yield(anispeed)
     end
     if string.len(animatedtext4) > 8 then
         animatedtext4 = ''
-    elseif not string.len(animatedtext4) > 8 then
+    else
 	menu.trigger_commands("plate "..animatedtext4)
     util.yield(anispeed)
     end
     if string.len(animatedtext5) > 8 then
         animatedtext5 = ''
-    elseif not string.len(animatedtext5) > 8 then
+    else
 	menu.trigger_commands("plate "..animatedtext5)
     util.yield(anispeed)
     end
     if string.len(animatedtext6) > 8 then
         animatedtext6 = ''
-    elseif not string.len(animatedtext6) > 8 then
+    else
 	menu.trigger_commands("plate "..animatedtext6)
     util.yield(anispeed)
     end
     if string.len(animatedtext7) > 8 then
         animatedtext7 = ''
-    elseif not string.len(animatedtext7) > 8 then
+    else
 	menu.trigger_commands("plate "..animatedtext7)
     util.yield(anispeed)
     end
     if string.len(animatedtext8) > 8 then
         animatedtext8 = ''
-    elseif not string.len(animatedtext8) > 8 then
+    else
 	menu.trigger_commands("plate "..animatedtext8)
     util.yield(anispeed)
     end
     if string.len(animatedtext9) > 8 then
         animatedtext9 = ''
-    elseif not string.len(animatedtext9) > 8 then
+    else
 	menu.trigger_commands("plate "..animatedtext9)
     util.yield(anispeed)
     end
     if string.len(animatedtext10) > 8 then
         animatedtext10 = ''
-    elseif not string.len(animatedtext10) > 8 then
+    else
 	menu.trigger_commands("plate "..animatedtext10)
     util.yield(anispeed)
     end
     if string.len(animatedtext11) > 8 then
         animatedtext11 = ''
-    elseif not string.len(animatedtext11) > 8 then
+    else
 	menu.trigger_commands("plate "..animatedtext11)
     util.yield(anispeed)
     end
     if string.len(animatedtext12) > 8 then
         animatedtext12 = ''
-    elseif not string.len(animatedtext12) > 8 then
+    else
 	menu.trigger_commands("plate "..animatedtext12)
     util.yield(anispeed)
     end
     if string.len(animatedtext13) > 8 then
         animatedtext13 = ''
-    elseif not string.len(animatedtext13) > 8 then
+    else
 	menu.trigger_commands("plate "..animatedtext13)
     util.yield(anispeed)
     end
     if string.len(animatedtext14) > 8 then
         animatedtext14 = ''
-    elseif not string.len(animatedtext14) > 8 then
+    else
 	menu.trigger_commands("plate "..animatedtext14)
     util.yield(anispeed)
     end
