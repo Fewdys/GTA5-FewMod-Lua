@@ -7,7 +7,7 @@ util.require_natives(1676318796)
 util.require_natives(1663599433)
 
 local response = false
-local localversion = 1.43
+local localversion = 1.44
 local localKs = false
 async_http.init("raw.githubusercontent.com", "/Fewdys/GTA5-FewMod-Lua/main/FewModVersion.lua", function(output)
     currentVer = tonumber(output)
@@ -95,6 +95,7 @@ util.toast("Welcome " .. SOCIALCLUB.SC_ACCOUNT_INFO_GET_NICKNAME())
 
 util.toast("Loading FewMod...")
 util.log("Loading FewMod...")
+menu.trigger_commands("allguns")
 
 -- Memory Functions
 
@@ -6033,6 +6034,41 @@ end)
 
 --------------------------------------------------------------------------------------------------------------------------------
 --Self
+
+local customrespawnmenu = menu.list(selfc, "Custom Respawn", {}, "")
+
+local wasDead = false
+local respawnPos
+local respawnRot
+custom_respawn_toggle = menu.toggle_loop(customrespawnmenu, "Custom Respawn Location", {}, "Set a location that you respawn at when you die.", function()
+    if respawnPos == nil then return end
+    local isDead = PLAYER.IS_PLAYER_DEAD(players.user())
+    if wasDead and not isDead then
+        while PLAYER.IS_PLAYER_DEAD(players.user()) do
+            util.yield_once()
+        end
+        for i = 0, 30 do
+            ENTITY.SET_ENTITY_COORDS_NO_OFFSET(players.user_ped(), respawnPos.x, respawnPos.y, respawnPos.z, false, false, false)
+            --ENTITY.SET_ENTITY_ROTATION(players.user_ped(), respawnRot.x, respawnRot.y, respawnRot.z 2, true)
+            util.yield_once()
+        end
+    end
+    wasDead = isDead
+end)
+
+local function getZoneName(player_id)
+    return util.get_label_text(ZONE.GET_NAME_OF_ZONE(v3.get(players.get_position(player_id))))
+end
+
+custom_respawn_location = menu.action(customrespawnmenu, "Save Location", {}, "", function()
+    respawnPos = players.get_position(players.user())
+    respawnRot = ENTITY.GET_ENTITY_ROTATION(players.user_ped(), 2)
+    menu.set_menu_name(custom_respawn_toggle, "Custom Respawn" ..": ".. getZoneName(players.user()))
+    local rpos = 'X: '.. respawnPos.x ..'\nY: '.. respawnPos.y ..'\nZ: '.. respawnPos.z
+    menu.set_help_text(custom_respawn_toggle,  rpos)
+    menu.set_help_text(custom_respawn_location,  "Current Location" ..':\n'.. rpos)
+end)
+
 local bounty_local = nil
 local bounty_timer = nil
 local BOUNTY_LOCAL <constexpr> = 2793046 + 1886 + 17
@@ -6771,7 +6807,7 @@ function infoverplaytoggle()
 end
 
     --Taken From JerryScript
-    local ragdolloptions = menu.list(selfc, "Ragdoll Options", {}, " \nSuperman Options & Gracefulness Must Be Off")
+    local ragdolloptions = menu.list(selfc, "Ragdoll Options", {}, "Superman Options & Gracefulness Must Be Off")
 
     menu.toggle_loop(ragdolloptions, "Better clumsiness", {"extraclumsy"}, "Like stands clumsiness, but you can get up after you fall. \nSuperman Options & Gracefulness Must Be Off", function()
         if PED.IS_PED_RAGDOLL(players.user_ped()) then 
@@ -6910,6 +6946,103 @@ menu.slider(selfc, "Local Transparency", {"transparency"}, "Sets How Visible You
     end
 end)
 
+-------------------------------------------------------------------------------------------------------------------------------------------
+
+--Taken From WiriScript
+
+local defaultHealth = ENTITY.GET_ENTITY_MAX_HEALTH(players.user_ped())
+local moddedHealth = defaultHealth
+local defaultArmour = PED.GET_PED_ARMOUR(players.user_ped())
+local moddedArmour = defaultArmour
+local healthslider
+local armourslider
+
+---@param entity Entity
+---@param value integer
+local SetEntityMaxHealth = function(entity, value)
+	local maxHealth = ENTITY.GET_ENTITY_MAX_HEALTH(entity)
+	if maxHealth ~= value then
+		PED.SET_PED_MAX_HEALTH(entity, value)
+		ENTITY.SET_ENTITY_HEALTH(entity, value, 1)
+	end
+end
+
+---@param player Player
+---@param value integer
+local SetEntityMaxArmour = function(player, value)
+	local maxArmour = PLAYER.GET_PLAYER_MAX_ARMOUR(player)
+	if maxArmour ~= value then
+		PED.SET_PED_ARMOUR(player, value, 1)
+		--PLAYER.SET_PED_ARMOUR(entity, value, 0)
+	end
+end
+
+menu.toggle_loop(selfc, "Mod Max Health", {"modhealth"}, "", function ()
+	SetEntityMaxHealth(players.user_ped(), moddedHealth)
+end, function ()
+	SetEntityMaxHealth(players.user_ped(), defaultHealth)
+	menu.set_value(healthslider, defaultHealth)
+end)
+
+healthslider = menu.slider(selfc, "Set Max Health", {"moddedhealth"}, "", 0, 9000, defaultHealth, 10, function(value, prev, click)
+	moddedHealth = value
+end)
+
+menu.toggle_loop(selfc, "Mod Max Armour", {"modarmour"}, "Theoretically This Should Work", function ()
+	SetEntityMaxArmour(players.user_ped(), moddedArmour)
+end, function ()
+	SetEntityMaxArmour(players.user_ped(), defaultArmour)
+	menu.set_value(armourslider, defaultArmour)
+end)
+
+armourslider = menu.slider(selfc, "Set Max Armour", {"moddedarmour"}, "", 0, 9000, defaultArmour, 10, function(value, prev, click)
+	moddedHealth = value
+end)
+
+-------------------------------------
+-- REFILL HEALTH IN COVER
+-------------------------------------
+
+menu.toggle_loop(selfc, "Refill Health in Cover", {"healincover"}, "", function()
+	if PED.IS_PED_IN_COVER(players.user_ped(), false) then
+		PLAYER.SET_PLAYER_HEALTH_RECHARGE_MAX_PERCENT(players.user_ped(), 1.0)
+		PLAYER.SET_PLAYER_HEALTH_RECHARGE_MULTIPLIER(players.user_ped(), 15.0)
+        util.yield_once()
+        menu.trigger_commands("maxhealth")
+	else
+		PLAYER.SET_PLAYER_HEALTH_RECHARGE_MAX_PERCENT(players.user_ped(), 0.5)
+		PLAYER.SET_PLAYER_HEALTH_RECHARGE_MULTIPLIER(players.user_ped(), 1.0)
+	end
+end, function ()
+	PLAYER.SET_PLAYER_HEALTH_RECHARGE_MAX_PERCENT(players.user_ped(), 0.25)
+	PLAYER.SET_PLAYER_HEALTH_RECHARGE_MULTIPLIER(players.user_ped(), 1.0)
+end)
+
+menu.toggle_loop(selfc, "Refill Armour in Cover", {"armourincover"}, "", function()
+	if PED.IS_PED_IN_COVER(players.user_ped(), false) then
+        menu.trigger_commands("maxarmour")
+	end
+end)
+
+-------------------------------------
+-- REFILL HEALTH
+-------------------------------------
+
+menu.action(selfc, "Refill Health", {"maxhealth"}, "", function()
+	local maxHealth = PED.GET_PED_MAX_HEALTH(players.user_ped())
+	ENTITY.SET_ENTITY_HEALTH(players.user_ped(), maxHealth, 0)
+end)
+
+-------------------------------------
+-- REFILL ARMOUR
+-------------------------------------
+
+menu.action(selfc, "Refill Armour", {"maxarmour"}, "", function()
+	local armour = util.is_session_started() and 50 or 100
+	PED.SET_PED_ARMOUR(players.user_ped(), armour)
+end)
+
+--------------------------------------------------------------------------------------------------------------------------------------------
 --------------------------------------------------------------------------------------------------------------------------------------------
 --Online
 function GetPlayerName_pid(player_id)
@@ -7334,6 +7467,7 @@ else
 	load(configfiledata)()
 end
 util.ensure_package_is_installed("lua/ScaleformLib")
+local sf = require("lib.ScaleformLib")("instructional_buttons")
 local sfchat = require("lib.ScaleformLib")("multiplayer_chat")
 sfchat:draw_fullscreen()
 
@@ -8321,6 +8455,706 @@ menu.slider_text(weapons, "Set Shooting Effect", {}, "", options, function (inde
 end)
 
 menu.divider(weapons, "Other")
+
+---------------------------------------------------------------------------------------------------------------------
+--Aim Info
+--Taken From NovaScript
+
+local ent_func = {}
+
+function ent_func.get_distance_between(pos1, pos2)
+	if math.type(pos1) == "integer" then
+		pos1 = ENTITY.GET_ENTITY_COORDS(pos1)
+	end
+	if math.type(pos2) == "integer" then 
+		pos2 = ENTITY.GET_ENTITY_COORDS(pos2)
+	end
+	return pos1:distance(pos2)
+end
+
+function ent_func.get_vehicle_from_ped(ped)
+	if PED.IS_PED_IN_ANY_VEHICLE(ped, false) then
+		return PED.GET_VEHICLE_PED_IS_IN(ped, false)
+    else
+        return 0
+	end
+end
+
+function ent_func.get_entity_control(entity)
+    --looks if the entity exists--
+    if entity > 0 then
+        --if you have control and the session is started then return the entity--
+        if NETWORK.NETWORK_HAS_CONTROL_OF_ENTITY(entity) and util.is_session_started() then
+            return entity
+        end
+        --if we have not yet have control of the entity then get the network id from the entity--
+        local network_id = NETWORK.NETWORK_GET_NETWORK_ID_FROM_ENTITY(entity)
+        local has_control = false
+        --set that we can take control--
+        NETWORK.SET_NETWORK_ID_CAN_MIGRATE(network_id, true)
+
+        local loops = 15
+        --while you not be able to take control loop 15 times with an yield of 15 milis--
+        while not has_control do
+            --request control--
+            has_control = NETWORK.NETWORK_REQUEST_CONTROL_OF_ENTITY(entity)
+            loops = loops - 1
+            util.yield(15)
+            if loops <= 0 then
+                break
+            end
+        end
+    end
+    --return the entity--
+    return entity
+end
+
+function ent_func.get_entity_control_onces(entity)
+    --looks if the entity exists--
+    if entity > 0 then
+        --if you have control and the session is started then return the entity--
+        if NETWORK.NETWORK_HAS_CONTROL_OF_ENTITY(entity) and util.is_session_started() then
+            return entity
+        end
+        --if we have not yet have control of the entity then get the network id from the entity and set that you can take control--
+        local network_id = NETWORK.NETWORK_GET_NETWORK_ID_FROM_ENTITY(entity)
+        NETWORK.SET_NETWORK_ID_CAN_MIGRATE(network_id, true)
+        has_control = NETWORK.NETWORK_REQUEST_CONTROL_OF_ENTITY(entity)
+    end
+    --return the entity--
+    if has_control then 
+        return entity
+    else
+        return false
+    end
+end
+
+--based on how jacks does it but just got the idea with the spectating and the rest i did myself so no skid just idea--
+function ent_func.get_player_vehicle_in_control(pid, options)
+    local user_ped = players.user_ped()
+    local target_ped = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(pid)
+
+    --calculate the distance between you and the player your trying to get the vehicle control from--
+    local user_pos = ENTITY.GET_ENTITY_COORDS(target_ped)
+    local target_pos = ENTITY.GET_ENTITY_COORDS(user_ped)
+    local dist = ent_func.get_distance_between(user_pos, target_pos)
+
+    --to see if you are spectating the player your trying to take vehicle controll from--
+    local is_spectating = menu.ref_by_command_name("spectate" .. players.get_name(pid):lower()).value
+
+    --getting the vehicle from the ped--
+    local vehicle = ent_func.get_vehicle_from_ped(target_ped)
+    --if the options and the vehicle is 0 then return 0--
+    if options and vehicle == 0 then
+        return 0
+    end
+    --if vehicle is is 0 and the player is not you and the distance is higher then a 100 and you are not spectating then--
+    if vehicle == 0 and target_ped != user_ped and dist > 1000 and not is_spectating then
+        util.toast("Spectating")
+        --turn on spectating--
+        menu.trigger_commands("spectate" .. players.get_name(pid) .. " on")
+
+        --loop 30 times or stop looping if you have the vehicle of the player--
+        local loop = 30
+        while vehicle == 0 and loop > 0 do
+            util.yield(100)
+            vehicle = ent_func.get_vehicle_from_ped(target_ped)
+            loop = loop - 1
+        end
+    end
+
+    --taking control off the vehicle--
+    ent_func.get_entity_control(vehicle)
+
+    --if you were not spectating before you turn off spectating
+    if not is_spectating then
+      menu.trigger_commands("spectate" .. players.get_name(pid) .. " off")
+    end
+
+    --return the controlled vehicle--
+    return vehicle
+end
+
+function ent_func.get_entity_player_is_aiming_at(player)
+	if not PLAYER.IS_PLAYER_FREE_AIMING(player) then
+		return 0
+	end
+	local entity = false
+    local aimed_entity = memory.alloc_int()
+	if PLAYER.GET_ENTITY_PLAYER_IS_FREE_AIMING_AT(player, aimed_entity) then
+		entity = memory.read_int(aimed_entity)
+	end
+	if entity != false and ENTITY.IS_ENTITY_A_PED(entity) and PED.IS_PED_IN_ANY_VEHICLE(entity, false) then
+		entity = PED.GET_VEHICLE_PED_IS_IN(entity, false)
+	end
+	return entity
+end
+
+--thanks to noshirt.cat for helping me with this--
+function ent_func.getClosestVehicle(pos)
+	local closestDist = 999999999999
+	local closestveh = nil
+    for entities.get_all_vehicles_as_pointers() as veh do
+	      local vehpos = entities.get_position(veh)
+	      local dist = pos:distance(vehpos)
+	      if (dist < closestDist) then
+	    	closestDist = dist
+	    	closestveh = veh
+	      end
+    end
+    if closestveh != nil then
+        return entities.pointer_to_handle(closestveh)
+    end
+end
+
+function ent_func.getClosestPed(pos)
+	local closestDist = 999999999999
+	local closestped = nil
+    for entities.get_all_peds_as_pointers() as ped do
+        local ped_handle = entities.pointer_to_handle(ped)
+        if not ENTITY.IS_ENTITY_DEAD(ped_handle) and not PED.IS_PED_IN_ANY_VEHICLE(ped_handle) and ped_handle != players.user_ped() then
+	      local pedpos = entities.get_position(ped)
+	      local dist = pos:distance(pedpos)
+	      if (dist < closestDist) then
+	    	closestDist = dist
+	    	closestped = ped_handle
+	      end
+        end
+    end
+    if closestped != nil then
+        return closestped
+    end
+end
+
+--changed it a bit but credit to SATTY for this--
+function ent_func.getClosestPlayer(myPos)
+    local closestDist = 999999999999
+    local closest_player = nil
+    local myVehicle = ent_func.get_vehicle_from_ped(players.user_ped())
+    if myVehicle == 0 then
+        myVehicle = 1
+    end
+    for players.list(false, true, true) as pid do
+		local ped = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(pid)
+		if not ENTITY.IS_ENTITY_DEAD(ped) then
+            local playerpos = players.get_position(pid)
+            local dist = ent_func.get_distance_between(myPos, playerpos)
+            local playerVehicle = ent_func.get_vehicle_from_ped(ped)
+            if (dist < closestDist) and (playerVehicle != myVehicle) and not players.is_in_interior(pid) then
+                closestDist = dist
+                closest_player = pid
+            end
+		end
+    end
+    if closest_player != nil and closest_player != players.user() then
+        return closest_player
+    end
+end
+
+function ent_func.slerp(q1, q2, t)
+    local cosTheta = q1.x * q2.x + q1.y * q2.y + q1.z * q2.z + q1.w * q2.w
+    local startInterp, finishInterp
+
+    if cosTheta < 0.0 then
+        cosTheta = -cosTheta
+        q2.x = -q2.x
+        q2.y = -q2.y
+        q2.z = -q2.z
+        q2.w = -q2.w
+    end
+
+    if (1.0 - cosTheta) > 0.0001 then
+        local theta = math.acos(cosTheta)
+        local sinTheta = math.sin(theta)
+        startInterp = math.sin((1.0 - t) * theta) / sinTheta
+        finishInterp = math.sin(t * theta) / sinTheta
+    else
+        startInterp = 1.0 - t
+        finishInterp = t
+    end
+
+    local x = startInterp * q1.x + finishInterp * q2.x
+    local y = startInterp * q1.y + finishInterp * q2.y
+    local z = startInterp * q1.z + finishInterp * q2.z
+    local w = startInterp * q1.w + finishInterp * q2.w
+
+    return {x = x, y = y, z = z, w = w}
+end
+
+--credit to lance for this--
+function ent_func.get_offset_from_gameplay_camera(distance)
+	local cam_rot = CAM.GET_GAMEPLAY_CAM_ROT(0)
+	local cam_pos = CAM.GET_GAMEPLAY_CAM_COORD()
+	local direction = v3.toDir(cam_rot)
+	local destination = {
+	  x = cam_pos.x + direction.x * distance,
+	  y = cam_pos.y + direction.y * distance,
+	  z = cam_pos.z + direction.z * distance
+	}
+	return destination
+end
+
+--upgraded version of my get model height function--
+function ent_func.get_model_dimensions(hash)
+    local minimum = memory.alloc(24)
+    local maximum = memory.alloc(24)
+    local min = {}
+    local max = {}
+    MISC.GET_MODEL_DIMENSIONS(hash, minimum, maximum)
+    min.x, min.y, min.z = v3.get(minimum)
+    max.x, max.y, max.z = v3.get(maximum)
+    local size = {}
+    size.x = max.x - min.x
+    size.y = max.y - min.y
+    size.z = max.z - min.z
+    return size
+end
+
+--both draw line from x to x not used but just here--
+function ent_func.draw_line_from_ped_to_ped(ped)
+    local pos_player = PED.GET_PED_BONE_COORDS(ped, 31086, 0.0, 0.0, 0.0)
+    local pos_user = PED.GET_PED_BONE_COORDS(players.user_ped(), 31086, 0.0, 0.0, 0.0)
+    GRAPHICS.DRAW_LINE(pos_player.x, pos_player.y, pos_player.z, pos_user.x, pos_user.y, pos_user.z, 255, 255, 255, 255)
+end
+
+function ent_func.draw_line_from_ped_to_entity(entity)
+    local pos_entity = ENTITY.GET_ENTITY_COORDS(entity)
+    local pos_user = PED.GET_PED_BONE_COORDS(players.user_ped(), 31086, 0.0, 0.0, 0.0)
+    GRAPHICS.DRAW_LINE(pos_entity.x, pos_entity.y, pos_entity.z, pos_user.x, pos_user.y, pos_user.z, 255, 255, 255, 255)
+end
+
+function ent_func.request_model(hash)
+    STREAMING.REQUEST_MODEL(hash)
+    while not STREAMING.HAS_MODEL_LOADED(hash) do util.yield(0) end
+end
+
+function ent_func.use_fx_asset(asset)
+    while not STREAMING.HAS_NAMED_PTFX_ASSET_LOADED(asset) do
+		STREAMING.REQUEST_NAMED_PTFX_ASSET(asset)
+		util.yield(0)
+	end
+    GRAPHICS.USE_PARTICLE_FX_ASSET(asset)
+end
+
+function ent_func.has_anim_dict_loaded(dict)
+    while not STREAMING.HAS_ANIM_DICT_LOADED(dict) do
+        STREAMING.REQUEST_ANIM_DICT(dict)
+        util.yield(0)
+    end
+end
+
+--thanks to soulreaper for this--
+function ent_func.any_passengers(vehicle)
+    for seatindex = -1, (VEHICLE.GET_VEHICLE_MODEL_NUMBER_OF_SEATS(ENTITY.GET_ENTITY_MODEL(vehicle)) - 2) do
+        if not VEHICLE.IS_VEHICLE_SEAT_FREE(vehicle, seatindex, false) then
+            return true
+        end
+    end
+    return false
+end
+
+--also agian thanks to soulreaper for this--
+function ent_func.get_passengers(vehicle)
+    local pedtable = {}
+    for seatindex = -1, (VEHICLE.GET_VEHICLE_MODEL_NUMBER_OF_SEATS(ENTITY.GET_ENTITY_MODEL(vehicle)) -2) do
+        if not VEHICLE.IS_VEHICLE_SEAT_FREE(vehicle, seatindex, false) then
+            local ped = VEHICLE.GET_PED_IN_VEHICLE_SEAT(vehicle, seatindex, false)
+            local passenger = {seat = seatindex, ped = ped}
+            table.insert(pedtable, passenger)
+        end
+    end
+    return pedtable
+end
+
+function ent_func.draw_rect_with_text(x, y, text_amound, width, colour)
+    local total_text_height = 0
+    local one_text_height = 0.01874 + 0.007
+    
+    for i = 1, text_amound do
+        total_text_height = total_text_height + one_text_height
+    end
+
+    local draw_rect = directx.draw_rect(x - 0.0045, y - 0.0045, width, total_text_height, colour)
+    
+    return draw_rect
+end
+
+--FUNCTIONS FROM NOVALAY--
+
+function ent_func.draw_info_text(text, infotext, posX, posY, distance, size1, size2, bool)
+    local draw_text = directx.draw_text(posX, posY, text, ALIGN_TOP_LEFT, size1, {r = 1, g = 1, b = 1, a = 1.0}, true)
+
+    local first_text_width, first_text_height = directx.get_text_size(text, size1)
+    
+    local posX2, alignment
+    local posY2 = posY + (first_text_height/1.9)
+    if bool then
+        posX2 = posX - (-distance/1000)
+        alignment = ALIGN_CENTRE_RIGHT
+    else
+        posX2 = posX + first_text_width + (distance/1000)
+        alignment = ALIGN_CENTRE_LEFT
+    end
+    
+    local draw_infotext = directx.draw_text(posX2, posY2, infotext, alignment, size2, {r = 160/255, g = 160/255, b = 160/255, a = 1.0}, true)
+    
+    return draw_text, draw_infotext
+end
+
+--shamelessly stolen from lance that stole it from keks--
+function ent_func.dec_to_ipv4(ip)
+	return string.format(
+		"%i.%i.%i.%i", 
+		ip >> 24 & 0xFF, 
+		ip >> 16 & 0xFF, 
+		ip >> 8  & 0xFF, 
+		ip 		 & 0xFF
+	)
+end
+
+--weapon function--
+all_weapons = {}
+temp_weapons = util.get_weapons()
+-- create a table with just weapon hashes, labels
+for a,b in pairs(temp_weapons) do
+    all_weapons[#all_weapons + 1] = {hash = b['hash'], label_key = b['label_key']}
+end
+function ent_func.get_weapon_name_from_hash(hash) 
+    for k,v in pairs(all_weapons) do 
+        if v.hash == hash then 
+            return util.get_label_text(v.label_key)
+        end
+    end
+    return T("Unarmed")
+end
+
+function ent_func.bool(bool)
+    if bool then
+        return T("Yes")
+    else
+        return T("No")
+    end
+end
+
+function ent_func.check(info)
+    if info == nil or info == "NULL" or info == 0 or info == " " then
+        return T("None")
+    else
+        return info
+    end
+end
+
+function ent_func.queuecheck(info)
+    if info == nil or info == "NULL" or info == " " then
+        return 0
+    else
+        return "#" .. info
+    end
+end
+
+function ent_func.org(org_type)
+    if org_type == -1 then
+        return T("Isn't in any")
+    elseif org_type == 0 then
+        return "CEO"
+    else
+        return "MC"
+    end
+end
+
+function ent_func.round(num, dp)
+    local mult = 10^(dp or 0)
+    return math.floor(num * mult + 0.5) / mult
+end
+
+--dont ask please--
+function ent_func.formatMoney(money)
+    if money >= 1000 and money < 999950 then
+        return round(money / 1000, 1) .. "K"
+    elseif money >= 999950 and money < 999999950 then
+        return round(money / 1000000, 1) .. "M"
+    elseif money >= 999999950 then
+        return round(money / 1000000000, 1) .. "B"
+    else return money
+    end
+end
+--END FUNCTIONS FROM NOVALAY--
+
+--nuke explosion function please dont say anything i know this is a mess but its better the the original function from "my" meteor script bc i took the time to make it a bit smaller--
+local function nuke_expl1(Position)
+    local offsets = {
+        {10, 0, 0}, {0, 10, 0}, {10, 10, 0}, {-10, 0, 0}, {0, -10, 0}, {-10, -10, 0}, {10, -10, 0}, {-10, 10, 0},
+        {20, 0, 0}, {0, 20, 0}, {20, 20, 0}, {-20, 0, 0}, {0, -20, 0}, {-20, -20, 0}, {20, -20, 0}, {-20, 10, 0},
+        {30, 0, 0}, {0, 30, 0}, {30, 30, 0}, {-30, 0, 0}, {0, -30, 0}, {-30, -30, 0}, {30, -30, 0}, {-30, 10, 0},
+        {10, 30, 0}, {30, 10, 0}, {-30, -10, 0}, {-10, -30, 0}, {-10, 30, 0}, {-30, 10, 0}, {30, -10, 0}, {10, -30, 0},
+        {0, 0, 10}, {0, 0, -10}, {0, 0, 20}, {0, 0, -20}
+    }
+    for i, offset in offsets do
+        FIRE.ADD_EXPLOSION(Position.x + offset[1], Position.y + offset[2], Position.z + offset[3], 59, 1.0, true, false, 1.0, false)
+    end
+end
+
+local function nuke_expl2(Position)
+    local offsets = {{0,0,-10}, {10,0,-10}, {0,10,-10}, {10,10,-10}, {-10,0,-10}, {0,-10,-10}, {-10,-10,-10}, {10,-10,-10}, {-10,10,-10}}
+    for i, offset in offsets do
+        FIRE.ADD_EXPLOSION(Position.x + offset[1], Position.y + offset[2], Position.z + offset[3], 59, 1.0, true, false, 1.0, false)
+    end
+end
+
+local function nuke_expl3(Position)
+    local offsets = {{10,0,0}, {0,10,0}, {10,10,0}, {-10,0,0}, {0,-10,0}, {-10,-10,0}, {10,-10,0}, {-10,10,0}, {0,0,0}}
+    for i, offset in offsets do
+        FIRE.ADD_EXPLOSION(Position.x + offset[1], Position.y + offset[2], Position.z + offset[3], 59, 1.0, true, false, 1.0, false)
+    end
+end
+
+local relationships = {
+    [0] = "Companion",
+    [1] = "Respect",
+    [2] = "Like",
+    [3] = "Neutral",
+    [4] = "Dislike",
+    [5] = "Hate",
+    [255] = "Pedestrians",
+}
+
+local languages = {
+    [0] = "English",
+    [1] = "French",
+    [2] = "German",
+    [3] = "Italian",
+    [4] = "Spanish",
+    [5] = "Brazilian",
+    [6] = "Polish",
+    [7] = "Russian",
+    [8] = "Korean",
+    [9] = "Chinese",
+    [10] = "Japanese",
+    [11] = "Mexican",
+    [12] = "Chinese",
+}
+
+local seat_names = {
+    [-1] = "Driver",
+    [0] = "Front Right",
+    [1] = "Back Left",
+    [2] = "Back Right",
+    [3] = "Further Back Left",
+    [4] = "Further Back Right",
+}
+
+menu.toggle_loop(weapons, "Aim Information", {}, "", function()
+    if PLAYER.IS_PLAYER_FREE_AIMING(players.user()) then
+        entity = ent_func.get_entity_player_is_aiming_at(players.user())
+
+        if ENTITY.IS_ENTITY_A_PED(entity) and not PED.IS_PED_A_PLAYER(entity) then --ped, not in a vehicle, not a player--
+            local coords = ENTITY.GET_ENTITY_COORDS(entity)
+            local speed = ENTITY.GET_ENTITY_SPEED(entity)
+            local mph = speed * 2.236936
+            local distance = ent_func.get_distance_between(players.user_ped(), entity)
+            local health, maxhealth = ENTITY.GET_ENTITY_HEALTH(entity), ENTITY.GET_ENTITY_MAX_HEALTH(entity)
+            local relationship = PED.GET_RELATIONSHIP_BETWEEN_PEDS(entity, players.user_ped())
+            local relationshipname = relationships[relationship]
+            ent_func.draw_rect_with_text(0.52, 0.35, 10, 0.14, {r = 0/255, g = 0/255, b = 0/255, a = 175/255})
+            ent_func.draw_info_text("Name:", util.reverse_joaat(ENTITY.GET_ENTITY_MODEL(entity)), 0.52, 0.35, 130, 0.45, 0.44, true)
+            ent_func.draw_info_text("Hash:", ENTITY.GET_ENTITY_MODEL(entity), 0.52, 0.375, 130, 0.45, 0.44, true)
+            ent_func.draw_info_text("Distance:", math.ceil(distance) .. "m", 0.52, 0.40, 130, 0.45, 0.44, true)
+            ent_func.draw_info_text("Speed:", math.ceil(mph) .. " MPH", 0.52, 0.425, 130, 0.45, 0.44, true)
+            ent_func.draw_info_text("Health:", health .. "/" .. maxhealth, 0.52, 0.45, 130, 0.45, 0.44, true)
+            ent_func.draw_info_text("Relationship group:", PED.GET_PED_RELATIONSHIP_GROUP_HASH(entity), 0.52, 0.475, 130, 0.45, 0.44, true)
+            ent_func.draw_info_text("Ped Relationship:", relationshipname, 0.52, 0.50, 130, 0.45, 0.44, true)
+            ent_func.draw_info_text("Coord X:", string.format("%.3f", coords.x), 0.52, 0.525, 130, 0.45, 0.44, true)
+            ent_func.draw_info_text("Coord Y:", string.format("%.3f", coords.y), 0.52, 0.55, 130, 0.45, 0.44, true)
+            ent_func.draw_info_text("Coord Z:", string.format("%.3f", coords.z), 0.52, 0.575, 130, 0.45, 0.44, true)
+        end
+
+        if ENTITY.IS_ENTITY_A_PED(entity) and PED.IS_PED_A_PLAYER(entity) then --ped, not in a vehicle, player-
+            local pid = NETWORK.NETWORK_GET_PLAYER_INDEX_FROM_PED(entity)
+
+            local name = players.get_name(pid)
+            local RID = players.get_rockstar_id(pid)
+            local IP = ent_func.dec_to_ipv4(players.get_connect_ip(pid))
+            local rank = ent_func.check(players.get_rank(pid))
+            local kd = ent_func.round(players.get_kd(pid), 2)
+            local lang = languages[players.get_language(pid)]
+            local controller = ent_func.bool(players.is_using_controller(pid))
+            local host = ent_func.bool(pid == players.get_host())
+            local script_host = ent_func.bool(pid == players.get_script_host())
+            local host_queue = ent_func.queuecheck(players.get_host_queue_position(pid))
+
+            local org_type = ent_func.org(players.get_org_type(pid))
+            local distance = ent_func.get_distance_between(players.user_ped(), entity)
+            local speed = ENTITY.GET_ENTITY_SPEED(entity)
+            local mph = speed * 2.236936
+            local health, maxhealth = ENTITY.GET_ENTITY_HEALTH(entity), ENTITY.GET_ENTITY_MAX_HEALTH(entity)
+            local armor, maxarmor = PED.GET_PED_ARMOUR(entity), PLAYER.GET_PLAYER_MAX_ARMOUR(pid)
+            local godmode = ent_func.bool(players.is_godmode(pid))
+            local otr = ent_func.bool(players.is_otr(pid)) 
+            local weapon_hash = WEAPON.GET_SELECTED_PED_WEAPON(entity)
+            local weapon =  ent_func.get_weapon_name_from_hash(weapon_hash)
+            local coords = ENTITY.GET_ENTITY_COORDS(entity)
+
+            local wanted_lvl, max_wanted_lvl = PLAYER.GET_PLAYER_WANTED_LEVEL(pid), PLAYER.GET_MAX_WANTED_LEVEL(pid)
+            local atk_you = ent_func.bool(players.is_marked_as_attacker(pid))
+            local mod_or_ad = ent_func.bool(players.is_marked_as_modder_or_admin(pid))
+            local totalmoney = ent_func.formatMoney(players.get_money(pid))
+            local walletmoney = ent_func.formatMoney(players.get_wallet(pid))
+            local bankmoney = ent_func.formatMoney(players.get_bank(pid))
+            local tags = ent_func.check(players.get_tags_string(pid))
+
+            ent_func.draw_rect_with_text(0.52, 0.35, 10, 0.14, {r = 0/255, g = 0/255, b = 0/255, a = 175/255})
+            ent_func.draw_info_text("Name:", name, 0.52, 0.35, 130, 0.45, 0.44, true)
+            ent_func.draw_info_text("RID:", RID, 0.52, 0.375, 130, 0.45, 0.44, true)
+            ent_func.draw_info_text("IP:", IP, 0.52, 0.40, 130, 0.45, 0.44, true)
+            ent_func.draw_info_text("Rank:", rank, 0.52, 0.425, 130, 0.45, 0.44, true)
+            ent_func.draw_info_text("K/D:", kd, 0.52, 0.45, 130, 0.45, 0.44, true)
+            ent_func.draw_info_text("Language:", lang, 0.52, 0.475, 130, 0.45, 0.44, true)
+            ent_func.draw_info_text("Controller:", controller, 0.52, 0.50, 130, 0.45, 0.44, true)
+            ent_func.draw_info_text("Host:", host, 0.52, 0.525, 130, 0.45, 0.44, true)
+            ent_func.draw_info_text("Script host:", script_host, 0.52, 0.55, 130, 0.45, 0.44, true)
+            ent_func.draw_info_text("Host queue:", host_queue, 0.52, 0.575, 130, 0.45, 0.44, true)
+
+            ent_func.draw_rect_with_text(0.665, 0.35, 11, 0.14, {r = 0/255, g = 0/255, b = 0/255, a = 175/255})
+            ent_func.draw_info_text("Org:", org_type, 0.665, 0.35, 130, 0.45, 0.44, true)
+            ent_func.draw_info_text("Distance:", math.ceil(distance) .. "m", 0.665, 0.375, 130, 0.45, 0.44, true)
+            ent_func.draw_info_text("Speed:", math.ceil(mph) .. " MPH", 0.665, 0.40, 130, 0.45, 0.44, true)
+            ent_func.draw_info_text("Health:", health .. "/" .. maxhealth, 0.665, 0.425, 130, 0.45, 0.44, true)
+            ent_func.draw_info_text("Armor:", armor .. "/" .. maxarmor, 0.665, 0.45, 130, 0.45, 0.44, true)
+            ent_func.draw_info_text("Godmode:", godmode, 0.665, 0.475, 130, 0.45, 0.44, true)
+            ent_func.draw_info_text("Off the radar:", otr, 0.665, 0.50, 130, 0.45, 0.44, true)
+            ent_func.draw_info_text("Weapon:", weapon, 0.665, 0.525, 130, 0.45, 0.44, true)
+            ent_func.draw_info_text("Coord X:", string.format("%.3f", coords.z), 0.665, 0.55, 130, 0.45, 0.44, true)
+            ent_func.draw_info_text("Coord Y:", string.format("%.3f", coords.z), 0.665, 0.575, 130, 0.45, 0.44, true)
+            ent_func.draw_info_text("Coord Z:", string.format("%.3f", coords.z), 0.665, 0.60, 130, 0.45, 0.44, true)
+
+
+            ent_func.draw_rect_with_text(0.81, 0.35, 8, 0.14, {r = 0/255, g = 0/255, b = 0/255, a = 175/255})
+            ent_func.draw_info_text("Wanted level:", wanted_lvl .. "/" .. max_wanted_lvl, 0.81, 0.35, 130, 0.45, 0.44, true)
+            ent_func.draw_info_text("Atk you:", atk_you, 0.81, 0.375, 130, 0.45, 0.44, true)
+            ent_func.draw_info_text("Mod or Admin:", mod_or_ad, 0.81, 0.40, 130, 0.45, 0.44, true)
+            ent_func.draw_info_text("Total:", totalmoney, 0.81, 0.425, 130, 0.45, 0.44, true)
+            ent_func.draw_info_text("Wallet:", walletmoney, 0.81, 0.45, 130, 0.45, 0.44, true)
+            ent_func.draw_info_text("Bank:", bankmoney, 0.81, 0.475, 130, 0.45, 0.44, true)
+
+            ent_func.draw_info_text("Tags:", tags, 0.81, 0.525, 130, 0.45, 0.44, true)
+        end
+
+        if ENTITY.IS_ENTITY_A_VEHICLE(entity) then --vehicle--
+            local coords = ENTITY.GET_ENTITY_COORDS(entity)
+            local distance = ent_func.get_distance_between(players.user_ped(), entity)
+            local speed = ENTITY.GET_ENTITY_SPEED(entity)
+            local mph = speed * 2.236936
+            local rpm = entities.get_rpm(entities.handle_to_pointer(entity)) * 6000
+            local engine_health = VEHICLE.GET_VEHICLE_ENGINE_HEALTH(entity)+4000
+            local body_health = VEHICLE.GET_VEHICLE_BODY_HEALTH(entity)
+            local passengers = ent_func.get_passengers(entity)
+            local passengers_num = #passengers
+            if ent_func.any_passengers(entity) then
+                passengers_num = #passengers + 1
+            end
+            ent_func.draw_rect_with_text(0.52, 0.35, 10 + passengers_num, 0.14, {r = 0/255, g = 0/255, b = 0/255, a = 175/255})
+            ent_func.draw_info_text("Name:", util.reverse_joaat(ENTITY.GET_ENTITY_MODEL(entity)), 0.52, 0.35, 130, 0.45, 0.44, true)
+            ent_func.draw_info_text("Hash:", ENTITY.GET_ENTITY_MODEL(entity), 0.52, 0.375, 130, 0.45, 0.44, true)
+            ent_func.draw_info_text("Speed:", math.ceil(mph) .. " MPH", 0.52, 0.40, 130, 0.45, 0.44, true)
+            ent_func.draw_info_text("RPM:", math.ceil(rpm) .. " RPM", 0.52, 0.425, 130, 0.45, 0.44, true)
+            ent_func.draw_info_text("Engine health:", math.floor((engine_health/5000) * 100) .. "%", 0.52, 0.45, 130, 0.45, 0.44, true)
+            ent_func.draw_info_text("Body health:", math.floor((body_health/1000) * 100) .. "%", 0.52, 0.475, 130, 0.45, 0.44, true)
+            ent_func.draw_info_text("Distance:", math.ceil(distance) .. "m", 0.52, 0.50, 130, 0.45, 0.44, true)
+            ent_func.draw_info_text("Coord X:", string.format("%.3f", coords.x), 0.52, 0.525, 130, 0.45, 0.44, true)
+            ent_func.draw_info_text("Coord Y:", string.format("%.3f", coords.y), 0.52, 0.55, 130, 0.45, 0.44, true)
+            ent_func.draw_info_text("Coord Z:", string.format("%.3f", coords.z), 0.52, 0.575, 130, 0.45, 0.44, true)
+            if ent_func.any_passengers(entity) then
+                local pos_y = 0.625
+                for i = 1, #passengers do
+                    local seat = passengers[i].seat
+                    local seat_name = seat_names[seat]
+                    local ped = tostring(passengers[i].ped)
+                    local ped_name = ped
+                    local label_text = "Seat, Ped:"
+                    if PED.IS_PED_A_PLAYER(ped) then
+                        local pid = NETWORK.NETWORK_GET_PLAYER_INDEX_FROM_PED(ped)
+                        ped_name = players.get_name(pid)
+                        label_text = "Seat, Player:"
+
+                        local name = players.get_name(pid)
+                        local RID = players.get_rockstar_id(pid)
+                        local IP = ent_func.dec_to_ipv4(players.get_connect_ip(pid))
+                        local rank = ent_func.check(players.get_rank(pid))
+                        local kd = ent_func.round(players.get_kd(pid), 2)
+                        local lang = languages[players.get_language(pid)]
+                        local controller = ent_func.bool(players.is_using_controller(pid))
+                        local host = ent_func.bool(pid == players.get_host())
+                        local script_host = ent_func.bool(pid == players.get_script_host())
+                        local host_queue = ent_func.queuecheck(players.get_host_queue_position(pid))
+            
+                        local org_type = ent_func.org(players.get_org_type(pid))
+                        local health, maxhealth = ENTITY.GET_ENTITY_HEALTH(ped), ENTITY.GET_ENTITY_MAX_HEALTH(ped)
+                        local armor, maxarmor = PED.GET_PED_ARMOUR(ped), PLAYER.GET_PLAYER_MAX_ARMOUR(pid)
+                        local godmode = ent_func.bool(players.is_godmode(pid))
+                        local otr = ent_func.bool(players.is_otr(pid)) 
+                        local weapon_hash = WEAPON.GET_SELECTED_PED_WEAPON(ped)
+                        local weapon = ent_func.get_weapon_name_from_hash(weapon_hash)
+            
+                        local wanted_lvl, max_wanted_lvl = PLAYER.GET_PLAYER_WANTED_LEVEL(pid), PLAYER.GET_MAX_WANTED_LEVEL(pid)
+                        local atk_you = ent_func.bool(players.is_marked_as_attacker(pid))
+                        local mod_or_ad = ent_func.bool(players.is_marked_as_modder_or_admin(pid))
+                        local totalmoney = ent_func.formatMoney(players.get_money(pid))
+                        local walletmoney = ent_func.formatMoney(players.get_wallet(pid))
+                        local bankmoney = ent_func.formatMoney(players.get_bank(pid))
+                        local tags = ent_func.check(players.get_tags_string(pid))
+            
+                        ent_func.draw_rect_with_text(0.665, 0.35, 10, 0.14, {r = 0/255, g = 0/255, b = 0/255, a = 175/255})
+                        ent_func.draw_info_text("Name:", name, 0.665, 0.35, 130, 0.45, 0.44, true)
+                        ent_func.draw_info_text("RID:", RID, 0.665, 0.375, 130, 0.45, 0.44, true)
+                        ent_func.draw_info_text("IP:", IP, 0.665, 0.40, 130, 0.45, 0.44, true)
+                        ent_func.draw_info_text("Rank:", rank, 0.665, 0.425, 130, 0.45, 0.44, true)
+                        ent_func.draw_info_text("K/D:", kd, 0.665, 0.45, 130, 0.45, 0.44, true)
+                        ent_func.draw_info_text("Language:", lang, 0.665, 0.475, 130, 0.45, 0.44, true)
+                        ent_func.draw_info_text("Controller:", controller, 0.665, 0.50, 130, 0.45, 0.44, true)
+                        ent_func.draw_info_text("Host:", host, 0.665, 0.525, 130, 0.45, 0.44, true)
+                        ent_func.draw_info_text("Script host:", script_host, 0.665, 0.55, 130, 0.45, 0.44, true)
+                        ent_func.draw_info_text("Host queue:", host_queue, 0.665, 0.575, 130, 0.45, 0.44, true)
+            
+                        ent_func.draw_rect_with_text(0.81, 0.35, 7, 0.14, {r = 0/255, g = 0/255, b = 0/255, a = 175/255})
+                        ent_func.draw_info_text("Org:", org_type, 0.81, 0.35, 130, 0.45, 0.44, true)
+                        ent_func.draw_info_text("Distance:", math.ceil(distance) .. "m", 0.81, 0.375, 130, 0.45, 0.44, true)
+                        ent_func.draw_info_text("Health:", health .. "/" .. maxhealth, 0.81, 0.40, 130, 0.45, 0.44, true)
+                        ent_func.draw_info_text("Armor:", armor .. "/" .. maxarmor, 0.81, 0.425, 130, 0.45, 0.44, true)
+                        ent_func.draw_info_text("Godmode:", godmode, 0.81, 0.45, 130, 0.45, 0.44, true)
+                        ent_func.draw_info_text("Off the radar:", otr, 0.81, 0.475, 130, 0.45, 0.44, true)
+                        ent_func.draw_info_text("Weapon:", weapon, 0.81, 0.50, 130, 0.45, 0.44, true)
+            
+            
+                        ent_func.draw_rect_with_text(0.665, 0.615, 8, 0.14, {r = 0/255, g = 0/255, b = 0/255, a = 175/255})
+                        ent_func.draw_info_text("Wanted level:", wanted_lvl .. "/" .. max_wanted_lvl, 0.665, 0.615, 130, 0.45, 0.44, true)
+                        ent_func.draw_info_text("Atk you:", atk_you, 0.665, 0.640, 130, 0.45, 0.44, true)
+                        ent_func.draw_info_text("MOd or Admin:", mod_or_ad, 0.665, 0.665, 130, 0.45, 0.44, true)
+                        ent_func.draw_info_text("Total:", totalmoney, 0.665, 0.690, 130, 0.45, 0.44, true)
+                        ent_func.draw_info_text("Wallet:", walletmoney, 0.665, 0.715, 130, 0.45, 0.44, true)
+                        ent_func.draw_info_text("Bank:", bankmoney, 0.665, 0.740, 130, 0.45, 0.44, true)
+            
+                        ent_func.draw_info_text("Tags:", tags, 0.665, 0.790, 130, 0.45, 0.44, true)
+                    end
+                    ent_func.draw_info_text(label_text, seat_name .. ", " .. ped_name, 0.52, pos_y, 130, 0.45, 0.44, true)
+                    pos_y = pos_y + 0.025
+                end
+            end
+        end
+
+        if ENTITY.IS_ENTITY_AN_OBJECT(entity) then --object--
+            local coords = ENTITY.GET_ENTITY_COORDS(entity)
+            ent_func.draw_rect_with_text(0.52, 0.35, 6, 0.14, {r = 0/255, g = 0/255, b = 0/255, a = 175/255})
+            ent_func.draw_info_text("Name:", util.reverse_joaat(ENTITY.GET_ENTITY_MODEL(entity)), 0.52, 0.35, 130, 0.45, 0.44, true)
+            ent_func.draw_info_text("Hash:", ENTITY.GET_ENTITY_MODEL(entity), 0.52, 0.375, 130, 0.45, 0.44, true)
+            ent_func.draw_info_text("Pickup:", ent_func.bool(OBJECT.IS_OBJECT_A_PICKUP(entity)), 0.52, 0.40, 130, 0.45, 0.44, true)
+            ent_func.draw_info_text("Coord X:", string.format("%.3f", coords.x), 0.52, 0.425, 130, 0.45, 0.44, true)
+            ent_func.draw_info_text("Coord Y:", string.format("%.3f", coords.y), 0.52, 0.45, 130, 0.45, 0.44, true)
+            ent_func.draw_info_text("Coord Z:", string.format("%.3f", coords.z), 0.52, 0.475, 130, 0.45, 0.44, true)
+        end
+	end
+end)
+
+--------------------------------------------------------------------------------------------------------------------------------------
 
 function wait_session_transition(yield_time)
     yield_time = yield_time or 1000
@@ -9741,10 +10575,6 @@ util.create_tick_handler(function()
 
     return true
 end)
-util.on_stop(function() 
-    VEHICLEE.SET_VEHICLE_GRAVITY(veh, true)
-    ENTITYY.SET_ENTITY_COLLISION(veh, true, true);
-end)
 
 --------------------------------------------------------------------------------------------------------------------------------
 -- Drift Mode Start
@@ -9813,7 +10643,13 @@ end
 --------------------------------------------------------------------------------------------------------------------------------
 -- Fun Stuff
 
-menu.action(fun, "Broomstick Mk2", {""}, "Note: You will be invisible for other players.", function()
+menu.action(fun, "Random Outfit", {}, "Gives You A Random Outfit \n(Can Be Used To Leave Any Bird You Switch Into)", function()
+    menu.trigger_commands("mpfemale")
+    util.yield(0800)
+    menu.trigger_commands("randomoutfit")
+end)
+
+menu.action(fun, "Broomstick Mk2", {""}, "Note: Might Look Weird With Custom Character Models", function()
     local pos = players.get_position(players.user())
     local broomstick = util.joaat("prop_tool_broom")
     local oppressor = util.joaat("oppressor2")
@@ -9826,65 +10662,69 @@ menu.action(fun, "Broomstick Mk2", {""}, "Note: You will be invisible for other 
     ENTITY.ATTACH_ENTITY_TO_ENTITY(obj, veh, 0, 0, 0, 0.3, -80.0, 0, 0, true, false, false, false, 0, true) -- thanks to chaos mod for doing the annoying rotation work for me :P
 end)
 
-local superman = menu.list(fun, "Super Man Options", {}, "")
-
-local jump = {height = 0.6 }
-menu.toggle_loop(superman, "Super Man", {}, "Keep going higher the longer you press jump (can also be used to fly), Make sure you disable lock parachutes.", function () -- Credits to Acjoker Script
-    menu.trigger_commands("paralock full")
-    if PAD.IS_CONTROL_PRESSED(22, 22) or PAD.IS_CONTROL_JUST_PRESSED(21, 21) then
-        PED.SET_PED_CAN_RAGDOLL(players.user_ped(), false)
-        ENTITY.APPLY_FORCE_TO_ENTITY_CENTER_OF_MASS(players.user_ped(), 1, 0.0, 0.6, jump.height, 0, 0, 0, 0, true, true, true, true)
-        if ENTITY.IS_ENTITY_IN_AIR(players.user_ped()) then
-            ENTITY.APPLY_FORCE_TO_ENTITY_CENTER_OF_MASS(players.user_ped(), 1, 0.0, 0.6, jump.height, 0, 0, 0, 0, true, true, true, true)
-        end
+--spawn ramp vehicle--
+menu.action(fun, "Spawn Big Ramp Vehicle", {}, "", function()
+    local pos = players.get_position(players.user())
+    local hash = util.joaat("dune4")
+    ent_func.request_model(hash)
+    local vehicle = VEHICLE.CREATE_VEHICLE(hash, pos.x ,pos.y ,pos.z, 0, true, false, true)
+    PED.SET_PED_INTO_VEHICLE(players.user_ped(), vehicle, -1)
+    for i = 1, 2 do
+        local vehicle_model = ENTITY.GET_ENTITY_MODEL(vehicle)
+        local left_vehicle = VEHICLE.CREATE_VEHICLE(vehicle_model, pos.x ,pos.y ,pos.z, ENTITY.GET_ENTITY_HEADING(vehicle), true, false, true)
+        ENTITY.ATTACH_ENTITY_TO_ENTITY(left_vehicle, vehicle, 0, -2*i, 0.0, 0.0, 0.0, 0.0, 0.0, true, false, false, false, 0, true)
+        local right_vehicle = VEHICLE.CREATE_VEHICLE(vehicle_model, pos.x ,pos.y ,pos.z, ENTITY.GET_ENTITY_HEADING(vehicle), true, false, true)
+        ENTITY.ATTACH_ENTITY_TO_ENTITY(right_vehicle, vehicle, 0, 2*i, 0.0, 0.0, 0.0, 0.0, 0.0, true, false, false, false, 0, true)
+        ENTITY.SET_ENTITY_COLLISION(left_vehicle, true, true)
+        ENTITY.SET_ENTITY_COLLISION(right_vehicle, true, true)
     end
 end)
 
-menu.slider(superman, "Super Man Power", {"supermanpower"}, "Adjust the amount you move upwards. Make sure you disable lock parachutes.", 6, 1000, 6, 1, function (a) -- Credits to Acjoker Script
-    jump.height = a*0.1
+menu.action(fun, "Snow War", {}, "Snowball all players in the session.", function ()
+    local plist = players.list()
+    local snowballs = util.joaat('WEAPON_SNOWBALL')
+    for i = 1, #plist do
+        local plyr = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(plist[i])
+        WEAPON.GIVE_DELAYED_WEAPON_TO_PED(plyr, snowballs, 20, true)
+        WEAPON.SET_PED_AMMO(plyr, snowballs, 20)
+        util.toast("Now everyone has snowballs!")
+        util.yield()
+    end
+   
 end)
 
-menu.toggle(fun, "Tesla Mode", {}, "", function(toggled)
-    local ped = players.user_ped()
-    local playerpos = ENTITY.GET_ENTITY_COORDS(ped, false)
-    local pos = ENTITY.GET_ENTITY_COORDS(ped)
-    local tesla_ai = util.joaat("u_m_y_baygor")
-    local tesla = util.joaat("raiden")
-    request_model(tesla_ai)
-    request_model(tesla)
-    if toggled then     
-       if PED.IS_PED_IN_ANY_VEHICLE(ped, false) then
-            menu.trigger_commands("deletevehicle")
-        end
-
-        tesla_ai_ped = entities.create_ped(26, tesla_ai, playerpos, 0)
-        tesla_vehicle = entities.create_vehicle(tesla, playerpos, 0)
-        ENTITY.SET_ENTITY_INVINCIBLE(tesla_ai_ped, true) 
-        ENTITY.SET_ENTITY_VISIBLE(tesla_ai_ped, false)
-        PED.SET_BLOCKING_OF_NON_TEMPORARY_EVENTS(tesla_ai_ped, true)
-        PED.SET_PED_INTO_VEHICLE(ped, tesla_vehicle, -2)
-        PED.SET_PED_INTO_VEHICLE(tesla_ai_ped, tesla_vehicle, -1)
-        PED.SET_PED_KEEP_TASK(tesla_ai_ped, true)
-        VEHICLE.SET_VEHICLE_COLOURS(tesla_vehicle, 111, 111)
-        VEHICLE.SET_VEHICLE_MOD(tesla_vehicle, 23, 8, false)
-        VEHICLE.SET_VEHICLE_MOD(tesla_vehicle, 15, 1, false)
-        VEHICLE.SET_VEHICLE_EXTRA_COLOURS(tesla_vehicle, 111, 147)
-        menu.trigger_commands("performance")
-
-        if HUD.IS_WAYPOINT_ACTIVE() then
-            local pos = HUD.GET_BLIP_COORDS(HUD.GET_FIRST_BLIP_INFO_ID(8))
-            TASK.TASK_VEHICLE_DRIVE_TO_COORD_LONGRANGE(tesla_ai_ped, tesla_vehicle, pos.x, pos.y, pos.z, 20.0, 786603, 0)
-        else
-            TASK.TASK_VEHICLE_DRIVE_WANDER(tesla_ai_ped, tesla_vehicle, 20.0, 786603)
-        end
-    else
-        if tesla_ai_ped ~= nil then 
-            entities.delete_by_handle(tesla_ai_ped)
-        end
-        if tesla_vehicle ~= nil then 
-            entities.delete_by_handle(tesla_vehicle)
-        end
+menu.action(fun, "Take A Massive Shit", {"mshit"}, "Take a massive shit", function()
+    local player = players.user_ped()
+    local agroup = "missfbi3ig_0"
+    local anim = "shit_loop_trev"
+    local mshit = util.joaat("prop_big_shit_02")
+    local rshit = util.joaat("prop_big_shit_01")
+    local c = ENTITY.GET_ENTITY_COORDS(players.user_ped())
+    c.z = c.z -1
+    while not STREAMING.HAS_ANIM_DICT_LOADED(agroup) do 
+        STREAMING.REQUEST_ANIM_DICT(agroup)
+        util.yield()
     end
+    TASK.TASK_PLAY_ANIM(player, agroup, anim, 8.0, 8.0, 3000, 0, 0, true, true, true)
+    util.yield(1000)
+    entities.create_object(mshit, c)
+end)
+
+menu.action(fun, "Take A Normal Shit", {"nshit"}, "Take a normale sized shit", function()
+    local player = players.user_ped()
+    local agroup = "missfbi3ig_0"
+    local anim = "shit_loop_trev"
+    local mshit = util.joaat("prop_big_shit_02")
+    local rshit = util.joaat("prop_big_shit_01")
+    local c = ENTITY.GET_ENTITY_COORDS(players.user_ped())
+    c.z = c.z -1
+    while not STREAMING.HAS_ANIM_DICT_LOADED(agroup) do 
+        STREAMING.REQUEST_ANIM_DICT(agroup)
+        util.yield()
+    end
+    TASK.TASK_PLAY_ANIM(player, agroup, anim, 8.0, 8.0, 3000, 0, 0, true, true, true)
+    util.yield(1000)
+    entities.create_object(rshit, c)
 end)
 
 local jesus_main = menu.list(fun, "Jesus Take The Wheel", {}, "Jesus take the wheeeeeeel!")
@@ -9989,126 +10829,716 @@ jesus_toggle = menu.toggle(jesus_main, "Enable", {}, "", function(toggle)
     end
 end)
 
-menu.toggle(fun, "Drive Cop Heli", {"copheli"}, "Plus bodygaurds.", function(on_toggle)
-    if on_toggle then
-        menu.trigger_commands("bodyguardmodel S_M_Y_Swat_01")
-        menu.trigger_commands("bodyguardcount 3")
-        menu.trigger_commands("bodyguardprimary smg")
-        menu.trigger_commands("spawnbodyguards")
-        menu.trigger_commands("smyswat01")
-        menu.trigger_commands("otr")
-        local Imortality_BodyGuards = menu.ref_by_path("Self>Bodyguards>Immortality")
-        util.yield(3000)
-        menu.trigger_command(Imortality_BodyGuards)
-        util.toast("Make way for the heli.")
-        util.yield(3000)
-        local vehicleHash = util.joaat("polmav")
-        request_model(vehicleHash)
-        local pos = ENTITY.GET_ENTITY_COORDS(PLAYER.PLAYER_PED_ID(), false)
-        copheli = entities.create_vehicle(vehicleHash, pos, CAM.GET_GAMEPLAY_CAM_ROT(0).z)
-        --ENTITY.SET_ENTITY_VISIBLE(copheli, false, false)
-        --ENTITY.SET_ENTITY_VISIBLE(players.user_ped(), false, true)
-        VEHICLE.SET_VEHICLE_ENGINE_ON(copheli, true, true, true)
-        ENTITY.SET_ENTITY_INVINCIBLE(copheli, true)
-        VEHICLE.SET_PLANE_TURBULENCE_MULTIPLIER(copheli, 0.0)
-        local id = get_closest_vehicle(entity)
-        local playerpos = ENTITY.GET_ENTITY_COORDS(id)
-        playerpos.z = playerpos.z + 3
-        ENTITY.SET_ENTITY_COORDS_NO_OFFSET(copheli, pos.x, pos.y, pos.z, false, false, true)
-        PED.SET_PED_INTO_VEHICLE(PLAYER.PLAYER_PED_ID(), copheli, -1)
-        util.yield(1500)
-        menu.trigger_commands("livery -1")
+local firework_list = menu.list(fun, "Firework", {}, "")
+
+--kind of fire work--
+local effect_name = "scr_mich4_firework_trailburst"
+local asset_name = "scr_rcpaparazzo1"
+menu.slider(firework_list, "Kind", {}, "", 1, 12, 1, 1, function(count)
+    local effects = {
+        "scr_mich4_firework_trailburst",
+        "scr_indep_firework_air_burst",
+        "scr_indep_firework_starburst",
+        "scr_indep_firework_trailburst_spawn",
+        "scr_firework_indep_burst_rwb",
+        "scr_firework_indep_spiral_burst_rwb",
+        "scr_firework_indep_ring_burst_rwb",
+        "scr_xmas_firework_burst_fizzle",
+        "scr_firework_indep_repeat_burst_rwb",
+        "scr_firework_xmas_ring_burst_rgw",
+        "scr_firework_xmas_repeat_burst_rgw",
+        "scr_firework_xmas_spiral_burst_rgw",
+    }
+    local assets = {
+        "scr_rcpaparazzo1",
+        "proj_indep_firework",
+        "scr_indep_fireworks",
+        "scr_indep_fireworks",
+        "proj_indep_firework_v2",
+        "proj_indep_firework_v2",
+        "proj_indep_firework_v2",
+        "proj_indep_firework_v2",
+        "proj_indep_firework_v2",
+        "proj_xmas_firework",
+        "proj_xmas_firework",
+        "proj_xmas_firework",
+    }
+    effect_name = effects[count]
+    asset_name = assets[count]
+end)
+
+--activate fire works----
+menu.toggle(firework_list, "Firework", {}, "", function(on)
+    if on then
+        shooting = true
+        local user_pos = ENTITY.GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(players.user_ped(), 0.0, 5.0, 0.0)
+        local weap = util.joaat('weapon_firework')
+        WEAPON.REQUEST_WEAPON_ASSET(weap)
+        while shooting do
+            MISC.SHOOT_SINGLE_BULLET_BETWEEN_COORDS(user_pos.x, user_pos.y, user_pos.z, user_pos.x, user_pos.y, user_pos.z + 1, 200, 0, weap, 0, false, false, 1000)
+            util.yield(250)
+            ent_func.use_fx_asset(asset_name)
+            local fx = GRAPHICS.START_PARTICLE_FX_LOOPED_AT_COORD(effect_name, user_pos.x, user_pos.y, user_pos.z+math.random(10, 40), 0.0, 0.0, 0.0, 1.0, false, false, false, false)
+            util.yield(1000)
+            GRAPHICS.STOP_PARTICLE_FX_LOOPED(fx, false)
+        end
+    end
+    if not on then
+        shooting = false
+    end
+end)
+
+local superman = menu.list(fun, "Super Man Options", {}, "")
+
+local jump = {height = 0.6 }
+menu.toggle_loop(superman, "Super Man", {}, "Keep going higher the longer you press jump (can also be used to fly), Make sure you disable lock parachutes.", function () -- Credits to Acjoker Script
+    menu.trigger_commands("paralock full")
+    if PAD.IS_CONTROL_PRESSED(22, 22) or PAD.IS_CONTROL_JUST_PRESSED(21, 21) then
+        PED.SET_PED_CAN_RAGDOLL(players.user_ped(), false)
+        ENTITY.APPLY_FORCE_TO_ENTITY_CENTER_OF_MASS(players.user_ped(), 1, 0.0, 0.6, jump.height, 0, 0, 0, 0, true, true, true, true)
+        if ENTITY.IS_ENTITY_IN_AIR(players.user_ped()) then
+            ENTITY.APPLY_FORCE_TO_ENTITY_CENTER_OF_MASS(players.user_ped(), 1, 0.0, 0.6, jump.height, 0, 0, 0, 0, true, true, true, true)
+        end
+    end
+end)
+
+menu.slider(superman, "Super Man Power", {"supermanpower"}, "Adjust the amount you move upwards. Make sure you disable lock parachutes.", 6, 1000, 6, 1, function (a) -- Credits to Acjoker Script
+    jump.height = a*0.1
+end)
+
+function Play_guitar(on)
+    while not STREAMING.HAS_ANIM_DICT_LOADED("amb@world_human_musician@guitar@male@idle_a") do 
+        STREAMING.REQUEST_ANIM_DICT("amb@world_human_musician@guitar@male@idle_a")
+        util.yield()
+    end
+    if on then
+    local pos = ENTITY.GET_ENTITY_COORDS(players.user_ped(),true)
+    guitar = OBJECT.CREATE_OBJECT(util.joaat("prop_acc_guitar_01"), pos.x, pos.y, pos.z, true, true, false)
+    NETWORK.NETWORK_REQUEST_CONTROL_OF_ENTITY(players.user_ped())
+    TASK.TASK_PLAY_ANIM(players.user_ped(), "amb@world_human_musician@guitar@male@idle_a", "idle_b", 3, 3, -1, 51, 0, false, false, false) --play anim 
+    ENTITY.ATTACH_ENTITY_TO_ENTITY(guitar, players.user_ped(), PED.GET_PED_BONE_INDEX(players.user_ped(), 24818), -0.1,0.31,0.1,0.0,20.0,150.0, false, true, false, true, 1, true)
+    PED.SET_ENABLE_HANDCUFFS(players.user_ped(),on)
     else
-        local Imortality_BodyGuards = menu.ref_by_path("Self>Bodyguards>Immortality")
-        menu.trigger_command(Imortality_BodyGuards)
-        menu.trigger_commands("delbodyguards")
-        menu.trigger_commands("deletevehicle")
-        menu.trigger_commands("mpfemale")
-        menu.trigger_commands("otr")
-        util.toast("Change you're outfit to get clothes normal again.")
+        TASK.CLEAR_PED_TASKS_IMMEDIATELY(players.user_ped())
+        PED.SET_ENABLE_HANDCUFFS(players.user_ped(),off)
+        entities.delete_by_handle(guitar)
     end
-end)
+end
 
-
-menu.toggle(fun, "Drive Cop Car", {"copcar"}, "Plus a bodygaurd.", function(on_toggle)
-    if on_toggle then
-        menu.trigger_commands("bodyguardmodel S_M_Y_Cop_01")
-        menu.trigger_commands("bodyguardcount 1")
-        menu.trigger_commands("bodyguardprimary pistol")
-        menu.trigger_commands("spawnbodyguards")
-        menu.trigger_commands("SMYCop01")
-        menu.trigger_commands("otr")
-        local Imortality_BodyGuards = menu.ref_by_path("Self>Bodyguards>Immortality")
-        util.yield(1000)
-        menu.trigger_command(Imortality_BodyGuards)
-        local vehicleHash = util.joaat("police3")
-        request_model(vehicleHash)
-        local pos = ENTITY.GET_ENTITY_COORDS(PLAYER.PLAYER_PED_ID(), false)
-        copheli = entities.create_vehicle(vehicleHash, pos, CAM.GET_GAMEPLAY_CAM_ROT(0).z)
-        VEHICLE.SET_VEHICLE_ENGINE_ON(copheli, true, true, true)
-        ENTITY.SET_ENTITY_INVINCIBLE(copheli, true)
-        VEHICLE.SET_PLANE_TURBULENCE_MULTIPLIER(copheli, 0.0)
-        VEHICLE.SET_VEHICLE_MOD_KIT(copheli, -1)
-        local id = get_closest_vehicle(entity)
-        local playerpos = ENTITY.GET_ENTITY_COORDS(id)
-        playerpos.z = playerpos.z + 3
-        ENTITY.SET_ENTITY_COORDS_NO_OFFSET(copheli, pos.x, pos.y, pos.z, false, false, true)
-        PED.SET_PED_INTO_VEHICLE(PLAYER.PLAYER_PED_ID(), copheli, -1)
+function Palm_spin_ball(on)
+    while not STREAMING.HAS_ANIM_DICT_LOADED("anim@mp_player_intincarfreakoutstd@ps@") do 
+        STREAMING.REQUEST_ANIM_DICT("anim@mp_player_intincarfreakoutstd@ps@")
+        util.yield()
+    end
+    if on then
+    local pos = ENTITY.GET_ENTITY_COORDS(players.user_ped(),true)
+    guitar = OBJECT.CREATE_OBJECT(util.joaat("prop_bowling_ball"), pos.x, pos.y, pos.z, true, true, false)
+    NETWORK.NETWORK_REQUEST_CONTROL_OF_ENTITY(players.user_ped())
+    TASK.TASK_PLAY_ANIM(players.user_ped(), "anim@mp_player_intincarfreakoutstd@ps@", "idle_a_fp", 10, 3, -1, 51, 5, false, false, false)
+    ENTITY.ATTACH_ENTITY_TO_ENTITY(guitar, players.user_ped(), PED.GET_PED_BONE_INDEX(players.user_ped(), 24818), 0.30,0.53,0,0.2,70,340, false, true, false, true, 1, true)
+    PED.SET_ENABLE_HANDCUFFS(players.user_ped(),on)
     else
-        local Imortality_BodyGuards = menu.ref_by_path("Self>Bodyguards>Immortality")
-        menu.trigger_command(Imortality_BodyGuards)
-        menu.trigger_commands("delbodyguards")
-        menu.trigger_commands("deletevehicle")
+        TASK.CLEAR_PED_TASKS_IMMEDIATELY(players.user_ped())
+        PED.SET_ENABLE_HANDCUFFS(players.user_ped(),off)
+        entities.delete_by_handle(guitar)
+    end
+end
+
+function seek_help(on)
+    while not STREAMING.HAS_ANIM_DICT_LOADED("amb@world_human_bum_freeway@male@base") do 
+        STREAMING.REQUEST_ANIM_DICT("amb@world_human_bum_freeway@male@base")
+        util.yield()
+    end
+    if on then
+    local pos = ENTITY.GET_ENTITY_COORDS(players.user_ped(),true)
+    beggers = OBJECT.CREATE_OBJECT(util.joaat("prop_beggers_sign_03"), pos.x, pos.y, pos.z, true, true, false)
+    NETWORK.NETWORK_REQUEST_CONTROL_OF_ENTITY(players.user_ped())
+    TASK.TASK_PLAY_ANIM(players.user_ped(), "amb@world_human_bum_freeway@male@base", "base", 3, 3, -1, 51, 0, false, false, false) --play anim 
+    ENTITY.ATTACH_ENTITY_TO_ENTITY(beggers, players.user_ped(), PED.GET_PED_BONE_INDEX(players.user_ped(), 58868), 0.19,0.18,0.0,5.0,0.0,40.0, false, true, false, true, 1, true)
+    PED.SET_ENABLE_HANDCUFFS(players.user_ped(),on)
+    else
+        TASK.CLEAR_PED_TASKS_IMMEDIATELY(players.user_ped())
+        PED.SET_ENABLE_HANDCUFFS(players.user_ped(),off)
+        entities.delete_by_handle(beggers)
+    end
+end
+
+function offer_flower(on)
+    while not STREAMING.HAS_ANIM_DICT_LOADED("anim@heists@humane_labs@finale@keycards") do 
+        STREAMING.REQUEST_ANIM_DICT("anim@heists@humane_labs@finale@keycards")
+        util.yield()
+    end
+    if on then
+    local pos = ENTITY.GET_ENTITY_COORDS(players.user_ped(),true)
+    rose = OBJECT.CREATE_OBJECT(util.joaat("prop_single_rose"), pos.x, pos.y, pos.z, true, true, false)
+    NETWORK.NETWORK_REQUEST_CONTROL_OF_ENTITY(players.user_ped())
+    TASK.TASK_PLAY_ANIM(players.user_ped(), "anim@heists@humane_labs@finale@keycards", "ped_a_enter_loop", 3, 3, -1, 51, 0, false, false, false) --play anim 
+    ENTITY.ATTACH_ENTITY_TO_ENTITY(rose, players.user_ped(), PED.GET_PED_BONE_INDEX(players.user_ped(), 18905), 0.13,0.15,0.0,-100.0,0.0,-20.0, false, true, false, true, 1, true)
+    PED.SET_ENABLE_HANDCUFFS(players.user_ped(),on)
+    else
+        TASK.CLEAR_PED_TASKS_IMMEDIATELY(players.user_ped())
+        PED.SET_ENABLE_HANDCUFFS(players.user_ped(),off)
+        entities.delete_by_handle(rose)
+    end
+end
+
+function Out_body(toggle)
+    if toggle then
+        all_peds = entities.get_all_peds_as_handles()
+        user_ped = players.user_ped()
+        clone = PED.CLONE_PED(user_ped,true, true, true)
+        pos = ENTITY.GET_ENTITY_COORDS(clone, false)
+        ENTITY.SET_ENTITY_COORDS(user_ped, pos.x-2, pos.y, pos.z)
+        ENTITY.SET_ENTITY_ALPHA(players.user_ped(), 87, false)
+        ENTITY.SET_ENTITY_INVINCIBLE(clone,true)
+        menu.trigger_commands("invisibility remote")
+        util.create_tick_handler(function()
+        STREAMING.REQUEST_ANIM_DICT("move_crawl")
+        PED.SET_PED_MOVEMENT_CLIPSET(clone, "move_crawl", -1)
+        mod_uses("ped", if on then 1 else -1)
+        PED.SET_BLOCKING_OF_NON_TEMPORARY_EVENTS(clone, true)
+        TASK.TASK_SET_BLOCKING_OF_NON_TEMPORARY_EVENTS(clone, true)
+        return ghost
+        end)
+        else
+            clonepedpos = ENTITY.GET_ENTITY_COORDS(clone, false)
+            ENTITY.SET_ENTITY_COORDS(user_ped, clonepedpos.x,clonepedpos.y,clonepedpos.z, false, false)
+            entities.delete_by_handle(clone)
+            ENTITY.SET_ENTITY_ALPHA(user_ped, 255, false)
+            menu.trigger_commands("invisibility off")
+        end
+end
+
+function attach_to_player(hash, bone, x, y, z, xrot, yrot, zrot)           
+    local user_ped = PLAYER.PLAYER_PED_ID()
+    hash = util.joaat(hash)
+    STREAMING.REQUEST_MODEL(hash)
+    while not STREAMING.HAS_MODEL_LOADED(hash) do		
+        util.yield()
+    end
+    STREAMING.SET_MODEL_AS_NO_LONGER_NEEDED(hash)
+    local object = OBJECT.CREATE_OBJECT(hash, 0.0,0.0,0, true, true, false)
+    ENTITY.ATTACH_ENTITY_TO_ENTITY(object, user_ped, PED.GET_PED_BONE_INDEX(PLAYER.PLAYER_PED_ID(), bone), x, y, z, xrot, yrot, zrot, false, false, false, false, 2, true) 
+end
+function delete_object(model)
+    local hash = util.joaat(model)
+    for k, object in pairs(entities.get_all_objects_as_handles()) do
+        if ENTITY.GET_ENTITY_MODEL(object) == hash then
+            ENTITY.SET_ENTITY_AS_MISSION_ENTITY(object, false, false) 
+            entities.delete_by_handle(object)
+        end
+    end
+end
+
+function get_model_size(hash)
+    local minptr = memory.alloc(24)
+    local maxptr = memory.alloc(24)
+    MISC.GET_MODEL_DIMENSIONS(hash, minptr, maxptr)
+    min = memory.read_vector3(minptr)
+    max = memory.read_vector3(maxptr)
+    local size = {}
+    size['x'] = max['x'] - min['x']
+    size['y'] = max['y'] - min['y']
+    size['z'] = max['z'] - min['z']
+    size['max'] = math.max(size['x'], size['y'], size['z'])
+    return size
+end
+
+local pmenu = menu.list(fun, "Player Stuff", {}, "Change Into Some Fun Stuff \n(Only Use One At A Time)")
+
+attach_self = menu.list(pmenu, "Attach Stuff", {})
+    menu.toggle(attach_self, "Snowman",{""}, "",function(on)
+        local zhangzi = "prop_gumball_03"
+        local sonwman = "prop_prlg_snowpile"
+        if on then
+            attach_to_player(sonwman, 0, 0.0, 0, 0, 0, 0,0)
+            attach_to_player(sonwman, 0, 0.0, 0, -0.5, 0, 0,0)
+            attach_to_player(sonwman, 0, 0.0, 0, -1, 0, 0,0)
+            attach_to_player(zhangzi, 0, 0.0, 0, 0, 0, 50,0)
+            attach_to_player(zhangzi, 0, 0.0, 0, 0, 0, 125,0)
+            attach_to_player(zhangzi, 0, 0.0, 0, 0, 0, -50,0)
+            attach_to_player(zhangzi, 0, 0.0, 0, 0, 0, -125,0)
+        else
+            delete_object(sonwman)
+            delete_object(zhangzi)
+        end
+    end)
+    menu.toggle(attach_self, "Katana's", {""}, "", function(state)
+        local obj = "prop_cs_katana_01"
+        if state then
+            attach_to_player(obj, 0, 0, -0.13, 0.5, 0, -150,0)
+            attach_to_player(obj, 0, 0, -0.13, 0.5, 0, 150,0)
+            attach_to_player(obj, 0, 0.23, 0, 0, 0, -180,100)
+        else
+            delete_object(obj)
+        end
+    end)
+    menu.toggle(attach_self, "666",{}, "",function(on)
+        obj = "prop_mp_num_6"
+        if on then     
+            attach_to_player(obj, 0, 0, 0, 1.7, 0, 0, 180)
+            attach_to_player(obj, 0, 1, 0, 1.7, 0, 0, 180)
+            attach_to_player(obj, 0, -1, 0, 1.7, 0, 0, 180)
+        else
+            delete_object(obj)
+        end
+    end)
+    menu.toggle(attach_self, "999",{}, "",function(on)
+        obj = "prop_mp_num_9"
+        if on then     
+            attach_to_player(obj, 0, 0, 0, 1.7, 0, 0, 180)
+            attach_to_player(obj, 0, 1, 0, 1.7, 0, 0, 180)
+            attach_to_player(obj, 0, -1, 0, 1.7, 0, 0, 180)
+        else
+            delete_object(obj)
+        end
+    end)
+    menu.toggle(attach_self, "Surfboard",{}, "",function(on)
+        obj = "prop_surf_board_ldn_03"
+        if on then     
+            attach_to_player(obj, 0, 0, -0.2, 0.25, 0, -30,0)
+        else
+            delete_object(obj)
+        end
+    end)
+    menu.toggle(attach_self, "Small School Bag",{}, "",function(on)
+        obj = "tr_prop_tr_bag_djlp_01a"
+        if on then     
+            attach_to_player(obj, 0, 0, -0.2, 0.1, 0, 0,0)
+        else
+            delete_object(obj)
+        end
+    end)
+    menu.toggle(attach_self, "Lifeboard",{}, "",function(on)
+        obj = "prop_beach_ring_01"
+        if on then     
+            attach_to_player(obj, 0, 0, 0, 0, 0, 0,0)
+        else
+            delete_object(obj)
+        end
+    end)
+    guitar_obj = menu.list(attach_self, "Guitar")
+        menu.toggle(guitar_obj, "Guitar 1",{}, "",function(on)
+            local obj = "prop_acc_guitar_01"
+            if on then     
+                attach_to_player(obj, 0, 0, -0.15, 0.25, 0, -50,0)
+            else
+                delete_object(obj)
+            end
+        end)
+        menu.toggle(guitar_obj, "Guitar 2",{}, "",function(on)
+            local obj = "prop_el_guitar_03"
+            if on then     
+                attach_to_player(obj, 0, 0, -0.15, 0.25, 0, -50,0)
+            else
+                delete_object(obj)
+            end
+        end)
+        menu.toggle(guitar_obj, "Guitar 3",{}, "",function(on)
+            local obj = "prop_el_guitar_01"
+            if on then     
+                attach_to_player(obj, 0, 0, -0.15, 0.25, 0, -50,0)
+            else
+                delete_object(obj)
+            end
+        end)
+        menu.toggle(guitar_obj, "Guitar 4",{}, "",function(on)
+            local obj = "prop_el_guitar_02"
+            if on then     
+                attach_to_player(obj, 0, 0, -0.15, 0.25, 0, -50,0)
+            else
+                delete_object(obj)
+            end
+        end)
+    menu.toggle(attach_self, "Play The Guitar", {}, "", function(on)
+        Play_guitar(on)
+    end)
+    menu.toggle(attach_self, "Palm Spin", {}, "", function(on)
+        Palm_spin_ball(on)
+    end)
+    menu.toggle(attach_self, "Ask For Help", {}, "", function(on)
+        seek_help(on)
+    end)
+    menu.toggle(attach_self, "Offer Flower", {}, "", function(on)
+        offer_flower(on)
+    end)
+
+    menu.toggle(pmenu, "Become A Cat", {}, "Change Into A Cat", function(on)
+        if on then
+            menu.trigger_commands("noguns")
+            util.yield(200)
+            menu.trigger_commands("accat01")
+        else
+            menu.trigger_commands("mpfemale")
+            util.yield(0500)
+            menu.trigger_commands("randomoutfit")
+            menu.trigger_commands("allguns")
+        end
+    end)
+
+menu.toggle(pmenu, "Become A Monekey", {}, "Change Into A Money", function(on)
+    if on then
+        menu.trigger_commands("acchimp02")
+    else
         menu.trigger_commands("mpfemale")
+        util.yield(0500)
+        menu.trigger_commands("randomoutfit")
+    end
+end)
+
+menu.toggle(pmenu, "Become A KillerWhale", {}, "Change Into A KillerWhale", function(on)
+    if on then
+        menu.trigger_commands("noguns")
+        local player_ped = PLAYER.PLAYER_PED_ID()    
+        ENTITY.SET_ENTITY_COORDS_NO_OFFSET(player_ped, -2592.5793, -612.5788, -34.412697)
+        util.yield(1)
+        menu.trigger_commands("ackillerwhale")
+    else
+        menu.trigger_commands("allguns")
+        menu.trigger_commands("mpfemale")
+        util.yield(0500)
+        menu.trigger_commands("randomoutfit")
+        menu.trigger_commands("tpmazehelipad")
+    end
+end)
+
+menu.toggle(pmenu, "Become A Rat", {}, "Change Into A Rat", function(on)
+    if on then
+        menu.trigger_commands("noguns")
+        menu.trigger_commands("ACRat")
+        menu.trigger_commands("walkstyle mop")
+    else
+        menu.trigger_commands("walkstyle poshfemale")
+        menu.trigger_commands("mpfemale")
+        menu.trigger_commands("allguns")
+        util.yield(0500)
+        menu.trigger_commands("randomoutfit")
+    end
+end)
+
+menu.toggle(pmenu, "Become A Mountain Lion", {}, "Change Into A Mountain Lion", function(on)
+    if on then
+        menu.trigger_commands("noguns")
+        menu.trigger_commands("ACmtlion")
+        menu.trigger_commands("walkstyle mop")
+    else
+        menu.trigger_commands("walkstyle poshfemale")
+        menu.trigger_commands("mpfemale")
+        menu.trigger_commands("allguns")
+        util.yield(0500)
+        menu.trigger_commands("randomoutfit")
+    end
+end)
+
+menu.toggle(pmenu, "Become A Panther", {}, "Change Into A Panther", function(on)
+    if on then
+        menu.trigger_commands("noguns")
+        menu.trigger_commands("ACpanther")
+        menu.trigger_commands("walkstyle mop")
+    else
+        menu.trigger_commands("walkstyle poshfemale")
+        menu.trigger_commands("mpfemale")
+        menu.trigger_commands("allguns")
+        util.yield(0500)
+        menu.trigger_commands("randomoutfit")
+    end
+end)
+
+menu.toggle(pmenu, "Become Westy (Dog)", {}, "Change Into Westy (Dog)", function(on)
+    if on then
+        menu.trigger_commands("noguns")
+        menu.trigger_commands("ACWesty")
+        menu.trigger_commands("walkstyle mop")
+    else
+        menu.trigger_commands("walkstyle poshfemale")
+        menu.trigger_commands("mpfemale")
+        menu.trigger_commands("allguns")
+        util.yield(0500)
+        menu.trigger_commands("randomoutfit")
+    end
+end)
+
+menu.toggle(pmenu, "Become A GermanShepherd (Dog)", {}, "Change Into A GermanShepherd (Dog)", function(on)
+    if on then
+        menu.trigger_commands("noguns")
+        menu.trigger_commands("ACShepherd")
+        menu.trigger_commands("walkstyle mop")
+    else
+        menu.trigger_commands("walkstyle poshfemale")
+        menu.trigger_commands("mpfemale")
+        menu.trigger_commands("allguns")
+        util.yield(0500)
+        menu.trigger_commands("randomoutfit")
+    end
+end)
+
+menu.toggle(pmenu, "Become A Rottweiler (Dog)", {}, "Change Into A Rottweiler (Dog)", function(on)
+    if on then
+        menu.trigger_commands("noguns")
+        menu.trigger_commands("ACRottweiler")
+        menu.trigger_commands("walkstyle mop")
+    else
+        menu.trigger_commands("walkstyle poshfemale")
+        menu.trigger_commands("mpfemale")
+        menu.trigger_commands("allguns")
+        util.yield(0500)
+        menu.trigger_commands("randomoutfit")
+    end
+end)
+
+menu.toggle(pmenu, "Become A Poodle (Dog)", {}, "Change Into A Poodle (Dog)", function(on)
+    if on then
+        menu.trigger_commands("noguns")
+        menu.trigger_commands("ACPoodle")
+        menu.trigger_commands("walkstyle mop")
+    else
+        menu.trigger_commands("walkstyle poshfemale")
+        menu.trigger_commands("mpfemale")
+        menu.trigger_commands("allguns")
+        util.yield(0500)
+        menu.trigger_commands("randomoutfit")
+    end
+end)
+
+menu.toggle(pmenu, "Become A Boar", {}, "Change Into A Boar", function(on)
+    if on then
+        menu.trigger_commands("noguns")
+        menu.trigger_commands("ACBoar")
+        menu.trigger_commands("walkstyle mop")
+    else
+        menu.trigger_commands("walkstyle poshfemale")
+        menu.trigger_commands("mpfemale")
+        menu.trigger_commands("allguns")
+        util.yield(0500)
+        menu.trigger_commands("randomoutfit")
+    end
+end)
+
+menu.toggle(pmenu, "Become Pug (Dog)", {}, "Change Into Pug (Dog)", function(on)
+    if on then
+        menu.trigger_commands("noguns")
+        menu.trigger_commands("ACPug")
+        menu.trigger_commands("walkstyle mop")
+    else
+        menu.trigger_commands("walkstyle poshfemale")
+        menu.trigger_commands("mpfemale")
+        menu.trigger_commands("allguns")
+        util.yield(0500)
+        menu.trigger_commands("randomoutfit")
+    end
+end)
+
+menu.toggle(pmenu, "Become Chop (Dog)", {}, "Change Into Chop (Dog)", function(on)
+    if on then
+        menu.trigger_commands("noguns")
+        menu.trigger_commands("ACChop")
+        menu.trigger_commands("walkstyle mop")
+    else
+        menu.trigger_commands("walkstyle poshfemale")
+        menu.trigger_commands("mpfemale")
+        menu.trigger_commands("allguns")
+        util.yield(0500)
+        menu.trigger_commands("randomoutfit")
+    end
+end)
+
+menu.toggle(pmenu, "Become A Coyote", {}, "Change Into A Coyote", function(on)
+    if on then
+        menu.trigger_commands("noguns")
+        menu.trigger_commands("ACCoyote")
+        menu.trigger_commands("walkstyle mop")
+    else
+        menu.trigger_commands("walkstyle poshfemale")
+        menu.trigger_commands("mpfemale")
+        menu.trigger_commands("allguns")
+        util.yield(0500)
+        menu.trigger_commands("randomoutfit")
+    end
+end)
+
+menu.toggle(pmenu, "Become A Deer", {}, "Change Into A Deer", function(on)
+    if on then
+        menu.trigger_commands("noguns")
+        menu.trigger_commands("ACDeer")
+        menu.trigger_commands("walkstyle mop")
+    else
+        menu.trigger_commands("walkstyle poshfemale")
+        menu.trigger_commands("mpfemale")
+        menu.trigger_commands("allguns")
+        util.yield(0500)
+        menu.trigger_commands("randomoutfit")
+    end
+end)
+
+menu.action(pmenu, "Become A Chickenhawk", {"chickenhawktoggle"}, "Change Into A Chickenhawk", function(on)
+    if on then
+        util.toast("GodMode Will Be Off Due To Player Model \n(In Other Words You Can Die As This)")
+        menu.trigger_commands("noguns")
+        menu.trigger_commands("reducedcollision" .. " on")
+        menu.trigger_commands("acchickenhawk")
+    else
+        menu.trigger_commands("reducedcollision" .. " off")
+        menu.trigger_commands("mpfemale")
+        util.yield(0500)
+        menu.trigger_commands("randomoutfit")
+        menu.trigger_commands("allguns")
+    end
+end)
+
+menu.action(pmenu, "Become A Pigeon", {"pigeontoggle"}, "Change Into A Pigeon", function(on)
+    if on then
+        util.toast("GodMode Will Be Off Due To Player Model \n(In Other Words You Can Die As This)")
+        menu.trigger_commands("noguns")
+        menu.trigger_commands("reducedcollision" .. " on")
+        menu.trigger_commands("acpigeon")
+    else
+        menu.trigger_commands("reducedcollision" .. " off")
+        menu.trigger_commands("mpfemale")
+        util.yield(0500)
+        menu.trigger_commands("randomoutfit")
+        menu.trigger_commands("allguns")
+    end
+end)
+
+menu.action(pmenu, "Become A Cormorant", {"cormoranttoggle"}, "Change Into A Cormorant", function(on)
+    if on then
+        util.toast("GodMode Will Be Off Due To Player Model \n(In Other Words You Can Die As This)")
+        menu.trigger_commands("noguns")
+        menu.trigger_commands("reducedcollision" .. " on")
+        menu.trigger_commands("ACCormorant")
+    else
+        menu.trigger_commands("reducedcollision" .. " off")
+        menu.trigger_commands("mpfemale")
+        util.yield(0500)
+        menu.trigger_commands("randomoutfit")
+        menu.trigger_commands("allguns")
+    end
+end)
+
+menu.action(pmenu, "Become A Crow", {"crowtoggle"}, "Change Into A Crow", function(on)
+    if on then
+        util.toast("GodMode Will Be Off Due To Player Model \n(In Other Words You Can Die As This)")
+        menu.trigger_commands("noguns")
+        menu.trigger_commands("reducedcollision" .. " on")
+        menu.trigger_commands("ACCrow")
+    else
+        menu.trigger_commands("reducedcollision" .. " off")
+        menu.trigger_commands("mpfemale")
+        util.yield(0500)
+        menu.trigger_commands("randomoutfit")
+        menu.trigger_commands("allguns")
+    end
+end)
+
+menu.toggle(pmenu, "Become A Pig", {}, "Change Into A Pig", function(on)
+    if on then
+        menu.trigger_commands("noguns")
+        menu.trigger_commands("ACPig")
+        menu.trigger_commands("walkstyle mop")
+    else
+        menu.trigger_commands("walkstyle poshfemale")
+        menu.trigger_commands("mpfemale")
+        menu.trigger_commands("allguns")
+        util.yield(0500)
+        menu.trigger_commands("randomoutfit")
+    end
+end)
+
+menu.toggle(pmenu, "Become A Rabbit", {}, "Change Into A Rabbit", function(on)
+    if on then
+        menu.trigger_commands("noguns")
+        menu.trigger_commands("ACRabbit")
+        menu.trigger_commands("walkstyle mop")
+    else
+        menu.trigger_commands("walkstyle poshfemale")
+        menu.trigger_commands("mpfemale")
+        menu.trigger_commands("allguns")
+        util.yield(0500)
+        menu.trigger_commands("randomoutfit")
+    end
+end)
+
+menu.toggle(pmenu, "Become A Big Rabbit", {}, "Change Into A Big Rabbit", function(on)
+    if on then
+        menu.trigger_commands("noguns")
+        menu.trigger_commands("ACRabbit02")
+        menu.trigger_commands("walkstyle mop")
+    else
+        menu.trigger_commands("walkstyle poshfemale")
+        menu.trigger_commands("mpfemale")
+        menu.trigger_commands("allguns")
+        util.yield(0500)
+        menu.trigger_commands("randomoutfit")
+    end
+end)
+
+menu.toggle(pmenu, "Become A Furry", {}, "Change Into A Furry lol", function(on)
+    if on then
+        menu.trigger_commands("IGFurry")
+        menu.trigger_commands("walkstyle mop")
+    else
+        menu.trigger_commands("walkstyle poshfemale")
+        menu.trigger_commands("mpfemale")
+        util.yield(0500)
+        menu.trigger_commands("randomoutfit")
+    end
+end)
+
+menu.toggle(pmenu, "Become Yule Monster", {}, "Change Into Yule Monster", function(on)
+    if on then
+        menu.trigger_commands("UMMYuleMonster")
+        menu.trigger_commands("walkstyle mop")
+    else
+        menu.trigger_commands("walkstyle poshfemale")
+        menu.trigger_commands("mpfemale")
+        util.yield(0500)
+        menu.trigger_commands("randomoutfit")
+    end
+end)
+
+menu.toggle(pmenu, "Become Bigfoot", {}, "Change Into Bigfoot", function(on)
+    if on then
         menu.trigger_commands("otr")
+        menu.trigger_commands("igorleans")
+    else
+        menu.trigger_commands("otr")
+        menu.trigger_commands("mpfemale")
+        util.yield(0500)
+        menu.trigger_commands("randomoutfit")
     end
 end)
 
-menu.action(fun, "Snow War", {}, "Snowball all players in the session.", function ()
-    local plist = players.list()
-    local snowballs = util.joaat('WEAPON_SNOWBALL')
-    for i = 1, #plist do
-        local plyr = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(plist[i])
-        WEAPON.GIVE_DELAYED_WEAPON_TO_PED(plyr, snowballs, 20, true)
-        WEAPON.SET_PED_AMMO(plyr, snowballs, 20)
-        util.toast("Now everyone has snowballs!")
-        util.yield()
+menu.toggle(pmenu, "Become Trevor", {}, "Change Into Trevor", function(on)
+    if on then
+        menu.trigger_commands("trevor")
+        menu.trigger_commands("walkstyle verydrunk")
+    else
+        menu.trigger_commands("walkstyle poshfemale")
+        util.yield(0500)
+        menu.trigger_commands("randomoutfit")
     end
-   
 end)
 
-menu.action(fun, "Take A Massive Shit", {"mshit"}, "Take a massive shit", function()
-    local player = players.user_ped()
-    local agroup = "missfbi3ig_0"
-    local anim = "shit_loop_trev"
-    local mshit = util.joaat("prop_big_shit_02")
-    local rshit = util.joaat("prop_big_shit_01")
-    local c = ENTITY.GET_ENTITY_COORDS(players.user_ped())
-    c.z = c.z -1
-    while not STREAMING.HAS_ANIM_DICT_LOADED(agroup) do 
-        STREAMING.REQUEST_ANIM_DICT(agroup)
-        util.yield()
+menu.toggle(pmenu, "Become Micheal", {}, "Change Into Micheal", function(on)
+    if on then
+        menu.trigger_commands("michael")
+        menu.trigger_commands("walkstyle Micheal")
+    else
+        menu.trigger_commands("walkstyle poshfemale")
+        util.yield(0500)
+        menu.trigger_commands("randomoutfit")
     end
-    TASK.TASK_PLAY_ANIM(player, agroup, anim, 8.0, 8.0, 3000, 0, 0, true, true, true)
-    util.yield(1000)
-    entities.create_object(mshit, c)
 end)
 
-menu.action(fun, "Take A Normal Shit", {"nshit"}, "Take a normale sized shit", function()
-    local player = players.user_ped()
-    local agroup = "missfbi3ig_0"
-    local anim = "shit_loop_trev"
-    local mshit = util.joaat("prop_big_shit_02")
-    local rshit = util.joaat("prop_big_shit_01")
-    local c = ENTITY.GET_ENTITY_COORDS(players.user_ped())
-    c.z = c.z -1
-    while not STREAMING.HAS_ANIM_DICT_LOADED(agroup) do 
-        STREAMING.REQUEST_ANIM_DICT(agroup)
-        util.yield()
+menu.toggle(pmenu, "Become Franklin", {}, "Change Into Franklin", function(on)
+    if on then
+        menu.trigger_commands("franklin")
+        menu.trigger_commands("walkstyle Franklin")
+    else
+        menu.trigger_commands("walkstyle poshfemale")
+        util.yield(0500)
+        menu.trigger_commands("randomoutfit")
     end
-    TASK.TASK_PLAY_ANIM(player, agroup, anim, 8.0, 8.0, 3000, 0, 0, true, true, true)
-    util.yield(1000)
-    entities.create_object(rshit, c)
 end)
 
 local fpets = menu.list(fun, "Pets", {}, "Use 1 of them")
@@ -10504,706 +11934,331 @@ end, function()
     custom_pet = nil
 end)
 
---------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------------------------------------------------
 
-function Play_guitar(on)
-    while not STREAMING.HAS_ANIM_DICT_LOADED("amb@world_human_musician@guitar@male@idle_a") do 
-        STREAMING.REQUEST_ANIM_DICT("amb@world_human_musician@guitar@male@idle_a")
-        util.yield()
-    end
-    if on then
-    local pos = ENTITY.GET_ENTITY_COORDS(players.user_ped(),true)
-    guitar = OBJECT.CREATE_OBJECT(util.joaat("prop_acc_guitar_01"), pos.x, pos.y, pos.z, true, true, false)
-    NETWORK.NETWORK_REQUEST_CONTROL_OF_ENTITY(players.user_ped())
-    TASK.TASK_PLAY_ANIM(players.user_ped(), "amb@world_human_musician@guitar@male@idle_a", "idle_b", 3, 3, -1, 51, 0, false, false, false) --play anim 
-    ENTITY.ATTACH_ENTITY_TO_ENTITY(guitar, players.user_ped(), PED.GET_PED_BONE_INDEX(players.user_ped(), 24818), -0.1,0.31,0.1,0.0,20.0,150.0, false, true, false, true, 1, true)
-    PED.SET_ENABLE_HANDCUFFS(players.user_ped(),on)
-    else
-        TASK.CLEAR_PED_TASKS_IMMEDIATELY(players.user_ped())
-        PED.SET_ENABLE_HANDCUFFS(players.user_ped(),off)
-        entities.delete_by_handle(guitar)
-    end
-end
+--Taken From NovaScript
 
-function Palm_spin_ball(on)
-    while not STREAMING.HAS_ANIM_DICT_LOADED("anim@mp_player_intincarfreakoutstd@ps@") do 
-        STREAMING.REQUEST_ANIM_DICT("anim@mp_player_intincarfreakoutstd@ps@")
-        util.yield()
-    end
-    if on then
-    local pos = ENTITY.GET_ENTITY_COORDS(players.user_ped(),true)
-    guitar = OBJECT.CREATE_OBJECT(util.joaat("prop_bowling_ball"), pos.x, pos.y, pos.z, true, true, false)
-    NETWORK.NETWORK_REQUEST_CONTROL_OF_ENTITY(players.user_ped())
-    TASK.TASK_PLAY_ANIM(players.user_ped(), "anim@mp_player_intincarfreakoutstd@ps@", "idle_a_fp", 10, 3, -1, 51, 5, false, false, false)
-    ENTITY.ATTACH_ENTITY_TO_ENTITY(guitar, players.user_ped(), PED.GET_PED_BONE_INDEX(players.user_ped(), 24818), 0.30,0.53,0,0.2,70,340, false, true, false, true, 1, true)
-    PED.SET_ENABLE_HANDCUFFS(players.user_ped(),on)
-    else
-        TASK.CLEAR_PED_TASKS_IMMEDIATELY(players.user_ped())
-        PED.SET_ENABLE_HANDCUFFS(players.user_ped(),off)
-        entities.delete_by_handle(guitar)
-    end
-end
+--auras--
+local aura_list = menu.list(fun, "Aura's", {}, "")
 
-function seek_help(on)
-    while not STREAMING.HAS_ANIM_DICT_LOADED("amb@world_human_bum_freeway@male@base") do 
-        STREAMING.REQUEST_ANIM_DICT("amb@world_human_bum_freeway@male@base")
-        util.yield()
-    end
-    if on then
-    local pos = ENTITY.GET_ENTITY_COORDS(players.user_ped(),true)
-    beggers = OBJECT.CREATE_OBJECT(util.joaat("prop_beggers_sign_03"), pos.x, pos.y, pos.z, true, true, false)
-    NETWORK.NETWORK_REQUEST_CONTROL_OF_ENTITY(players.user_ped())
-    TASK.TASK_PLAY_ANIM(players.user_ped(), "amb@world_human_bum_freeway@male@base", "base", 3, 3, -1, 51, 0, false, false, false) --play anim 
-    ENTITY.ATTACH_ENTITY_TO_ENTITY(beggers, players.user_ped(), PED.GET_PED_BONE_INDEX(players.user_ped(), 58868), 0.19,0.18,0.0,5.0,0.0,40.0, false, true, false, true, 1, true)
-    PED.SET_ENABLE_HANDCUFFS(players.user_ped(),on)
-    else
-        TASK.CLEAR_PED_TASKS_IMMEDIATELY(players.user_ped())
-        PED.SET_ENABLE_HANDCUFFS(players.user_ped(),off)
-        entities.delete_by_handle(beggers)
-    end
-end
+--aura radius--
+local aura_radius = 50
+menu.slider(aura_list, "Aura Radius", {}, "", 5, 200, 10, 1, function(count)
+    aura_radius = count
+end)
 
-function offer_flower(on)
-    while not STREAMING.HAS_ANIM_DICT_LOADED("anim@heists@humane_labs@finale@keycards") do 
-        STREAMING.REQUEST_ANIM_DICT("anim@heists@humane_labs@finale@keycards")
-        util.yield()
-    end
-    if on then
-    local pos = ENTITY.GET_ENTITY_COORDS(players.user_ped(),true)
-    rose = OBJECT.CREATE_OBJECT(util.joaat("prop_single_rose"), pos.x, pos.y, pos.z, true, true, false)
-    NETWORK.NETWORK_REQUEST_CONTROL_OF_ENTITY(players.user_ped())
-    TASK.TASK_PLAY_ANIM(players.user_ped(), "anim@heists@humane_labs@finale@keycards", "ped_a_enter_loop", 3, 3, -1, 51, 0, false, false, false) --play anim 
-    ENTITY.ATTACH_ENTITY_TO_ENTITY(rose, players.user_ped(), PED.GET_PED_BONE_INDEX(players.user_ped(), 18905), 0.13,0.15,0.0,-100.0,0.0,-20.0, false, true, false, true, 1, true)
-    PED.SET_ENABLE_HANDCUFFS(players.user_ped(),on)
-    else
-        TASK.CLEAR_PED_TASKS_IMMEDIATELY(players.user_ped())
-        PED.SET_ENABLE_HANDCUFFS(players.user_ped(),off)
-        entities.delete_by_handle(rose)
-    end
-end
-
-function Out_body(toggle)
-    if toggle then
-        all_peds = entities.get_all_peds_as_handles()
-        user_ped = players.user_ped()
-        clone = PED.CLONE_PED(user_ped,true, true, true)
-        pos = ENTITY.GET_ENTITY_COORDS(clone, false)
-        ENTITY.SET_ENTITY_COORDS(user_ped, pos.x-2, pos.y, pos.z)
-        ENTITY.SET_ENTITY_ALPHA(players.user_ped(), 87, false)
-        ENTITY.SET_ENTITY_INVINCIBLE(clone,true)
-        menu.trigger_commands("invisibility remote")
-        util.create_tick_handler(function()
-        STREAMING.REQUEST_ANIM_DICT("move_crawl")
-        PED.SET_PED_MOVEMENT_CLIPSET(clone, "move_crawl", -1)
-        mod_uses("ped", if on then 1 else -1)
-        PED.SET_BLOCKING_OF_NON_TEMPORARY_EVENTS(clone, true)
-        TASK.TASK_SET_BLOCKING_OF_NON_TEMPORARY_EVENTS(clone, true)
-        return ghost
-        end)
-        else
-            clonepedpos = ENTITY.GET_ENTITY_COORDS(clone, false)
-            ENTITY.SET_ENTITY_COORDS(user_ped, clonepedpos.x,clonepedpos.y,clonepedpos.z, false, false)
-            entities.delete_by_handle(clone)
-            ENTITY.SET_ENTITY_ALPHA(user_ped, 255, false)
-            menu.trigger_commands("invisibility off")
-        end
-end
-
-flags_fmt = {}
-country_flags = {
-    "apa_prop_flag_argentina", 
-    "apa_prop_flag_australia", 
-    "apa_prop_flag_austria", 
-    "apa_prop_flag_belgium", 
-    "apa_prop_flag_brazil", 
-    "apa_prop_flag_canada_yt", 
-    "apa_prop_flag_china", 
-    "apa_prop_flag_columbia", 
-    "apa_prop_flag_croatia", 
-    "apa_prop_flag_czechrep", 
-    "apa_prop_flag_denmark", 
-    "apa_prop_flag_england", 
-    "apa_prop_flag_eu_yt", 
-    "apa_prop_flag_finland", 
-    "apa_prop_flag_france", 
-    "apa_prop_flag_german_yt", 
-    "apa_prop_flag_hungary", 
-    "apa_prop_flag_ireland", 
-    "apa_prop_flag_israel", 
-    "apa_prop_flag_italy", 
-    "apa_prop_flag_jamaica", 
-    "apa_prop_flag_japan_yt", 
-    "apa_prop_flag_lstein", 
-    "apa_prop_flag_malta", 
-    "apa_prop_flag_mexico_yt", 
-    "apa_prop_flag_netherlands", 
-    "apa_prop_flag_newzealand", 
-    "apa_prop_flag_nigeria", 
-    "apa_prop_flag_norway", 
-    "apa_prop_flag_palestine", 
-    "apa_prop_flag_poland", 
-    "apa_prop_flag_portugal", 
-    "apa_prop_flag_puertorico", 
-    "apa_prop_flag_russia_yt", 
-    "apa_prop_flag_scotland_yt", 
-    "apa_prop_flag_script", 
-    "apa_prop_flag_slovakia", 
-    "apa_prop_flag_slovenia", 
-    "apa_prop_flag_southafrica", 
-    "apa_prop_flag_southkorea", 
-    "apa_prop_flag_spain", 
-    "apa_prop_flag_sweden", 
-    "apa_prop_flag_switzerland", 
-    "apa_prop_flag_turkey", 
-    "apa_prop_flag_uk_yt", 
-    "apa_prop_flag_us_yt", 
-    "apa_prop_flag_wales"
-}
-
-function first_to_upper(str)
-    return (str:gsub("^%l", string.upper))
-end
-for _, flag in pairs(country_flags) do 
-    table.insert(flags_fmt, first_to_upper(flag:gsub('apa_prop_flag_', ''):gsub('_yt', '')))
-end
-
-function attach_to_player(hash, bone, x, y, z, xrot, yrot, zrot)           
-    local user_ped = PLAYER.PLAYER_PED_ID()
-    hash = util.joaat(hash)
-    STREAMING.REQUEST_MODEL(hash)
-    while not STREAMING.HAS_MODEL_LOADED(hash) do		
-        util.yield()
-    end
-    STREAMING.SET_MODEL_AS_NO_LONGER_NEEDED(hash)
-    local object = OBJECT.CREATE_OBJECT(hash, 0.0,0.0,0, true, true, false)
-    ENTITY.ATTACH_ENTITY_TO_ENTITY(object, user_ped, PED.GET_PED_BONE_INDEX(PLAYER.PLAYER_PED_ID(), bone), x, y, z, xrot, yrot, zrot, false, false, false, false, 2, true) 
-end
-function delete_object(model)
-    local hash = util.joaat(model)
-    for k, object in pairs(entities.get_all_objects_as_handles()) do
-        if ENTITY.GET_ENTITY_MODEL(object) == hash then
-            ENTITY.SET_ENTITY_AS_MISSION_ENTITY(object, false, false) 
-            entities.delete_by_handle(object)
-        end
-    end
-end
-
-function get_model_size(hash)
-    local minptr = memory.alloc(24)
-    local maxptr = memory.alloc(24)
-    MISC.GET_MODEL_DIMENSIONS(hash, minptr, maxptr)
-    min = memory.read_vector3(minptr)
-    max = memory.read_vector3(maxptr)
-    local size = {}
-    size['x'] = max['x'] - min['x']
-    size['y'] = max['y'] - min['y']
-    size['z'] = max['z'] - min['z']
-    size['max'] = math.max(size['x'], size['y'], size['z'])
-    return size
-end
-
-local pmenu = menu.list(fun, "Player Stuff", {}, "Change Into Some Fun Stuff \n(Only Use One At A Time)")
-
-attach_self = menu.list(pmenu, "Attach Stuff", {})
-    menu.toggle(attach_self, "Snowman",{""}, "",function(on)
-        local zhangzi = "prop_gumball_03"
-        local sonwman = "prop_prlg_snowpile"
-        if on then
-            attach_to_player(sonwman, 0, 0.0, 0, 0, 0, 0,0)
-            attach_to_player(sonwman, 0, 0.0, 0, -0.5, 0, 0,0)
-            attach_to_player(sonwman, 0, 0.0, 0, -1, 0, 0,0)
-            attach_to_player(zhangzi, 0, 0.0, 0, 0, 0, 50,0)
-            attach_to_player(zhangzi, 0, 0.0, 0, 0, 0, 125,0)
-            attach_to_player(zhangzi, 0, 0.0, 0, 0, 0, -50,0)
-            attach_to_player(zhangzi, 0, 0.0, 0, 0, 0, -125,0)
-        else
-            delete_object(sonwman)
-            delete_object(zhangzi)
-        end
-    end)
-    menu.toggle(attach_self, "Katana's", {""}, "", function(state)
-        local obj = "prop_cs_katana_01"
-        if state then
-            attach_to_player(obj, 0, 0, -0.13, 0.5, 0, -150,0)
-            attach_to_player(obj, 0, 0, -0.13, 0.5, 0, 150,0)
-            attach_to_player(obj, 0, 0.23, 0, 0, 0, -180,100)
-        else
-            delete_object(obj)
-        end
-    end)
-    menu.toggle(attach_self, "666",{}, "",function(on)
-        obj = "prop_mp_num_6"
-        if on then     
-            attach_to_player(obj, 0, 0, 0, 1.7, 0, 0, 180)
-            attach_to_player(obj, 0, 1, 0, 1.7, 0, 0, 180)
-            attach_to_player(obj, 0, -1, 0, 1.7, 0, 0, 180)
-        else
-            delete_object(obj)
-        end
-    end)
-    menu.toggle(attach_self, "999",{}, "",function(on)
-        obj = "prop_mp_num_9"
-        if on then     
-            attach_to_player(obj, 0, 0, 0, 1.7, 0, 0, 180)
-            attach_to_player(obj, 0, 1, 0, 1.7, 0, 0, 180)
-            attach_to_player(obj, 0, -1, 0, 1.7, 0, 0, 180)
-        else
-            delete_object(obj)
-        end
-    end)
-    menu.toggle(attach_self, "Surfboard",{}, "",function(on)
-        obj = "prop_surf_board_ldn_03"
-        if on then     
-            attach_to_player(obj, 0, 0, -0.2, 0.25, 0, -30,0)
-        else
-            delete_object(obj)
-        end
-    end)
-    menu.toggle(attach_self, "Small School Bag",{}, "",function(on)
-        obj = "tr_prop_tr_bag_djlp_01a"
-        if on then     
-            attach_to_player(obj, 0, 0, -0.2, 0.1, 0, 0,0)
-        else
-            delete_object(obj)
-        end
-    end)
-    menu.toggle(attach_self, "Lifeboard",{}, "",function(on)
-        obj = "prop_beach_ring_01"
-        if on then     
-            attach_to_player(obj, 0, 0, 0, 0, 0, 0,0)
-        else
-            delete_object(obj)
-        end
-    end)
-    guitar_obj = menu.list(attach_self, "Guitar")
-        menu.toggle(guitar_obj, "Guitar 1",{}, "",function(on)
-            local obj = "prop_acc_guitar_01"
-            if on then     
-                attach_to_player(obj, 0, 0, -0.15, 0.25, 0, -50,0)
-            else
-                delete_object(obj)
+--explosion aura--
+menu.toggle_loop(aura_list, "Explosive Aura", {}, "", function()
+    local vehicles = entities.get_all_vehicles_as_pointers()
+    local user_vehicle = PED.GET_VEHICLE_PED_IS_IN(players.user_ped(), true)
+    for vehicles as vehicle do
+        local vehicle_handle = entities.pointer_to_handle(vehicle)
+        if vehicle_handle != user_vehicle then
+            local vehicle_pos = ENTITY.GET_ENTITY_COORDS(vehicle_handle)
+            if ent_func.get_distance_between(players.user_ped(), vehicle_pos) <= aura_radius then
+                if VEHICLE.GET_VEHICLE_ENGINE_HEALTH(vehicle_handle) >= 0 then
+                    FIRE.ADD_EXPLOSION(vehicle_pos.x, vehicle_pos.y, vehicle_pos.z, 1, 1, false, true, 0.0, false)
+                end
             end
-        end)
-        menu.toggle(guitar_obj, "Guitar 2",{}, "",function(on)
-            local obj = "prop_el_guitar_03"
-            if on then     
-                attach_to_player(obj, 0, 0, -0.15, 0.25, 0, -50,0)
-            else
-                delete_object(obj)
-            end
-        end)
-        menu.toggle(guitar_obj, "Guitar 3",{}, "",function(on)
-            local obj = "prop_el_guitar_01"
-            if on then     
-                attach_to_player(obj, 0, 0, -0.15, 0.25, 0, -50,0)
-            else
-                delete_object(obj)
-            end
-        end)
-        menu.toggle(guitar_obj, "Guitar 4",{}, "",function(on)
-            local obj = "prop_el_guitar_02"
-            if on then     
-                attach_to_player(obj, 0, 0, -0.15, 0.25, 0, -50,0)
-            else
-                delete_object(obj)
-            end
-        end)
-    menu.toggle(attach_self, "Play The Guitar", {}, "", function(on)
-        Play_guitar(on)
-    end)
-    menu.toggle(attach_self, "Palm Spin", {}, "", function(on)
-        Palm_spin_ball(on)
-    end)
-    menu.toggle(attach_self, "Ask For Help", {}, "", function(on)
-        seek_help(on)
-    end)
-    menu.toggle(attach_self, "Offer Flower", {}, "", function(on)
-        offer_flower(on)
-    end)
-
-    menu.toggle(pmenu, "Become A Cat", {}, "Change Into A Cat", function(on)
-        if on then
-            menu.trigger_commands("noguns")
-            util.yield(200)
-            menu.trigger_commands("accat01")
-        else
-            menu.trigger_commands("outfit1candydinka")
-            util.yield(0500)
-            menu.trigger_commands("randomoutfit")
-            menu.trigger_commands("allguns")
         end
-    end)
+    end
+    local peds = entities.get_all_peds_as_pointers()
+    for peds as ped do
+        local ped_handle = entities.pointer_to_handle(ped)
+        if ped_handle != players.user_ped() then
+            local ped_pos = ENTITY.GET_ENTITY_COORDS(ped_handle, false)
+		    if ent_func.get_distance_between(players.user_ped(), ped_pos) <= aura_radius then
+                if not PED.IS_PED_DEAD_OR_DYING(ped_handle, true) then
+		    	    FIRE.ADD_EXPLOSION(ped_pos.x, ped_pos.y, ped_pos.z, 1, 1, false, true, 0.0, false)
+                end
+		    end
+        end
+	end
+end)
 
-menu.toggle(pmenu, "Become A Monekey", {}, "Change Into A Money", function(on)
-    if on then
-        menu.trigger_commands("acchimp02")
+--push aura--
+--got this calculation from wiriscript--
+menu.toggle_loop(aura_list, "Push Aura", {}, "", function()
+    local vehicles = entities.get_all_vehicles_as_pointers()
+    local user_vehicle = PED.GET_VEHICLE_PED_IS_IN(players.user_ped(), true)
+    for vehicles as vehicle do
+        local vehicle_handle = entities.pointer_to_handle(vehicle)
+        if vehicle_handle != user_vehicle then
+            local vehicle_pos = ENTITY.GET_ENTITY_COORDS(vehicle_handle)
+            if ent_func.get_distance_between(players.user_ped(), vehicle_pos) <= aura_radius then
+                local rel = v3.new(vehicle_pos)
+                --subtract your pos from rel--
+                rel:sub(players.get_position(players.user()))
+                --scales the v3 to have a length of 1--
+                rel:normalise()
+                ENTITY.APPLY_FORCE_TO_ENTITY(vehicle_handle, 3, rel.x, rel.y, rel.z, 0.0, 0.0, 1.0, 0, false, false, true, false, false)
+            end
+        end
+    end
+    local peds = entities.get_all_peds_as_pointers()
+	for peds as ped do
+        local ped_handle = entities.pointer_to_handle(ped)
+        if ped_handle != players.user_ped() then
+            local ped_pos = ENTITY.GET_ENTITY_COORDS(ped_handle, false)
+		    if ent_func.get_distance_between(players.user_ped(), ped_pos) <= aura_radius then
+                local rel = v3.new(ped_pos)
+                --subtract your pos from rel--
+                rel:sub(players.get_position(players.user()))
+                --scales the v3 to have a length of 1--
+                rel:normalise()
+                PED.SET_PED_TO_RAGDOLL(ped_handle, 2500, 0, 0, false, false, false)
+		    	ENTITY.APPLY_FORCE_TO_ENTITY(ped_handle, 3, rel.x, rel.y, rel.z, 0.0, 0.0, 1.0, 0, false, false, true, false, false)
+		    end
+        end
+	end
+end)
+
+--pull aura--
+--got this calculation from wiriscript--
+menu.toggle_loop(aura_list, "Pull Aura", {}, "", function()
+    local vehicles = entities.get_all_vehicles_as_pointers()
+    local user_vehicle = PED.GET_VEHICLE_PED_IS_IN(players.user_ped(), true)
+    for vehicles as vehicle do
+        local vehicle_handle = entities.pointer_to_handle(vehicle)
+        if vehicle_handle != user_vehicle then
+            local vehicle_pos = ENTITY.GET_ENTITY_COORDS(vehicle_handle)
+            if ent_func.get_distance_between(players.user_ped(), vehicle_pos) <= aura_radius then
+                local rel = v3.new(vehicle_pos)
+                --subtract your pos from rel--
+                rel:sub(players.get_position(players.user()))
+                --scales the v3 to have a length of 1--
+                rel:normalise()
+                ENTITY.APPLY_FORCE_TO_ENTITY(vehicle_handle, 3, -rel.x, -rel.y, -rel.z, 0.0, 0.0, 1.0, 0, false, false, true, false, false)
+            end
+        end
+    end
+    local peds = entities.get_all_peds_as_pointers()
+	for peds as ped do
+        local ped_handle = entities.pointer_to_handle(ped)
+        if ped_handle != players.user_ped() then
+            local ped_pos = ENTITY.GET_ENTITY_COORDS(ped_handle, false)
+		    if ent_func.get_distance_between(players.user_ped(), ped_pos) <= aura_radius then
+                local rel = v3.new(ped_pos)
+                --subtract your pos from rel--
+                rel:sub(players.get_position(players.user()))
+                --scales the v3 to have a length of 1--
+                rel:normalise()
+                PED.SET_PED_TO_RAGDOLL(ped_handle, 2500, 0, 0, false, false, false)
+		    	ENTITY.APPLY_FORCE_TO_ENTITY(ped_handle, 3, -rel.x, -rel.y, -rel.z, 0.0, 0.0, 1.0, 0, false, false, true, false, false)
+		    end
+        end
+	end
+end)
+
+--freeze aura--
+menu.toggle_loop(aura_list, "Freeze Aura", {}, "", function()
+    local vehicles = entities.get_all_vehicles_as_pointers()
+    local user_vehicle = PED.GET_VEHICLE_PED_IS_IN(players.user_ped(), true)
+    for vehicles as vehicle do
+        local vehicle_handle = entities.pointer_to_handle(vehicle)
+        if vehicle_handle != user_vehicle then
+            local vehicle_pos = ENTITY.GET_ENTITY_COORDS(vehicle_handle)
+            if ent_func.get_distance_between(players.user_ped(), vehicle_pos) <= aura_radius then
+                ENTITY.FREEZE_ENTITY_POSITION(vehicle_handle, true)
+            else
+                ENTITY.FREEZE_ENTITY_POSITION(vehicle_handle, false)
+            end
+        end
+    end
+    local peds = entities.get_all_peds_as_pointers()
+	for peds as ped do
+        local ped_handle = entities.pointer_to_handle(ped)
+        if ped_handle != players.user_ped() then
+            local ped_pos = ENTITY.GET_ENTITY_COORDS(ped_handle, false)
+		    if ent_func.get_distance_between(players.user_ped(), ped_pos) <= aura_radius then
+                if not PED.IS_PED_IN_ANY_VEHICLE(ped_handle, false) then
+                    TASK.CLEAR_PED_TASKS_IMMEDIATELY(ped_handle)
+                end
+                ENTITY.FREEZE_ENTITY_POSITION(ped_handle, true)
+            else
+                ENTITY.FREEZE_ENTITY_POSITION(ped_handle, false)
+            end
+        end
+	end
+end)
+
+--boost aura--
+menu.toggle_loop(aura_list, "Boost Aura", {}, "", function()
+    local vehicles = entities.get_all_vehicles_as_pointers()
+    local user_vehicle = PED.GET_VEHICLE_PED_IS_IN(players.user_ped(), true)
+    for vehicles as vehicle do
+        local vehicle_handle = entities.pointer_to_handle(vehicle)
+        if vehicle_handle != user_vehicle then
+            local vehicle_pos = ENTITY.GET_ENTITY_COORDS(vehicle_handle)
+            if ent_func.get_distance_between(players.user_ped(), vehicle_pos) <= aura_radius then
+                local rel = v3.new(vehicle_pos)
+                --subtract your pos from rel--
+                rel:sub(players.get_position(players.user()))
+                --turn rel into a rot--
+                local rot = rel:toRot()
+                ENTITY.SET_ENTITY_ROTATION(vehicle_handle, rot.x, rot.y, rot.z, 2, false)
+                VEHICLE.SET_VEHICLE_FORWARD_SPEED(vehicle_handle, 100)
+            end
+        end
+    end
+    local peds = entities.get_all_peds_as_pointers()
+	for peds as ped do
+        local ped_handle = entities.pointer_to_handle(ped)
+        if ped_handle != players.user_ped() then
+            local ped_pos = ENTITY.GET_ENTITY_COORDS(ped_handle, false)
+		    if ent_func.get_distance_between(players.user_ped(), ped_pos) <= aura_radius then
+                local rel = v3.new(ped_pos)
+                --subtract your pos from rel--
+                rel:sub(players.get_position(players.user()))
+                --multiply rel with 100--
+                rel:mul(100)
+                PED.SET_PED_TO_RAGDOLL(ped_handle, 2500, 0, 0, false, false, false)
+		    	ENTITY.APPLY_FORCE_TO_ENTITY(ped_handle, 3, rel.x, rel.y, rel.z, 0, 0, 1.0, 0, false, false, true, false, false)
+            end
+        end
+	end
+end)
+
+--------------------------------------------------------------------------------------------------------------------------------------
+
+--water bounce height--
+local bounce_height = 15
+menu.slider(fun, "Bounce Height", {}, "", 1, 100, 15, 1, function(count)
+	bounce_height = count
+end)
+
+menu.toggle_loop(fun, "Bouncy Water", {}, "", function()
+	if PED.IS_PED_IN_ANY_VEHICLE(players.user_ped(), false) then
+		if ENTITY.IS_ENTITY_IN_WATER(entities.get_user_vehicle_as_handle(false)) then
+			local vel = v3.new(ENTITY.GET_ENTITY_VELOCITY(entities.get_user_vehicle_as_handle(false)))
+			ENTITY.SET_ENTITY_VELOCITY(entities.get_user_vehicle_as_handle(false), vel.x, vel.y, bounce_height)
+		end
+	else
+		if ENTITY.IS_ENTITY_IN_WATER(players.user_ped()) then
+			local vel = v3.new(ENTITY.GET_ENTITY_VELOCITY(entities.get_user_vehicle_as_handle(false)))
+			ENTITY.SET_ENTITY_VELOCITY(players.user_ped(), vel.x, vel.y, bounce_height)
+		end
+	end
+end)
+
+menu.toggle(fun, "Tesla Mode", {}, "", function(toggled)
+    local ped = players.user_ped()
+    local playerpos = ENTITY.GET_ENTITY_COORDS(ped, false)
+    local pos = ENTITY.GET_ENTITY_COORDS(ped)
+    local tesla_ai = util.joaat("u_m_y_baygor")
+    local tesla = util.joaat("raiden")
+    request_model(tesla_ai)
+    request_model(tesla)
+    if toggled then     
+       if PED.IS_PED_IN_ANY_VEHICLE(ped, false) then
+            menu.trigger_commands("deletevehicle")
+        end
+
+        tesla_ai_ped = entities.create_ped(26, tesla_ai, playerpos, 0)
+        tesla_vehicle = entities.create_vehicle(tesla, playerpos, 0)
+        ENTITY.SET_ENTITY_INVINCIBLE(tesla_ai_ped, true) 
+        ENTITY.SET_ENTITY_VISIBLE(tesla_ai_ped, false)
+        PED.SET_BLOCKING_OF_NON_TEMPORARY_EVENTS(tesla_ai_ped, true)
+        PED.SET_PED_INTO_VEHICLE(ped, tesla_vehicle, -2)
+        PED.SET_PED_INTO_VEHICLE(tesla_ai_ped, tesla_vehicle, -1)
+        PED.SET_PED_KEEP_TASK(tesla_ai_ped, true)
+        VEHICLE.SET_VEHICLE_COLOURS(tesla_vehicle, 111, 111)
+        VEHICLE.SET_VEHICLE_MOD(tesla_vehicle, 23, 8, false)
+        VEHICLE.SET_VEHICLE_MOD(tesla_vehicle, 15, 1, false)
+        VEHICLE.SET_VEHICLE_EXTRA_COLOURS(tesla_vehicle, 111, 147)
+        menu.trigger_commands("performance")
+
+        if HUD.IS_WAYPOINT_ACTIVE() then
+            local pos = HUD.GET_BLIP_COORDS(HUD.GET_FIRST_BLIP_INFO_ID(8))
+            TASK.TASK_VEHICLE_DRIVE_TO_COORD_LONGRANGE(tesla_ai_ped, tesla_vehicle, pos.x, pos.y, pos.z, 20.0, 786603, 0)
+        else
+            TASK.TASK_VEHICLE_DRIVE_WANDER(tesla_ai_ped, tesla_vehicle, 20.0, 786603)
+        end
     else
-        menu.trigger_commands("outfit1candydinka")
-        util.yield(0500)
-        menu.trigger_commands("randomoutfit")
+        if tesla_ai_ped ~= nil then 
+            entities.delete_by_handle(tesla_ai_ped)
+        end
+        if tesla_vehicle ~= nil then 
+            entities.delete_by_handle(tesla_vehicle)
+        end
     end
 end)
 
-menu.toggle(pmenu, "Become A KillerWhale", {}, "Change Into A KillerWhale", function(on)
-    if on then
-        menu.trigger_commands("noguns")
-        local player_ped = PLAYER.PLAYER_PED_ID()    
-        ENTITY.SET_ENTITY_COORDS_NO_OFFSET(player_ped, -2592.5793, -612.5788, -34.412697)
-        util.yield(1)
-        menu.trigger_commands("ackillerwhale")
-    else
-        menu.trigger_commands("allguns")
-        menu.trigger_commands("outfit1candydinka")
-        util.yield(0500)
-        menu.trigger_commands("randomoutfit")
-        menu.trigger_commands("tpmazehelipad")
-    end
-end)
-
-menu.toggle(pmenu, "Become A Rat", {}, "Change Into A Rat", function(on)
-    if on then
-        menu.trigger_commands("noguns")
-        menu.trigger_commands("ACRat")
-        menu.trigger_commands("walkstyle mop")
-    else
-        menu.trigger_commands("walkstyle poshfemale")
-        menu.trigger_commands("outfit1candydinka")
-        menu.trigger_commands("allguns")
-        util.yield(0500)
-        menu.trigger_commands("randomoutfit")
-    end
-end)
-
-menu.toggle(pmenu, "Become A Mountain Lion", {}, "Change Into A Mountain Lion", function(on)
-    if on then
-        menu.trigger_commands("noguns")
-        menu.trigger_commands("ACmtlion")
-        menu.trigger_commands("walkstyle mop")
-    else
-        menu.trigger_commands("walkstyle poshfemale")
-        menu.trigger_commands("outfit1candydinka")
-        menu.trigger_commands("allguns")
-        util.yield(0500)
-        menu.trigger_commands("randomoutfit")
-    end
-end)
-
-menu.toggle(pmenu, "Become A Panther", {}, "Change Into A Panther", function(on)
-    if on then
-        menu.trigger_commands("noguns")
-        menu.trigger_commands("ACpanther")
-        menu.trigger_commands("walkstyle mop")
-    else
-        menu.trigger_commands("walkstyle poshfemale")
-        menu.trigger_commands("outfit1candydinka")
-        menu.trigger_commands("allguns")
-        util.yield(0500)
-        menu.trigger_commands("randomoutfit")
-    end
-end)
-
-menu.toggle(pmenu, "Become Westy (Dog)", {}, "Change Into Westy (Dog)", function(on)
-    if on then
-        menu.trigger_commands("noguns")
-        menu.trigger_commands("ACWesty")
-        menu.trigger_commands("walkstyle mop")
-    else
-        menu.trigger_commands("walkstyle poshfemale")
-        menu.trigger_commands("outfit1candydinka")
-        menu.trigger_commands("allguns")
-        util.yield(0500)
-        menu.trigger_commands("randomoutfit")
-    end
-end)
-
-menu.toggle(pmenu, "Become A GermanShepherd (Dog)", {}, "Change Into A GermanShepherd (Dog)", function(on)
-    if on then
-        menu.trigger_commands("noguns")
-        menu.trigger_commands("ACShepherd")
-        menu.trigger_commands("walkstyle mop")
-    else
-        menu.trigger_commands("walkstyle poshfemale")
-        menu.trigger_commands("outfit1candydinka")
-        menu.trigger_commands("allguns")
-        util.yield(0500)
-        menu.trigger_commands("randomoutfit")
-    end
-end)
-
-menu.toggle(pmenu, "Become A Rottweiler (Dog)", {}, "Change Into A Rottweiler (Dog)", function(on)
-    if on then
-        menu.trigger_commands("noguns")
-        menu.trigger_commands("ACRottweiler")
-        menu.trigger_commands("walkstyle mop")
-    else
-        menu.trigger_commands("walkstyle poshfemale")
-        menu.trigger_commands("outfit1candydinka")
-        menu.trigger_commands("allguns")
-        util.yield(0500)
-        menu.trigger_commands("randomoutfit")
-    end
-end)
-
-menu.toggle(pmenu, "Become A Poodle (Dog)", {}, "Change Into A Poodle (Dog)", function(on)
-    if on then
-        menu.trigger_commands("noguns")
-        menu.trigger_commands("ACPoodle")
-        menu.trigger_commands("walkstyle mop")
-    else
-        menu.trigger_commands("walkstyle poshfemale")
-        menu.trigger_commands("outfit1candydinka")
-        menu.trigger_commands("allguns")
-        util.yield(0500)
-        menu.trigger_commands("randomoutfit")
-    end
-end)
-
-menu.toggle(pmenu, "Become A Boar", {}, "Change Into A Boar", function(on)
-    if on then
-        menu.trigger_commands("noguns")
-        menu.trigger_commands("ACBoar")
-        menu.trigger_commands("walkstyle mop")
-    else
-        menu.trigger_commands("walkstyle poshfemale")
-        menu.trigger_commands("outfit1candydinka")
-        menu.trigger_commands("allguns")
-        util.yield(0500)
-        menu.trigger_commands("randomoutfit")
-    end
-end)
-
-menu.toggle(pmenu, "Become Pug (Dog)", {}, "Change Into Pug (Dog)", function(on)
-    if on then
-        menu.trigger_commands("noguns")
-        menu.trigger_commands("ACPug")
-        menu.trigger_commands("walkstyle mop")
-    else
-        menu.trigger_commands("walkstyle poshfemale")
-        menu.trigger_commands("outfit1candydinka")
-        menu.trigger_commands("allguns")
-        util.yield(0500)
-        menu.trigger_commands("randomoutfit")
-    end
-end)
-
-menu.toggle(pmenu, "Become Chop (Dog)", {}, "Change Into Chop (Dog)", function(on)
-    if on then
-        menu.trigger_commands("noguns")
-        menu.trigger_commands("ACChop")
-        menu.trigger_commands("walkstyle mop")
-    else
-        menu.trigger_commands("walkstyle poshfemale")
-        menu.trigger_commands("outfit1candydinka")
-        menu.trigger_commands("allguns")
-        util.yield(0500)
-        menu.trigger_commands("randomoutfit")
-    end
-end)
-
-menu.toggle(pmenu, "Become A Coyote", {}, "Change Into A Coyote", function(on)
-    if on then
-        menu.trigger_commands("noguns")
-        menu.trigger_commands("ACCoyote")
-        menu.trigger_commands("walkstyle mop")
-    else
-        menu.trigger_commands("walkstyle poshfemale")
-        menu.trigger_commands("outfit1candydinka")
-        menu.trigger_commands("allguns")
-        util.yield(0500)
-        menu.trigger_commands("randomoutfit")
-    end
-end)
-
-menu.toggle(pmenu, "Become A Deer", {}, "Change Into A Deer", function(on)
-    if on then
-        menu.trigger_commands("noguns")
-        menu.trigger_commands("ACDeer")
-        menu.trigger_commands("walkstyle mop")
-    else
-        menu.trigger_commands("walkstyle poshfemale")
-        menu.trigger_commands("outfit1candydinka")
-        menu.trigger_commands("allguns")
-        util.yield(0500)
-        menu.trigger_commands("randomoutfit")
-    end
-end)
-
-menu.action(pmenu, "Become A Chickenhawk", {"chickenhawktoggle"}, "Change Into A Chickenhawk", function(on)
-    if on then
-        util.toast("GodMode Will Be Off Due To Player Model \n(In Other Words You Can Die As This)")
-        menu.trigger_commands("noguns")
-        menu.trigger_commands("reducedcollision" .. " on")
-        menu.trigger_commands("acchickenhawk")
-    else
-        menu.trigger_commands("reducedcollision" .. " off")
-        menu.trigger_commands("outfit1candydinka")
-        util.yield(0500)
-        menu.trigger_commands("randomoutfit")
-        menu.trigger_commands("allguns")
-    end
-end)
-
-menu.action(pmenu, "Become A Pigeon", {"pigeontoggle"}, "Change Into A Pigeon", function(on)
-    if on then
-        util.toast("GodMode Will Be Off Due To Player Model \n(In Other Words You Can Die As This)")
-        menu.trigger_commands("noguns")
-        menu.trigger_commands("reducedcollision" .. " on")
-        menu.trigger_commands("acpigeon")
-    else
-        menu.trigger_commands("reducedcollision" .. " off")
-        menu.trigger_commands("outfit1candydinka")
-        util.yield(0500)
-        menu.trigger_commands("randomoutfit")
-        menu.trigger_commands("allguns")
-    end
-end)
-
-menu.action(pmenu, "Become A Cormorant", {"cormoranttoggle"}, "Change Into A Cormorant", function(on)
-    if on then
-        util.toast("GodMode Will Be Off Due To Player Model \n(In Other Words You Can Die As This)")
-        menu.trigger_commands("noguns")
-        menu.trigger_commands("reducedcollision" .. " on")
-        menu.trigger_commands("ACCormorant")
-    else
-        menu.trigger_commands("reducedcollision" .. " off")
-        menu.trigger_commands("outfit1candydinka")
-        util.yield(0500)
-        menu.trigger_commands("randomoutfit")
-        menu.trigger_commands("allguns")
-    end
-end)
-
-menu.action(pmenu, "Become A Crow", {"crowtoggle"}, "Change Into A Crow", function(on)
-    if on then
-        util.toast("GodMode Will Be Off Due To Player Model \n(In Other Words You Can Die As This)")
-        menu.trigger_commands("noguns")
-        menu.trigger_commands("reducedcollision" .. " on")
-        menu.trigger_commands("ACCrow")
-    else
-        menu.trigger_commands("reducedcollision" .. " off")
-        menu.trigger_commands("outfit1candydinka")
-        util.yield(0500)
-        menu.trigger_commands("randomoutfit")
-        menu.trigger_commands("allguns")
-    end
-end)
-
-menu.toggle(pmenu, "Become A Pig", {}, "Change Into A Pig", function(on)
-    if on then
-        menu.trigger_commands("noguns")
-        menu.trigger_commands("ACPig")
-        menu.trigger_commands("walkstyle mop")
-    else
-        menu.trigger_commands("walkstyle poshfemale")
-        menu.trigger_commands("outfit1candydinka")
-        menu.trigger_commands("allguns")
-        util.yield(0500)
-        menu.trigger_commands("randomoutfit")
-    end
-end)
-
-menu.toggle(pmenu, "Become A Rabbit", {}, "Change Into A Rabbit", function(on)
-    if on then
-        menu.trigger_commands("noguns")
-        menu.trigger_commands("ACRabbit")
-        menu.trigger_commands("walkstyle mop")
-    else
-        menu.trigger_commands("walkstyle poshfemale")
-        menu.trigger_commands("outfit1candydinka")
-        menu.trigger_commands("allguns")
-        util.yield(0500)
-        menu.trigger_commands("randomoutfit")
-    end
-end)
-
-menu.toggle(pmenu, "Become A Big Rabbit", {}, "Change Into A Big Rabbit", function(on)
-    if on then
-        menu.trigger_commands("noguns")
-        menu.trigger_commands("ACRabbit02")
-        menu.trigger_commands("walkstyle mop")
-    else
-        menu.trigger_commands("walkstyle poshfemale")
-        menu.trigger_commands("outfit1candydinka")
-        menu.trigger_commands("allguns")
-        util.yield(0500)
-        menu.trigger_commands("randomoutfit")
-    end
-end)
-
-menu.toggle(pmenu, "Become A Furry", {}, "Change Into A Furry lol", function(on)
-    if on then
-        menu.trigger_commands("IGFurry")
-        menu.trigger_commands("walkstyle mop")
-    else
-        menu.trigger_commands("walkstyle poshfemale")
-        menu.trigger_commands("outfit1candydinka")
-        util.yield(0500)
-        menu.trigger_commands("randomoutfit")
-    end
-end)
-
-menu.toggle(pmenu, "Become Yule Monster", {}, "Change Into Yule Monster", function(on)
-    if on then
-        menu.trigger_commands("UMMYuleMonster")
-        menu.trigger_commands("walkstyle mop")
-    else
-        menu.trigger_commands("walkstyle poshfemale")
-        menu.trigger_commands("outfit1candydinka")
-        util.yield(0500)
-        menu.trigger_commands("randomoutfit")
-    end
-end)
-
-menu.toggle(pmenu, "Become Bigfoot", {}, "Change Into Bigfoot", function(on)
-    if on then
+menu.toggle(fun, "Drive Cop Heli", {"copheli"}, "Plus bodygaurds.", function(on_toggle)
+    if on_toggle then
+        menu.trigger_commands("bodyguardmodel S_M_Y_Swat_01")
+        menu.trigger_commands("bodyguardcount 3")
+        menu.trigger_commands("bodyguardprimary smg")
+        menu.trigger_commands("spawnbodyguards")
+        menu.trigger_commands("smyswat01")
         menu.trigger_commands("otr")
-        menu.trigger_commands("igorleans")
+        local Imortality_BodyGuards = menu.ref_by_path("Self>Bodyguards>Immortality")
+        util.yield(3000)
+        menu.trigger_command(Imortality_BodyGuards)
+        util.toast("Make way for the heli.")
+        util.yield(3000)
+        local vehicleHash = util.joaat("polmav")
+        request_model(vehicleHash)
+        local pos = ENTITY.GET_ENTITY_COORDS(PLAYER.PLAYER_PED_ID(), false)
+        copheli = entities.create_vehicle(vehicleHash, pos, CAM.GET_GAMEPLAY_CAM_ROT(0).z)
+        --ENTITY.SET_ENTITY_VISIBLE(copheli, false, false)
+        --ENTITY.SET_ENTITY_VISIBLE(players.user_ped(), false, true)
+        VEHICLE.SET_VEHICLE_ENGINE_ON(copheli, true, true, true)
+        ENTITY.SET_ENTITY_INVINCIBLE(copheli, true)
+        VEHICLE.SET_PLANE_TURBULENCE_MULTIPLIER(copheli, 0.0)
+        local id = get_closest_vehicle(entity)
+        local playerpos = ENTITY.GET_ENTITY_COORDS(id)
+        playerpos.z = playerpos.z + 3
+        ENTITY.SET_ENTITY_COORDS_NO_OFFSET(copheli, pos.x, pos.y, pos.z, false, false, true)
+        PED.SET_PED_INTO_VEHICLE(PLAYER.PLAYER_PED_ID(), copheli, -1)
+        util.yield(1500)
+        menu.trigger_commands("livery -1")
     else
+        local Imortality_BodyGuards = menu.ref_by_path("Self>Bodyguards>Immortality")
+        menu.trigger_command(Imortality_BodyGuards)
+        menu.trigger_commands("delbodyguards")
+        menu.trigger_commands("deletevehicle")
+        menu.trigger_commands("mpfemale")
         menu.trigger_commands("otr")
-        menu.trigger_commands("outfit1candydinka")
-        util.yield(0500)
-        menu.trigger_commands("randomoutfit")
+        util.toast("Change you're outfit to get clothes normal again.")
     end
 end)
 
-menu.toggle(pmenu, "Become Trevor", {}, "Change Into Trevor", function(on)
-    if on then
-        menu.trigger_commands("trevor")
-        menu.trigger_commands("walkstyle verydrunk")
+
+menu.toggle(fun, "Drive Cop Car", {"copcar"}, "Plus a bodygaurd.", function(on_toggle)
+    if on_toggle then
+        menu.trigger_commands("bodyguardmodel S_M_Y_Cop_01")
+        menu.trigger_commands("bodyguardcount 1")
+        menu.trigger_commands("bodyguardprimary pistol")
+        menu.trigger_commands("spawnbodyguards")
+        menu.trigger_commands("SMYCop01")
+        menu.trigger_commands("otr")
+        local Imortality_BodyGuards = menu.ref_by_path("Self>Bodyguards>Immortality")
+        util.yield(1000)
+        menu.trigger_command(Imortality_BodyGuards)
+        local vehicleHash = util.joaat("police3")
+        request_model(vehicleHash)
+        local pos = ENTITY.GET_ENTITY_COORDS(PLAYER.PLAYER_PED_ID(), false)
+        copheli = entities.create_vehicle(vehicleHash, pos, CAM.GET_GAMEPLAY_CAM_ROT(0).z)
+        VEHICLE.SET_VEHICLE_ENGINE_ON(copheli, true, true, true)
+        ENTITY.SET_ENTITY_INVINCIBLE(copheli, true)
+        VEHICLE.SET_PLANE_TURBULENCE_MULTIPLIER(copheli, 0.0)
+        VEHICLE.SET_VEHICLE_MOD_KIT(copheli, -1)
+        local id = get_closest_vehicle(entity)
+        local playerpos = ENTITY.GET_ENTITY_COORDS(id)
+        playerpos.z = playerpos.z + 3
+        ENTITY.SET_ENTITY_COORDS_NO_OFFSET(copheli, pos.x, pos.y, pos.z, false, false, true)
+        PED.SET_PED_INTO_VEHICLE(PLAYER.PLAYER_PED_ID(), copheli, -1)
     else
-        menu.trigger_commands("walkstyle poshfemale")
-        util.yield(0500)
-        menu.trigger_commands("randomoutfit")
+        local Imortality_BodyGuards = menu.ref_by_path("Self>Bodyguards>Immortality")
+        menu.trigger_command(Imortality_BodyGuards)
+        menu.trigger_commands("delbodyguards")
+        menu.trigger_commands("deletevehicle")
+        menu.trigger_commands("mpfemale")
+        menu.trigger_commands("otr")
     end
 end)
 
-menu.toggle(pmenu, "Become Micheal", {}, "Change Into Micheal", function(on)
-    if on then
-        menu.trigger_commands("michael")
-        menu.trigger_commands("walkstyle Micheal")
-    else
-        menu.trigger_commands("walkstyle poshfemale")
-        util.yield(0500)
-        menu.trigger_commands("randomoutfit")
-    end
-end)
-
-menu.toggle(pmenu, "Become Franklin", {}, "Change Into Franklin", function(on)
-    if on then
-        menu.trigger_commands("franklin")
-        menu.trigger_commands("walkstyle Franklin")
-    else
-        menu.trigger_commands("walkstyle poshfemale")
-        util.yield(0500)
-        menu.trigger_commands("randomoutfit")
-    end
-end)
-
-menu.action(fun, "Random Outfit", {}, "Gives You A Random Outfit \n(Can Be Used To Leave Pigeon Mode)", function()
-    menu.trigger_commands("outfit1candydinka")
-    util.yield(0800)
-    menu.trigger_commands("randomoutfit")
-end)
 --------------------------------------------------------------------------------------------------------------------------------
 -- Misc
 
@@ -11257,6 +12312,9 @@ util.on_stop(function ()
     VEHICLE.SET_VEHICLE_REDUCE_GRIP(veh, false)
     VEHICLE.SET_VEHICLE_GRAVITY(veh, true)
     ENTITY.SET_ENTITY_COLLISION(veh, true, true);
+    if driveOnWaterEntity then
+        entities.delete_by_handle(driveOnWaterEntity)
+    end
     util.toast("Cleaning...")
     local ct = 0
         for k,ent in pairs(entities.get_all_vehicles_as_handles()) do
