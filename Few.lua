@@ -12358,7 +12358,7 @@ menu.action(misc, "Skybase", {"skybase"}, "", function(cl)
     local number_of_cages = 3
     local elec_box = util.joaat("prop_contr_03b_ld")
     local ped = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(players.user())
-    local pos = v3.new(-236.19, -811.11, 485.60) --ENTITY.GET_ENTITY_COORDS(ped)
+    local pos = v3.new(-236.19, -811.11, 415.60) --ENTITY.GET_ENTITY_COORDS(ped)
     request_model(elec_box)
     local temp_v3 = v3.new(0, 0, 0)
     for i = 1, number_of_cages do
@@ -12401,7 +12401,7 @@ end)
 menu.action(misc, "TP To Skybase", {"tpskybase"}, "Please Only Spawn 1 \nThe Position Is A Fixed Position", function()
     menu.trigger_commands("doors on")
     menu.trigger_commands("nodeathbarriers on")
-    ENTITY.SET_ENTITY_COORDS_NO_OFFSET(players.user_ped(), -236.19, -811.11, 488.60, false, false, false)
+    ENTITY.SET_ENTITY_COORDS_NO_OFFSET(players.user_ped(), -236.19, -811.11, 418.60, false, false, false)
 end)
 
 menu.action(misc, "Delete Skybase", {"delskybase"}, "", function()
