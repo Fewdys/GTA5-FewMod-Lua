@@ -7,7 +7,7 @@ util.require_natives(1676318796)
 util.require_natives(1663599433)
 
 local response = false
-local localversion = 1.50
+local localversion = 1.51
 local localKs = false
 async_http.init("raw.githubusercontent.com", "/Fewdys/GTA5-FewMod-Lua/main/FewModVersion.lua", function(output)
     currentVer = tonumber(output)
@@ -210,17 +210,14 @@ local function bone_within_bounds(ped, bone, bounds, fov)
     end
 end
 
-util.yield_once()
 menu.divider(uwuself, "Lua Shit")
 menu.divider(uwuvehicle, "Lua Shit")
 menu.divider(uwuonline, "Lua Shit")
 --menu.divider(protecc, "Lua Shit")
 menu.divider(uwuworld, "Lua Shit")
 menu.divider(uwustand, "Lua Shit")
-util.yield_once()
 
 -- Few Functions
-util.yield_once()
 Fewd = {
     int = function(global, value)
         local radress = memory.script_global(global)
@@ -809,7 +806,6 @@ players.on_join(function(player_id)
     local vehicle = menu.list(Few, "Vehicle")
     local attachc = menu.list(Few, "Misc")
     local chats = menu.list(Few, "Chat Options", {}, "")
-    util.yield_once()
 
     menu.action(chats, "Send Private Chat Message", {"PM"}, "Sends Message To This Player Only", 
     function (click_type)
@@ -4013,7 +4009,6 @@ menu.divider(crashes, "Item Crashes")
                                 entities.delete_by_pointer(v)
                             end
                         end
-                        util.yield_once()
                         util.yield_once()
                     until not (thingy)
                     thingy = false
