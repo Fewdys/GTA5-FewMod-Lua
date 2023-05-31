@@ -5489,14 +5489,13 @@ menu.divider(kicks, "Base Kicks")
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 -- Vehicle
 
-    menu.action(vehicle, "Detach", {"detach"}, "unstuck yourself", function()
-        local car = PED.GET_VEHICLE_PED_IS_IN(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id), true)
-        ENTITY.DETACH_ENTITY(car, false, false)
+    menu.action(vehicle, "Detach", {"detach"}, "unstuck yourself \nDetach Will Not Work When Spectating", function()
+        local car = PED.GET_VEHICLE_PED_IS_IN(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id), false)
+        ENTITY.DETACH_ENTITY(players.user_ped(), car, false, false)
         if player_cur_car ~= 0 then
             ENTITY.DETACH_ENTITY(player_cur_car, false, false)
         end
         ENTITY.DETACH_ENTITY(players.user_ped(), false, false)
-        TASK.CLEAR_PED_TASKS(PLAYER.PLAYER_PED_ID())
     end)
 
 menu.action(vehicle, "Attach to BMX", {""}, "Use Ledge Sit animation to properly sit on the player's bars", function()
@@ -5540,12 +5539,9 @@ end)
 end)]]
 
 
-menu.action(attachc, "Detach", {"detach"}, "unstuck yourself", function()
-    local car = PED.GET_VEHICLE_PED_IS_IN(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id), true)
-    ENTITY.DETACH_ENTITY(car, false, false)
-    if player_cur_car ~= 0 then
-        ENTITY.DETACH_ENTITY(player_cur_car, false, false)
-    end
+menu.action(attachc, "Detach", {"detach"}, "unstuck yourself \nDetach Will Not Work When Spectating", function()
+    local p = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)
+    ENTITY.DETACH_ENTITY(p, false, false)
     ENTITY.DETACH_ENTITY(players.user_ped(), false, false)
     TASK.CLEAR_PED_TASKS(PLAYER.PLAYER_PED_ID())
 end)
