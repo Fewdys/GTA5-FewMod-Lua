@@ -7,7 +7,7 @@ util.require_natives(1676318796)
 util.require_natives(1663599433)
 
 local response = false
-local localversion = 1.48
+local localversion = 1.49
 local localKs = false
 async_http.init("raw.githubusercontent.com", "/Fewdys/GTA5-FewMod-Lua/main/FewModVersion.lua", function(output)
     currentVer = tonumber(output)
@@ -5621,7 +5621,10 @@ menu.toggle_loop(attachc, "Spoof Attach/Auto Teleport", {""}, "Shows You Are Att
 end)
 
 menu.toggle_loop(attachc, "Auto Teleport", {""}, "Constantly Teleports to The Player", function()
+    local p = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)
+    if players.exists(p) then
     menu.trigger_commands("tp " .. PLAYER.GET_PLAYER_NAME(player_id))
+    elseif not players.exists(p) then return end
 end)
 
     menu.action(vehicle, "Kick From Vehicle", {}, "Attempts to kick the player from their vehicle", function()
@@ -12256,7 +12259,6 @@ menu.toggle(misc, "Stand ID", {}, "It makes you invisible to other stand users, 
 end)
 
 util.on_pre_stop(function()
-    VEHICLE.SET_VEHICLE_REDUCE_GRIP(veh, false)
     util.toast("Cleaning...")
     local ct = 0
         for k,ent in pairs(entities.get_all_vehicles_as_handles()) do
@@ -12292,6 +12294,7 @@ end)
 
 util.on_stop(function()
     VEHICLE.SET_VEHICLE_GRAVITY(veh, true)
+    VEHICLE.SET_VEHICLE_REDUCE_GRIP(veh, false)
     ENTITY.SET_ENTITY_COLLISION(veh, true, true);
     util.toast("Cleaned, Bye <3")
 end)
