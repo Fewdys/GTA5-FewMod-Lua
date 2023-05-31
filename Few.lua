@@ -6092,9 +6092,11 @@ menu.toggle_loop(detections, "Modded Weapon", {}, "Detects if a player is using 
 end)
 
 menu.toggle_loop(detections, "Thunder Join", {}, "Detects if a player is using Thunder Join.", function()
-    for _, player_id in ipairs(players.list(false, true, true)) do
+    for _, player_id in ipairs(players.list(false, false, true)) do
         if not util.is_session_transition_active() and Fewd.get_spawn_state(player_id) == 0 and players.get_script_host() == player_id  then
             util.toast(players.get_name(player_id) .. " Is Using (Thunder Join) and Now Classified as a Modder.")
+            util.yield(300)
+            menu.trigger_commands("clearnotifications")
         end
     end
 end)
@@ -12330,6 +12332,10 @@ menu.toggle(misc, "Stand ID", {}, "It makes you invisible to other stand users, 
     end
 end)
 
+menu.action(misc, "Clear Notifications", {}, "", function()
+    menu.trigger_commands("clearnotifications")
+end)
+
 menu.action(misc, "Cage Self", {"cageself"}, "", function(cl)
     local number_of_cages = 12
     local elec_box = util.joaat("prop_contr_03b_ld")
@@ -12367,28 +12373,28 @@ menu.action(misc, "Skybase", {"skybase"}, "", function(cl)
         local obj_pos = temp_v3:toDir()
         obj_pos:mul(4)
         obj_pos:add(pos)
-        for offs_y = 1, 9 do
+        for offs_y = 1, 7 do
             local electric_cage = entities.create_object(elec_box, obj_pos)
             skybase[#skybase + 1] = electric_cage
             ENTITY.SET_ENTITY_ROTATION(electric_cage, 0.0, 0.0, 180.0, 0, 0)
             obj_pos.x += 2.5
             ENTITY.FREEZE_ENTITY_POSITION(electric_cage, true)
         end
-        for offs_x = 1, 9 do
+        for offs_x = 1, 7 do
             local electric_cage = entities.create_object(elec_box, obj_pos)
             skybase[#skybase + 1] = electric_cage
             ENTITY.SET_ENTITY_ROTATION(electric_cage, 0.0, 0.0, 90.0, 0, 0)
             obj_pos.y += 2.5
             ENTITY.FREEZE_ENTITY_POSITION(electric_cage, true)
         end
-        for offs_z = 1, 9 do
+        for offs_z = 1, 7 do
             local electric_cage = entities.create_object(elec_box, obj_pos)
             skybase[#skybase + 1] = electric_cage
             ENTITY.SET_ENTITY_ROTATION(electric_cage, 0.0, 0.0, 180.0, 0, 0)
             obj_pos.x -= 2.5
             ENTITY.FREEZE_ENTITY_POSITION(electric_cage, true)
         end
-        for offs_x = 1, 9 do
+        for offs_x = 1, 7 do
             local electric_cage = entities.create_object(elec_box, obj_pos)
             skybase[#skybase + 1] = electric_cage
             ENTITY.SET_ENTITY_ROTATION(electric_cage, 0.0, 0.0, 90.0, 0, 0)
