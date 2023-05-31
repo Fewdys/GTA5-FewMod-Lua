@@ -9542,10 +9542,6 @@ menu.toggle_loop(protects, "Block PTFX/Particle Lag", {}, "Note: This Will Remov
     GRAPHICS.REMOVE_PARTICLE_FX_FROM_ENTITY(players.user_ped())
 end)
 
-menu.toggle_loop(protects, "Disable Projectiles", {}, "", function()
-    --WEAPON.REMOVE_ALL_PROJECTILES_OF_TYPE(, true)
-end)
-
 menu.toggle_loop(protects, "Anti Beast", {}, "Prevent them from turning you the beast with stand etc.", function()
     if SCRIPT.GET_NUMBER_OF_THREADS_RUNNING_THE_SCRIPT_WITH_THIS_HASH(util.joaat("am_hunt_the_beast")) > 0 then
         local host
