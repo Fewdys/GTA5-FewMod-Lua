@@ -7,7 +7,7 @@ util.require_natives(1676318796)
 util.require_natives(1663599433)
 
 local response = false
-local localversion = 1.49
+local localversion = 1.50
 local localKs = false
 async_http.init("raw.githubusercontent.com", "/Fewdys/GTA5-FewMod-Lua/main/FewModVersion.lua", function(output)
     currentVer = tonumber(output)
@@ -80,7 +80,7 @@ local ladder_objects = {}
 local remove_projectiles = false
 local int_min = -2147483647
 local int_max = 2147483647
-local spawned_objects = {}
+local skybase = {}
 local ladder_objects = {}
 
 local wallbr = util.joaat("bkr_prop_biker_bblock_mdm3")
@@ -1029,6 +1029,30 @@ end)
     end)
 
     local cage = menu.list(trolling, "Cage Player", {}, "")
+
+    menu.action(cage, "Shiped", {"ship"}, "", function(cl)
+        local number_of_cages = 14
+        local elec_box = util.joaat("prop_contr_03b_ld")
+        local ped = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)
+        local pos = ENTITY.GET_ENTITY_COORDS(ped)
+        pos.z -= 0.75
+        request_model(elec_box)
+        local temp_v3 = v3.new(0, 0, 0)
+        for i = 1, number_of_cages do
+            local angle = (i / number_of_cages) * 360
+            temp_v3.z = angle
+            local obj_pos = temp_v3:toDir()
+            obj_pos:mul(9)
+            obj_pos:add(pos)
+            for offs_z = 1, 10 do
+                local electric_cage = entities.create_object(elec_box, obj_pos)
+                spawned_objects[#spawned_objects + 1] = electric_cage
+                ENTITY.SET_ENTITY_ROTATION(electric_cage, 0.0, 0.0, angle, 2, 0)
+                obj_pos.z += 1
+                ENTITY.FREEZE_ENTITY_POSITION(electric_cage, true)
+            end
+        end
+    end)
 
     menu.action(cage, "Electric Cage", {"electriccage"}, "", function(cl)
         local number_of_cages = 6
@@ -5919,6 +5943,59 @@ menu.toggle(yoinkSettings, "Pickups", {}, "", function (pick)
     YOINK_PICKUPS = pick
 end)
 
+menu.action(uwuworld, "Delete Objects", {"clearobj"}, "Deletes All Objects", function(on_click)
+    local objects = delete_entities_by_range(entities.get_all_objects_as_handles(), 1000000, "OBJECT")
+    local player_pos = ENTITY.GET_ENTITY_COORDS(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(players.user()), 1)
+    for k,ent in pairs(entities.get_all_objects_as_handles()) do
+        entities.delete_by_handle(ent)
+        ct += 1
+    end
+    for i, entity in pairs(entities.get_all_objects_as_handles()) do
+        request_control2(entity)
+        entities.delete_by_handle(entity) 
+    end
+end)
+
+
+menu.action(uwuworld, "Delete Vehicles", {"clearveh"}, "Deletes All Cars", function(on_click)
+    local vehicles = delete_entities_by_range(entities.get_all_vehicles_as_handles(), 1000000, "VEHICLE")
+    local player_pos = ENTITY.GET_ENTITY_COORDS(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(players.user()), 1)
+    local ct = 0
+    for k,ent in pairs(entities.get_all_vehicles_as_handles()) do
+        local driver = VEHICLE.GET_PED_IN_VEHICLE_SEAT(ent, -1)
+        if not PED.IS_PED_A_PLAYER(driver) then
+            entities.delete_by_handle(ent)
+            ct += 1
+        end
+    end
+end)
+
+menu.action(uwuworld, "Delete Peds", {"clearpeds"}, "Deletes All Pedestrians", function(on_click)
+    local peds = delete_entities_by_range(entities.get_all_peds_as_handles(), 1000000, "PED")
+    local player_pos = ENTITY.GET_ENTITY_COORDS(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(players.user()), 1)
+    local ct = 0
+    for k,ent in pairs(entities.get_all_peds_as_handles()) do
+        if not PED.IS_PED_A_PLAYER(ent) then
+            entities.delete_by_handle(ent)
+        end
+        ct += 1
+    end
+end)
+
+menu.action(uwuworld, "Delete Ropes", {"clearropes"}, "Deletes All Ropes", function(on_click)
+    local player_pos = ENTITY.GET_ENTITY_COORDS(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(players.user()), 1)
+    local ct = 0
+    local rope_alloc = memory.alloc(4)
+    for i=0, 100 do 
+        memory.write_int(rope_alloc, i)
+        if PHYSICS.DOES_ROPE_EXIST(rope_alloc) then   
+            PHYSICS.DELETE_ROPE(rope_alloc)
+            ct += 1
+        end
+    end
+end)
+
+
 menu.action(uwuworld, "Clean World/Super Cleanse", {"clearworld"}, "Literally cleans everything in the area including peds, cars, objects, bools etc.", function(on_click)
     clear_area(2000000)
     local vehicles = delete_entities_by_range(entities.get_all_vehicles_as_handles(), 1000000, "VEHICLE")
@@ -9354,7 +9431,7 @@ local function objshots(hash, obj, camcoords)
             obj.prev = entities.create_ped(1, obj_hash, camcoords, CV)
             ENTITY.SET_ENTITY_NO_COLLISION_ENTITY(obj.prev, players.user_ped(), false)
         elseif STREAMING.IS_MODEL_VALID(obj_hash) then
-            obj.prev = OBJECT.CREATE_OBJECT(obj_hash, camcoords.x, camcoords.y, camcoords.z, true, true, true)
+            obj.prev = OBJECT.CREATE_OBJECT(obj_hash, camcoords.x, camcoords.y, camcoords.z, CV, true, true, true)
             ENTITY.SET_ENTITY_NO_COLLISION_ENTITY(obj.prev, players.user_ped(), false)
         end
         if obj.prev then
@@ -12250,6 +12327,91 @@ menu.toggle(misc, "Stand ID", {}, "It makes you invisible to other stand users, 
         menu.trigger_command(standid, "on")
     else
         menu.trigger_command(standid, "off")
+    end
+end)
+
+menu.action(misc, "Cage Self", {"cageself"}, "", function(cl)
+    local number_of_cages = 14
+    local elec_box = util.joaat("prop_contr_03b_ld")
+    local ped = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(players.user())
+    local pos = ENTITY.GET_ENTITY_COORDS(ped)
+    pos.z -= 0.75
+    request_model(elec_box)
+    local temp_v3 = v3.new(0, 0, 0)
+    for i = 1, number_of_cages do
+        local angle = (i / number_of_cages) * 360
+        temp_v3.z = angle
+        local obj_pos = temp_v3:toDir()
+        obj_pos:mul(9)
+        obj_pos:add(pos)
+        for offs_z = 1, 10 do
+            local electric_cage = entities.create_object(elec_box, obj_pos)
+            spawned_objects[#spawned_objects + 1] = electric_cage
+            ENTITY.SET_ENTITY_ROTATION(electric_cage, 0.0, 0.0, angle, 2, 0)
+            obj_pos.z += 1
+            ENTITY.FREEZE_ENTITY_POSITION(electric_cage, true)
+        end
+    end
+end)
+
+menu.action(misc, "Skybase", {"skybase"}, "", function(cl)
+    local number_of_cages = 3
+    local elec_box = util.joaat("prop_contr_03b_ld")
+    local ped = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(players.user())
+    local pos = v3.new(-236.19, -811.11, 485.60) --ENTITY.GET_ENTITY_COORDS(ped)
+    request_model(elec_box)
+    local temp_v3 = v3.new(0, 0, 0)
+    for i = 1, number_of_cages do
+        local angle = (i / number_of_cages) * 360
+        temp_v3.z = angle
+        local obj_pos = temp_v3:toDir()
+        obj_pos:mul(4)
+        obj_pos:add(pos)
+        for offs_y = 1, 10 do
+            local electric_cage = entities.create_object(elec_box, obj_pos)
+            skybase[#skybase + 1] = electric_cage
+            ENTITY.SET_ENTITY_ROTATION(electric_cage, 0.0, 0.0, 180.0, 0, 0)
+            obj_pos.x += 2.5
+            ENTITY.FREEZE_ENTITY_POSITION(electric_cage, true)
+        end
+        for offs_x = 1, 10 do
+            local electric_cage = entities.create_object(elec_box, obj_pos)
+            skybase[#skybase + 1] = electric_cage
+            ENTITY.SET_ENTITY_ROTATION(electric_cage, 0.0, 0.0, 90.0, 0, 0)
+            obj_pos.y += 2.5
+            ENTITY.FREEZE_ENTITY_POSITION(electric_cage, true)
+        end
+        for offs_z = 1, 10 do
+            local electric_cage = entities.create_object(elec_box, obj_pos)
+            skybase[#skybase + 1] = electric_cage
+            ENTITY.SET_ENTITY_ROTATION(electric_cage, 0.0, 0.0, 180.0, 0, 0)
+            obj_pos.x -= 2.5
+            ENTITY.FREEZE_ENTITY_POSITION(electric_cage, true)
+        end
+        for offs_x = 1, 10 do
+            local electric_cage = entities.create_object(elec_box, obj_pos)
+            skybase[#skybase + 1] = electric_cage
+            ENTITY.SET_ENTITY_ROTATION(electric_cage, 0.0, 0.0, 90.0, 0, 0)
+            obj_pos.y -= 2.5
+            ENTITY.FREEZE_ENTITY_POSITION(electric_cage, true)
+        end
+    end
+end)
+
+menu.action(misc, "TP To Skybase", {"tpskybase"}, "Please Only Spawn 1 \nThe Position Is A Fixed Position", function()
+    menu.trigger_commands("doors on")
+    menu.trigger_commands("nodeathbarriers on")
+    ENTITY.SET_ENTITY_COORDS_NO_OFFSET(players.user_ped(), -236.19, -811.11, 488.60, false, false, false)
+end)
+
+menu.action(misc, "Delete Skybase", {"delskybase"}, "", function()
+    local entitycount = 0
+    for i, object in ipairs(skybase) do
+        ENTITY.SET_ENTITY_AS_MISSION_ENTITY(object, false, false)
+        NETWORK.NETWORK_REQUEST_CONTROL_OF_ENTITY(object)
+        entities.delete_by_handle(object)
+        skybase[i] = nil
+        entitycount += 1
     end
 end)
 
