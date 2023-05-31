@@ -1044,7 +1044,7 @@ end)
             local obj_pos = temp_v3:toDir()
             obj_pos:mul(9)
             obj_pos:add(pos)
-            for offs_z = 1, 10 do
+            for offs_z = 1, 6 do
                 local electric_cage = entities.create_object(elec_box, obj_pos)
                 spawned_objects[#spawned_objects + 1] = electric_cage
                 ENTITY.SET_ENTITY_ROTATION(electric_cage, 0.0, 0.0, angle, 2, 0)
@@ -12344,7 +12344,7 @@ menu.action(misc, "Cage Self", {"cageself"}, "", function(cl)
         local obj_pos = temp_v3:toDir()
         obj_pos:mul(9)
         obj_pos:add(pos)
-        for offs_z = 1, 10 do
+        for offs_z = 1, 6 do
             local electric_cage = entities.create_object(elec_box, obj_pos)
             spawned_objects[#spawned_objects + 1] = electric_cage
             ENTITY.SET_ENTITY_ROTATION(electric_cage, 0.0, 0.0, angle, 2, 0)
