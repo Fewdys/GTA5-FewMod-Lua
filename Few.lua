@@ -1031,7 +1031,7 @@ end)
     local cage = menu.list(trolling, "Cage Player", {}, "")
 
     menu.action(cage, "Shiped", {"ship"}, "", function(cl)
-        local number_of_cages = 14
+        local number_of_cages = 12
         local elec_box = util.joaat("prop_contr_03b_ld")
         local ped = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)
         local pos = ENTITY.GET_ENTITY_COORDS(ped)
@@ -1042,13 +1042,13 @@ end)
             local angle = (i / number_of_cages) * 360
             temp_v3.z = angle
             local obj_pos = temp_v3:toDir()
-            obj_pos:mul(9)
+            obj_pos:mul(8)
             obj_pos:add(pos)
-            for offs_z = 1, 6 do
+            for offs_z = 1, 5 do
                 local electric_cage = entities.create_object(elec_box, obj_pos)
                 spawned_objects[#spawned_objects + 1] = electric_cage
                 ENTITY.SET_ENTITY_ROTATION(electric_cage, 0.0, 0.0, angle, 2, 0)
-                obj_pos.z += 1
+                obj_pos.z += 1.8
                 ENTITY.FREEZE_ENTITY_POSITION(electric_cage, true)
             end
         end
@@ -12331,7 +12331,7 @@ menu.toggle(misc, "Stand ID", {}, "It makes you invisible to other stand users, 
 end)
 
 menu.action(misc, "Cage Self", {"cageself"}, "", function(cl)
-    local number_of_cages = 14
+    local number_of_cages = 12
     local elec_box = util.joaat("prop_contr_03b_ld")
     local ped = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(players.user())
     local pos = ENTITY.GET_ENTITY_COORDS(ped)
@@ -12342,13 +12342,13 @@ menu.action(misc, "Cage Self", {"cageself"}, "", function(cl)
         local angle = (i / number_of_cages) * 360
         temp_v3.z = angle
         local obj_pos = temp_v3:toDir()
-        obj_pos:mul(9)
+        obj_pos:mul(8)
         obj_pos:add(pos)
-        for offs_z = 1, 6 do
+        for offs_z = 1, 5 do
             local electric_cage = entities.create_object(elec_box, obj_pos)
             spawned_objects[#spawned_objects + 1] = electric_cage
             ENTITY.SET_ENTITY_ROTATION(electric_cage, 0.0, 0.0, angle, 2, 0)
-            obj_pos.z += 1
+            obj_pos.z += 1.8
             ENTITY.FREEZE_ENTITY_POSITION(electric_cage, true)
         end
     end
@@ -12367,28 +12367,28 @@ menu.action(misc, "Skybase", {"skybase"}, "", function(cl)
         local obj_pos = temp_v3:toDir()
         obj_pos:mul(4)
         obj_pos:add(pos)
-        for offs_y = 1, 10 do
+        for offs_y = 1, 9 do
             local electric_cage = entities.create_object(elec_box, obj_pos)
             skybase[#skybase + 1] = electric_cage
             ENTITY.SET_ENTITY_ROTATION(electric_cage, 0.0, 0.0, 180.0, 0, 0)
             obj_pos.x += 2.5
             ENTITY.FREEZE_ENTITY_POSITION(electric_cage, true)
         end
-        for offs_x = 1, 10 do
+        for offs_x = 1, 9 do
             local electric_cage = entities.create_object(elec_box, obj_pos)
             skybase[#skybase + 1] = electric_cage
             ENTITY.SET_ENTITY_ROTATION(electric_cage, 0.0, 0.0, 90.0, 0, 0)
             obj_pos.y += 2.5
             ENTITY.FREEZE_ENTITY_POSITION(electric_cage, true)
         end
-        for offs_z = 1, 10 do
+        for offs_z = 1, 9 do
             local electric_cage = entities.create_object(elec_box, obj_pos)
             skybase[#skybase + 1] = electric_cage
             ENTITY.SET_ENTITY_ROTATION(electric_cage, 0.0, 0.0, 180.0, 0, 0)
             obj_pos.x -= 2.5
             ENTITY.FREEZE_ENTITY_POSITION(electric_cage, true)
         end
-        for offs_x = 1, 10 do
+        for offs_x = 1, 9 do
             local electric_cage = entities.create_object(elec_box, obj_pos)
             skybase[#skybase + 1] = electric_cage
             ENTITY.SET_ENTITY_ROTATION(electric_cage, 0.0, 0.0, 90.0, 0, 0)
