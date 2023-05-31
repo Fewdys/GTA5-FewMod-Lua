@@ -6091,16 +6091,6 @@ menu.toggle_loop(detections, "Modded Weapon", {}, "Detects if a player is using 
     end
 end)
 
-menu.toggle_loop(detections, "Thunder Join", {}, "Detects if a player is using Thunder Join.", function()
-    for _, player_id in ipairs(players.list(false, false, true)) do
-        if not util.is_session_transition_active() and Fewd.get_spawn_state(player_id) == 0 and players.get_script_host() == player_id  then
-            util.toast(players.get_name(player_id) .. " Is Using (Thunder Join) and Now Classified as a Modder.")
-            util.yield(300)
-            menu.trigger_commands("clearnotifications")
-        end
-    end
-end)
-
 --------------------------------------------------------------------------------------------------------------------------------
 --Self
 
