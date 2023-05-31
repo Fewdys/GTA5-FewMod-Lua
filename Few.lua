@@ -5621,10 +5621,9 @@ menu.toggle_loop(attachc, "Spoof Attach/Auto Teleport", {""}, "Shows You Are Att
 end)
 
 menu.toggle_loop(attachc, "Auto Teleport", {""}, "Constantly Teleports to The Player", function()
-    local p = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)
-    if players.exists(p) then
+    if players.exists(player_id) then
     menu.trigger_commands("tp " .. PLAYER.GET_PLAYER_NAME(player_id))
-    elseif not players.exists(p) then return end
+    end
 end)
 
     menu.action(vehicle, "Kick From Vehicle", {}, "Attempts to kick the player from their vehicle", function()
