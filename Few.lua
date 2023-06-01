@@ -999,7 +999,6 @@ end)
         end
     
         NETWORK.NETWORK_REQUEST_CONTROL_OF_ENTITY(vehicle)
-        request_control2(vehicle)
         ENTITY.APPLY_FORCE_TO_ENTITY_CENTER_OF_MASS(vehicle, 1, 0, 100, 40, true, true, true, true)
     end
 
@@ -12452,7 +12451,7 @@ end
 
 menu.toggle_loop(world2,"Nearby Vehicles Fly Away", {"flyawayvehicles"}, "", function()
     for k, veh in pairs(entities.get_all_vehicles_as_handles()) do
-        request_control2(veh)
+        NETWORK.NETWORK_REQUEST_CONTROL_OF_ENTITY(veh)
         ENTITY.APPLY_FORCE_TO_ENTITY_CENTER_OF_MASS(veh, 1, 0, 0, 100, true, false, true)
         util.yield(10)
     end
@@ -12461,7 +12460,6 @@ end)
 local dont_stop = false
 	menu.toggle_loop(world2,"Blackhole Vehicles", {"blackholeveh"}, "", function(on)
 		for k, veh in pairs(entities.get_all_vehicles_as_handles()) do
-            request_control2(veh)
             local locspeed2 = speed
             local holecoords = ENTITY.GET_ENTITY_COORDS(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id), true)
                 NETWORK.NETWORK_REQUEST_CONTROL_OF_ENTITY(veh)
@@ -12472,6 +12470,7 @@ local dont_stop = false
                 local y_vec = (holecoords['y']-vcoords['y'])*speed
                 local z_vec = ((holecoords['z']+hole_zoff)-vcoords['z'])*speed
                 ENTITY.SET_ENTITY_INVINCIBLE(veh, true)
+                NETWORK.NETWORK_REQUEST_CONTROL_OF_ENTITY(veh)
                 ENTITY.APPLY_FORCE_TO_ENTITY_CENTER_OF_MASS(veh, 1, x_vec, y_vec, z_vec, true, false, true, true)
             if not dont_stop and not PAD.IS_CONTROL_PRESSED(2, 71) and not PAD.IS_CONTROL_PRESSED(2, 72) then
                 VEHICLE.SET_VEHICLE_FORWARD_SPEED(veh, 0.0);
@@ -12491,6 +12490,7 @@ local dont_stop = false
                 local y_vec = (holecoords['y']-vcoords['y'])*speed
                 local z_vec = ((holecoords['z']+hole_zoff)-vcoords['z'])*speed
                 ENTITY.SET_ENTITY_INVINCIBLE(veh, true)
+                NETWORK.NETWORK_REQUEST_CONTROL_OF_ENTITY(veh)
                 ENTITY.APPLY_FORCE_TO_ENTITY_CENTER_OF_MASS(veh, 1, x_vec, y_vec, z_vec, true, false, true, true)
             if not dont_stop and not PAD.IS_CONTROL_PRESSED(2, 71) and not PAD.IS_CONTROL_PRESSED(2, 72) then
                 VEHICLE.SET_VEHICLE_FORWARD_SPEED(veh, 0.0);
@@ -12500,7 +12500,6 @@ local dont_stop = false
 
     menu.toggle_loop(world2,"Blackhole Objects", {"objectblackhole"}, "", function(on)
 		for k, veh in pairs(entities.get_all_objects_as_handles()) do
-            request_control2(veh)
             local locspeed2 = speed
             local holecoords = ENTITY.GET_ENTITY_COORDS(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id), true)
                 NETWORK.NETWORK_REQUEST_CONTROL_OF_ENTITY(veh)
@@ -12511,6 +12510,7 @@ local dont_stop = false
                 local y_vec = (holecoords['y']-vcoords['y'])*speed
                 local z_vec = ((holecoords['z']+hole_zoff)-vcoords['z'])*speed
                 ENTITY.SET_ENTITY_INVINCIBLE(veh, true)
+                NETWORK.NETWORK_REQUEST_CONTROL_OF_ENTITY(veh)
                 ENTITY.APPLY_FORCE_TO_ENTITY_CENTER_OF_MASS(veh, 1, x_vec, y_vec, z_vec, true, false, true, true)
             if not dont_stop and not PAD.IS_CONTROL_PRESSED(2, 71) and not PAD.IS_CONTROL_PRESSED(2, 72) then
                 VEHICLE.SET_VEHICLE_FORWARD_SPEED(veh, 0.0);
@@ -12528,12 +12528,12 @@ local dont_stop = false
 
 menu.toggle_loop(world2, "All Cars Sink", {"sinkcars"}, "All Cars Sink.", function(on_toggle)
     for k, veh in pairs(entities.get_all_vehicles_as_handles()) do
-        request_control2(veh)
         local locspeed2 = speed
         local holecoords = ENTITY.GET_ENTITY_COORDS(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id), true)
             NETWORK.NETWORK_REQUEST_CONTROL_OF_ENTITY(veh)
             ENTITY.GET_ENTITY_COORDS(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(bh_target), true)
             vcoords = ENTITY.GET_ENTITY_COORDS(veh, true)
+            NETWORK.NETWORK_REQUEST_CONTROL_OF_ENTITY(veh)
             VEHICLE.SET_DISABLE_MAP_COLLISION(veh, vcoords, true)
         if not dont_stop and not PAD.IS_CONTROL_PRESSED(2, 71) and not PAD.IS_CONTROL_PRESSED(2, 72) then
             VEHICLE.SET_VEHICLE_FORWARD_SPEED(veh, 0.0);
