@@ -12528,6 +12528,7 @@ local dont_stop = false
 
 menu.toggle_loop(world2, "All Cars Sink", {"sinkcars"}, "All Cars Sink.", function(on_toggle)
     for k, veh in pairs(entities.get_all_vehicles_as_handles()) do
+        request_control2(veh)
         local locspeed2 = speed
         local holecoords = ENTITY.GET_ENTITY_COORDS(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id), true)
             NETWORK.NETWORK_REQUEST_CONTROL_OF_ENTITY(veh)
