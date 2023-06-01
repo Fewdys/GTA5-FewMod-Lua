@@ -5804,13 +5804,6 @@ function dec_to_ipv4(ip)
 	)
 end
 
-handle_ptr = memory.alloc(13*8)
-
-local function pid_to_handle(player_id)
-    NETWORK.NETWORK_HANDLE_FROM_PLAYER(player_id, handle_ptr, 13)
-    return handle_ptr
-end
-
 function encode(text)
 	return string.gsub(text, "%s", "+")
 end
@@ -5849,16 +5842,23 @@ local function is_player_modder(pid)
     )
 end
 
+handle_ptr = memory.alloc(13*8)
+
+function pid_to_handle(player_id)
+    NETWORK.NETWORK_HANDLE_FROM_PLAYER(player_id, handle_ptr, 13)
+    return handle_ptr
+end
+
 ----main function
 function infoverplaytoggle()
     local focused = players.get_focused()
     if ((focused[1] ~= nil and focused[2] == nil) or render_window) and menu.is_open() then
         --general info grabbing locals
-        local pid = focused[1]
-        local hdl = pid_to_handle(pid)
-        if render_window then pid = players.user() end
-        local ped = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(pid)
-        local my_pos, player_pos = players.get_position(players.user()), players.get_position(pid)
+        local player_id = focused[1]
+        local hdl = pid_to_handle(player_id)
+        if render_window then player_id = players.user() end
+        local ped = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)
+        local my_pos, player_pos = players.get_position(players.user()), players.get_position(player_id)
     
         --general element drawing locals
         local spacing_x = spacing/ASPECT_RATIO
@@ -5872,20 +5872,20 @@ function infoverplaytoggle()
                 width = total_w/2,
                 content =
                 {
-                    {"Rank", players.get_rank(pid)},
-                    {"K/D", roundNum(players.get_kd(pid), 2)},
-                    {"Wallet", "$"..formatMoney(players.get_wallet(pid))},
-                    {"Bank", "$"..formatMoney(players.get_bank(pid))}
+                    {"Rank", players.get_rank(player_id)},
+                    {"K/D", roundNum(players.get_kd(player_id), 2)},
+                    {"Wallet", "$"..formatMoney(players.get_wallet(player_id))},
+                    {"Bank", "$"..formatMoney(players.get_bank(player_id))}
                 }
             },
             {
                 width = total_w/2,
                 content =
                 {
-                    {"Language", ({"English","French","German","Italian","Spanish","Brazilian","Polish","Russian","Korean","Traditional Chinese","Japanese","Mexican","Simplified Chinese"})[players.get_language(pid) + 1]},
-                    {"Controller", boolText(players.is_using_controller(pid))},
-                    {"Ping", math.floor(NETWORK1._NETWORK_GET_AVERAGE_LATENCY_FOR_PLAYER(pid) + 0.5).." ms"},
-                    {"Host Sequence", "#"..players.get_host_queue_position(pid)},
+                    {"Language", ({"English","French","German","Italian","Spanish","Brazilian","Polish","Russian","Korean","Traditional Chinese","Japanese","Mexican","Simplified Chinese"})[players.get_language(player_id) + 1]},
+                    {"Controller", boolText(players.is_using_controller(player_id))},
+                    {"Ping", math.floor(NETWORK1._NETWORK_GET_AVERAGE_LATENCY_FOR_PLAYER(player_id) + 0.5).." ms"},
+                    {"Host Sequence", "#"..players.get_host_queue_position(player_id)},
                 }
             },
             {
@@ -5895,7 +5895,7 @@ function infoverplaytoggle()
                     {"Model", util.reverse_joaat(ENTITY.GET_ENTITY_MODEL(ped))},
                     {"Area", util.get_label_text(ZONE.GET_NAME_OF_ZONE(player_pos.x, player_pos.y, player_pos.z))},
                     {"Weapon", hashToWeapon(WEAPON.GET_SELECTED_PED_WEAPON(ped))},
-                    {"Vehicle", checkValue(util.get_label_text(players.get_vehicle_model(pid)))}
+                    {"Vehicle", checkValue(util.get_label_text(players.get_vehicle_model(player_id)))}
                 }
             },
             {
@@ -5911,30 +5911,30 @@ function infoverplaytoggle()
                 width = total_w/2,
                 content =
                 {
-                    {"Organization", ({"None","CEO","MC"})[players.get_org_type(pid) + 2]},
-                    {"Wanted", PLAYER.GET_PLAYER_WANTED_LEVEL(pid).."/5"},
-                    {"Cutscene", boolText(NETWORK.IS_PLAYER_IN_CUTSCENE(pid))}
+                    {"Organization", ({"None","CEO","MC"})[players.get_org_type(player_id) + 2]},
+                    {"Wanted", PLAYER.GET_PLAYER_WANTED_LEVEL(player_id).."/5"},
+                    {"Cutscene", boolText(NETWORK.IS_PLAYER_IN_CUTSCENE(player_id))}
                 }
             },
             {
                 width = total_w + spacing_x,
                 content =
                 {
-                    {"Interior", boolText(players.is_in_interior(pid))},
-                    {"Interior ID", interiorcheck(pid)},
-                    {"Rockstar ID", checkValue(players.get_rockstar_id(pid))},
-                    {"Tags/Labels", checkValue(players.get_tags_string(pid))},
-                    {"IP", ipcheckself(pid)}
+                    {"Interior", boolText(players.is_in_interior(player_id))},
+                    {"Interior ID", interiorcheck(player_id)},
+                    {"Rockstar ID", checkValue(players.get_rockstar_id(player_id))},
+                    {"Tags/Labels", checkValue(players.get_tags_string(player_id))},
+                    {"IP", ipcheckself(player_id)}
                 }
             },
             {
                 width = total_w/2,
                 content =
                 {
-                    {"GodMode", boolText(players.is_godmode(pid))},
-                    {"Passive Mode", boolText(is_player_passive(pid))},
-                    {"Attacked You", boolText(players.is_marked_as_attacker(pid))},
-                    {"Modder", boolText(players.is_marked_as_modder(pid))}
+                    {"GodMode", boolText(players.is_godmode(player_id))},
+                    {"Passive Mode", boolText(is_player_passive(player_id))},
+                    {"Attacked You", boolText(players.is_marked_as_attacker(player_id))},
+                    {"Modder", boolText(players.is_marked_as_modder(player_id))}
                 }
             },
             {
@@ -5942,9 +5942,9 @@ function infoverplaytoggle()
                 content =
                 {
                     {"Friend", boolText(NETWORK.NETWORK_IS_FRIEND(hdl))},
-                    {"Host", boolText(pid == players.get_host())},
-                    {"Script Host", boolText(pid == players.get_script_host())},
-                    {"Off The Radar", boolText(players.is_otr(pid))}
+                    {"Host", boolText(player_id == players.get_host())},
+                    {"Script Host", boolText(player_id == players.get_script_host())},
+                    {"Off The Radar", boolText(players.is_otr(player_id))}
                 }
             },
         }
@@ -5993,7 +5993,7 @@ function infoverplaytoggle()
 
         drawBorder(gui_x, gui_y, total_w + spacing_x, name_h)
         drawRect(gui_x, gui_y, total_w + spacing_x, name_h, infocolour.title_bar)
-        directx.draw_text(gui_x + total_w/2, gui_y + name_h/2, players.get_name(pid), ALIGN_CENTRE, name_size, infocolour.name)
+        directx.draw_text(gui_x + total_w/2, gui_y + name_h/2, players.get_name(player_id), ALIGN_CENTRE, name_size, infocolour.name)
         drawBorder(map_x, gui_y, map_w_total, name_h)
         drawRect(map_x, gui_y, map_w_total, name_h, infocolour.title_bar)
         drawBorder(map_x, player_list_y, map_w_total, gui_h)
@@ -6001,7 +6001,7 @@ function infoverplaytoggle()
         directx.draw_texture(textures.map, map_w/2, gui_h, 0.5, 0.5, map_x + padding_x * 2 + bar_w + map_w/2 , player_list_y + gui_h/2, 0, infocolour.map)
         directx.draw_texture(textures.blip, 0.004, 0, 0.5, 0.5, map_x + padding_x * 2 + bar_w + ((player_pos.x + 4000)/8500) * map_w, player_list_y + (1 - (player_pos.y + 4000)/12000) * gui_h, (360 - heading)/360, infocolour.blip)
 
-        local armour_perc = PED.GET_PED_ARMOUR(ped)/PLAYER.GET_PLAYER_MAX_ARMOUR(pid)
+        local armour_perc = PED.GET_PED_ARMOUR(ped)/PLAYER.GET_PLAYER_MAX_ARMOUR(player_id)
         local armour_bar_bg = {r = infocolour.armour_bar.r/2, g = infocolour.armour_bar.g/2, b = infocolour.armour_bar.b/2, a = infocolour.armour_bar.a}
         drawRect(map_x + padding_x, player_list_y + gui_h/2 - padding/2, bar_w, -((gui_h - padding * 3)/2 * armour_perc), infocolour.armour_bar) --foreground
         drawRect(map_x + padding_x, player_list_y + padding, bar_w, (gui_h - padding * 3)/2 * (1 - armour_perc), armour_bar_bg) --background
@@ -7751,9 +7751,9 @@ function ent_func.get_entity_control_onces(entity)
 end
 
 --based on how jacks does it but just got the idea with the spectating and the rest i did myself so no skid just idea--
-function ent_func.get_player_vehicle_in_control(pid, options)
+function ent_func.get_player_vehicle_in_control(player_id, options)
     local user_ped = players.user_ped()
-    local target_ped = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(pid)
+    local target_ped = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)
 
     --calculate the distance between you and the player your trying to get the vehicle control from--
     local user_pos = ENTITY.GET_ENTITY_COORDS(target_ped)
@@ -7761,7 +7761,7 @@ function ent_func.get_player_vehicle_in_control(pid, options)
     local dist = ent_func.get_distance_between(user_pos, target_pos)
 
     --to see if you are spectating the player your trying to take vehicle controll from--
-    local is_spectating = menu.ref_by_command_name("spectate" .. players.get_name(pid):lower()).value
+    local is_spectating = menu.ref_by_command_name("spectate" .. players.get_name(player_id):lower()).value
 
     --getting the vehicle from the ped--
     local vehicle = ent_func.get_vehicle_from_ped(target_ped)
@@ -7773,7 +7773,7 @@ function ent_func.get_player_vehicle_in_control(pid, options)
     if vehicle == 0 and target_ped != user_ped and dist > 1000 and not is_spectating then
         util.toast("Spectating")
         --turn on spectating--
-        menu.trigger_commands("spectate" .. players.get_name(pid) .. " on")
+        menu.trigger_commands("spectate" .. players.get_name(player_id) .. " on")
 
         --loop 30 times or stop looping if you have the vehicle of the player--
         local loop = 30
@@ -7789,7 +7789,7 @@ function ent_func.get_player_vehicle_in_control(pid, options)
 
     --if you were not spectating before you turn off spectating
     if not is_spectating then
-      menu.trigger_commands("spectate" .. players.get_name(pid) .. " off")
+      menu.trigger_commands("spectate" .. players.get_name(player_id) .. " off")
     end
 
     --return the controlled vehicle--
@@ -7855,15 +7855,15 @@ function ent_func.getClosestPlayer(myPos)
     if myVehicle == 0 then
         myVehicle = 1
     end
-    for players.list(false, true, true) as pid do
-		local ped = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(pid)
+    for players.list(false, true, true) as player_id do
+		local ped = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)
 		if not ENTITY.IS_ENTITY_DEAD(ped) then
-            local playerpos = players.get_position(pid)
+            local playerpos = players.get_position(player_id)
             local dist = ent_func.get_distance_between(myPos, playerpos)
             local playerVehicle = ent_func.get_vehicle_from_ped(ped)
-            if (dist < closestDist) and (playerVehicle != myVehicle) and not players.is_in_interior(pid) then
+            if (dist < closestDist) and (playerVehicle != myVehicle) and not players.is_in_interior(player_id) then
                 closestDist = dist
-                closest_player = pid
+                closest_player = player_id
             end
 		end
     end
@@ -8190,38 +8190,38 @@ menu.toggle_loop(weapons, "Aim Information", {}, "", function()
         end
 
         if ENTITY.IS_ENTITY_A_PED(entity) and PED.IS_PED_A_PLAYER(entity) then --ped, not in a vehicle, player-
-            local pid = NETWORK.NETWORK_GET_PLAYER_INDEX_FROM_PED(entity)
+            local player_id = NETWORK.NETWORK_GET_PLAYER_INDEX_FROM_PED(entity)
 
-            local name = players.get_name(pid)
-            local RID = players.get_rockstar_id(pid)
-            local IP = ent_func.dec_to_ipv4(players.get_connect_ip(pid))
-            local rank = ent_func.check(players.get_rank(pid))
-            local kd = ent_func.round(players.get_kd(pid), 2)
-            local lang = languages[players.get_language(pid)]
-            local controller = ent_func.bool(players.is_using_controller(pid))
-            local host = ent_func.bool(pid == players.get_host())
-            local script_host = ent_func.bool(pid == players.get_script_host())
-            local host_queue = ent_func.queuecheck(players.get_host_queue_position(pid))
+            local name = players.get_name(player_id)
+            local RID = players.get_rockstar_id(player_id)
+            local IP = ent_func.dec_to_ipv4(players.get_connect_ip(player_id))
+            local rank = ent_func.check(players.get_rank(player_id))
+            local kd = ent_func.round(players.get_kd(player_id), 2)
+            local lang = languages[players.get_language(player_id)]
+            local controller = ent_func.bool(players.is_using_controller(player_id))
+            local host = ent_func.bool(player_id == players.get_host())
+            local script_host = ent_func.bool(player_id == players.get_script_host())
+            local host_queue = ent_func.queuecheck(players.get_host_queue_position(player_id))
 
-            local org_type = ent_func.org(players.get_org_type(pid))
+            local org_type = ent_func.org(players.get_org_type(player_id))
             local distance = ent_func.get_distance_between(players.user_ped(), entity)
             local speed = ENTITY.GET_ENTITY_SPEED(entity)
             local mph = speed * 2.236936
             local health, maxhealth = ENTITY.GET_ENTITY_HEALTH(entity), ENTITY.GET_ENTITY_MAX_HEALTH(entity)
-            local armor, maxarmor = PED.GET_PED_ARMOUR(entity), PLAYER.GET_PLAYER_MAX_ARMOUR(pid)
-            local godmode = ent_func.bool(players.is_godmode(pid))
-            local otr = ent_func.bool(players.is_otr(pid)) 
+            local armor, maxarmor = PED.GET_PED_ARMOUR(entity), PLAYER.GET_PLAYER_MAX_ARMOUR(player_id)
+            local godmode = ent_func.bool(players.is_godmode(player_id))
+            local otr = ent_func.bool(players.is_otr(player_id)) 
             local weapon_hash = WEAPON.GET_SELECTED_PED_WEAPON(entity)
             local weapon =  ent_func.get_weapon_name_from_hash(weapon_hash)
             local coords = ENTITY.GET_ENTITY_COORDS(entity)
 
-            local wanted_lvl, max_wanted_lvl = PLAYER.GET_PLAYER_WANTED_LEVEL(pid), PLAYER.GET_MAX_WANTED_LEVEL(pid)
-            local atk_you = ent_func.bool(players.is_marked_as_attacker(pid))
-            local mod_or_ad = ent_func.bool(players.is_marked_as_modder_or_admin(pid))
-            local totalmoney = ent_func.formatMoney(players.get_money(pid))
-            local walletmoney = ent_func.formatMoney(players.get_wallet(pid))
-            local bankmoney = ent_func.formatMoney(players.get_bank(pid))
-            local tags = ent_func.check(players.get_tags_string(pid))
+            local wanted_lvl, max_wanted_lvl = PLAYER.GET_PLAYER_WANTED_LEVEL(player_id), PLAYER.GET_MAX_WANTED_LEVEL(player_id)
+            local atk_you = ent_func.bool(players.is_marked_as_attacker(player_id))
+            local mod_or_ad = ent_func.bool(players.is_marked_as_modder_or_admin(player_id))
+            local totalmoney = ent_func.formatMoney(players.get_money(player_id))
+            local walletmoney = ent_func.formatMoney(players.get_wallet(player_id))
+            local bankmoney = ent_func.formatMoney(players.get_bank(player_id))
+            local tags = ent_func.check(players.get_tags_string(player_id))
 
             ent_func.draw_rect_with_text(0.52, 0.35, 10, 0.14, {r = 0/255, g = 0/255, b = 0/255, a = 175/255})
             ent_func.draw_info_text("Name:", name, 0.52, 0.35, 130, 0.45, 0.44, true)
@@ -8293,36 +8293,36 @@ menu.toggle_loop(weapons, "Aim Information", {}, "", function()
                     local ped_name = ped
                     local label_text = "Seat, Ped:"
                     if PED.IS_PED_A_PLAYER(ped) then
-                        local pid = NETWORK.NETWORK_GET_PLAYER_INDEX_FROM_PED(ped)
-                        ped_name = players.get_name(pid)
+                        local player_id = NETWORK.NETWORK_GET_PLAYER_INDEX_FROM_PED(ped)
+                        ped_name = players.get_name(player_id)
                         label_text = "Seat, Player:"
 
-                        local name = players.get_name(pid)
-                        local RID = players.get_rockstar_id(pid)
-                        local IP = ent_func.dec_to_ipv4(players.get_connect_ip(pid))
-                        local rank = ent_func.check(players.get_rank(pid))
-                        local kd = ent_func.round(players.get_kd(pid), 2)
-                        local lang = languages[players.get_language(pid)]
-                        local controller = ent_func.bool(players.is_using_controller(pid))
-                        local host = ent_func.bool(pid == players.get_host())
-                        local script_host = ent_func.bool(pid == players.get_script_host())
-                        local host_queue = ent_func.queuecheck(players.get_host_queue_position(pid))
+                        local name = players.get_name(player_id)
+                        local RID = players.get_rockstar_id(player_id)
+                        local IP = ent_func.dec_to_ipv4(players.get_connect_ip(player_id))
+                        local rank = ent_func.check(players.get_rank(player_id))
+                        local kd = ent_func.round(players.get_kd(player_id), 2)
+                        local lang = languages[players.get_language(player_id)]
+                        local controller = ent_func.bool(players.is_using_controller(player_id))
+                        local host = ent_func.bool(player_id == players.get_host())
+                        local script_host = ent_func.bool(player_id == players.get_script_host())
+                        local host_queue = ent_func.queuecheck(players.get_host_queue_position(player_id))
             
-                        local org_type = ent_func.org(players.get_org_type(pid))
+                        local org_type = ent_func.org(players.get_org_type(player_id))
                         local health, maxhealth = ENTITY.GET_ENTITY_HEALTH(ped), ENTITY.GET_ENTITY_MAX_HEALTH(ped)
-                        local armor, maxarmor = PED.GET_PED_ARMOUR(ped), PLAYER.GET_PLAYER_MAX_ARMOUR(pid)
-                        local godmode = ent_func.bool(players.is_godmode(pid))
-                        local otr = ent_func.bool(players.is_otr(pid)) 
+                        local armor, maxarmor = PED.GET_PED_ARMOUR(ped), PLAYER.GET_PLAYER_MAX_ARMOUR(player_id)
+                        local godmode = ent_func.bool(players.is_godmode(player_id))
+                        local otr = ent_func.bool(players.is_otr(player_id)) 
                         local weapon_hash = WEAPON.GET_SELECTED_PED_WEAPON(ped)
                         local weapon = ent_func.get_weapon_name_from_hash(weapon_hash)
             
-                        local wanted_lvl, max_wanted_lvl = PLAYER.GET_PLAYER_WANTED_LEVEL(pid), PLAYER.GET_MAX_WANTED_LEVEL(pid)
-                        local atk_you = ent_func.bool(players.is_marked_as_attacker(pid))
-                        local mod_or_ad = ent_func.bool(players.is_marked_as_modder_or_admin(pid))
-                        local totalmoney = ent_func.formatMoney(players.get_money(pid))
-                        local walletmoney = ent_func.formatMoney(players.get_wallet(pid))
-                        local bankmoney = ent_func.formatMoney(players.get_bank(pid))
-                        local tags = ent_func.check(players.get_tags_string(pid))
+                        local wanted_lvl, max_wanted_lvl = PLAYER.GET_PLAYER_WANTED_LEVEL(player_id), PLAYER.GET_MAX_WANTED_LEVEL(player_id)
+                        local atk_you = ent_func.bool(players.is_marked_as_attacker(player_id))
+                        local mod_or_ad = ent_func.bool(players.is_marked_as_modder_or_admin(player_id))
+                        local totalmoney = ent_func.formatMoney(players.get_money(player_id))
+                        local walletmoney = ent_func.formatMoney(players.get_wallet(player_id))
+                        local bankmoney = ent_func.formatMoney(players.get_bank(player_id))
+                        local tags = ent_func.check(players.get_tags_string(player_id))
             
                         ent_func.draw_rect_with_text(0.665, 0.35, 10, 0.14, {r = 0/255, g = 0/255, b = 0/255, a = 175/255})
                         ent_func.draw_info_text("Name:", name, 0.665, 0.35, 130, 0.45, 0.44, true)
@@ -12460,7 +12460,7 @@ local dont_stop = false
 	menu.toggle_loop(world2,"Blackhole Vehicles", {"blackholeveh"}, "", function(on)
 		for k, veh in pairs(entities.get_all_vehicles_as_handles()) do
             local locspeed2 = speed
-            local holecoords = ENTITY.GET_ENTITY_COORDS(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(pid), true)
+            local holecoords = ENTITY.GET_ENTITY_COORDS(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id), true)
                 NETWORK.NETWORK_REQUEST_CONTROL_OF_ENTITY(veh)
                 ENTITY.GET_ENTITY_COORDS(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(bh_target), true)
                 vcoords = ENTITY.GET_ENTITY_COORDS(veh, true)
@@ -12479,7 +12479,7 @@ local dont_stop = false
     menu.toggle_loop(world2,"Blackhole Peds", {"pedblackhole"}, "", function(on)
 		for k, veh in pairs(entities.get_all_peds_as_handles()) do
             local locspeed2 = speed
-            local holecoords = ENTITY.GET_ENTITY_COORDS(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(pid), true)
+            local holecoords = ENTITY.GET_ENTITY_COORDS(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id), true)
                 NETWORK.NETWORK_REQUEST_CONTROL_OF_ENTITY(veh)
                 ENTITY.GET_ENTITY_COORDS(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(bh_target), true)
                 vcoords = ENTITY.GET_ENTITY_COORDS(veh, true)
@@ -12498,7 +12498,7 @@ local dont_stop = false
     menu.toggle_loop(world2,"Blackhole Objects", {"objectblackhole"}, "", function(on)
 		for k, veh in pairs(entities.get_all_objects_as_handles()) do
             local locspeed2 = speed
-            local holecoords = ENTITY.GET_ENTITY_COORDS(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(pid), true)
+            local holecoords = ENTITY.GET_ENTITY_COORDS(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id), true)
                 NETWORK.NETWORK_REQUEST_CONTROL_OF_ENTITY(veh)
                 ENTITY.GET_ENTITY_COORDS(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(bh_target), true)
                 vcoords = ENTITY.GET_ENTITY_COORDS(veh, true)
@@ -12525,7 +12525,7 @@ local dont_stop = false
 menu.toggle_loop(world2, "All Cars Sink", {"sinkcars"}, "All Cars Sink.", function(on_toggle)
     for k, veh in pairs(entities.get_all_vehicles_as_handles()) do
         local locspeed2 = speed
-        local holecoords = ENTITY.GET_ENTITY_COORDS(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(pid), true)
+        local holecoords = ENTITY.GET_ENTITY_COORDS(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id), true)
             NETWORK.NETWORK_REQUEST_CONTROL_OF_ENTITY(veh)
             ENTITY.GET_ENTITY_COORDS(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(bh_target), true)
             vcoords = ENTITY.GET_ENTITY_COORDS(veh, true)
