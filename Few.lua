@@ -3331,8 +3331,7 @@ menu.divider(crashes, "Component Crashes")
 	local krustykrab = menu.list(crashes, "Crusty Crab Crash", {"CrustyCrabCrash"}, "It's risky to spectate, beware: it works on 2T1 users")
 
     local peds = 5
-    menu.slider(krustykrab, "Number of spatulas", {}, "Send spatulas ah~", 1, 50, 1, 1, function(amount)
-        util.toast(players.get_name(player_id).. " Spatulas have been sen")
+    menu.slider(krustykrab, "Number of spatulas", {}, "Send spatulas ah~", 1, 45, 1, 1, function(amount)
         peds = amount
     end)
 
@@ -3340,7 +3339,7 @@ menu.divider(crashes, "Component Crashes")
     local crash_toggle = false
     menu.toggle(krustykrab, "Number of spatulas", {"SpatalusCrash"}, "It's risky to spectate, beware.", function(val)
         menu.trigger_commands("anticrashcamera on")
-        util.toast(players.get_name(player_id).. " Spatulas have been sen")
+        util.toast(players.get_name(player_id).. " Spatulas have been sent")
         local crash_toggle = val
         Fewd.BlockSyncs(player_id, function()
             if val then
@@ -3381,6 +3380,7 @@ menu.divider(crashes, "Component Crashes")
                 end
                 crash_ents = {}
             end
+            menu.trigger_commands("clearworld")
             menu.trigger_commands("anticrashcamera off")
         end)
     end)
