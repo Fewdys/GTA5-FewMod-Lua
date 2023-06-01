@@ -7,7 +7,7 @@ util.require_natives(1676318796)
 util.require_natives(1663599433)
 
 local response = false
-local localversion = 1.53
+local localversion = 1.54
 local localKs = false
 async_http.init("raw.githubusercontent.com", "/Fewdys/GTA5-FewMod-Lua/main/FewModVersion.lua", function(output)
     currentVer = tonumber(output)
@@ -974,6 +974,7 @@ end)
         local audible = true
         local visible = true
     
+        request_model(hash)
         load_weapon_asset(hash)
         
         for i = 0, 50 do
@@ -984,8 +985,6 @@ end)
     
             local coords = ENTITY.GET_ENTITY_COORDS(ped)
             MISC.SHOOT_SINGLE_BULLET_BETWEEN_COORDS(coords.x, coords.y, coords.z, coords.x, coords.y, coords.z - 2, 100, 0, hash, 0, audible, not visible, 2500)
-            
-            util.yield(10)
         end
     
         util.toast("Could Not Kill " .. players.get_name(player_id) .. ". \nPlayer Either Can't Be Ragdolled Or Is In GodMode")
@@ -1000,13 +999,8 @@ end)
         end
     
         NETWORK.NETWORK_REQUEST_CONTROL_OF_ENTITY(vehicle)
-    
-        if NETWORK.NETWORK_HAS_CONTROL_OF_ENTITY(vehicle) then
-            ENTITY.APPLY_FORCE_TO_ENTITY_CENTER_OF_MASS(vehicle, 1, 0, 100, 40, true, true, true, true)
-            util.toast("Launched" .. players.get_name(player_id) .. "'s Vehicle")
-        else
-            util.toast("Couln't Get Control Of " .. players.get_name(player_id) .. "'s Vehicle")
-        end
+        request_control2(vehicle)
+        ENTITY.APPLY_FORCE_TO_ENTITY_CENTER_OF_MASS(vehicle, 1, 0, 100, 40, true, true, true, true)
     end
 
     menu.action(trolling, "Passive Mode kill", {}, "(DOESN'T WORK ON NO RAGDOLL PLAYERS) Kills The Player in Passive Mode", function ()
@@ -5920,8 +5914,6 @@ function infoverplaytoggle()
                 width = total_w + spacing_x,
                 content =
                 {
-                    {"Interior", boolText(players.is_in_interior(player_id))},
-                    {"Interior ID", interiorcheck(player_id)},
                     {"Rockstar ID", checkValue(players.get_rockstar_id(player_id))},
                     {"Tags/Labels", checkValue(players.get_tags_string(player_id))},
                     {"IP", ipcheckself(player_id)}
@@ -5945,6 +5937,15 @@ function infoverplaytoggle()
                     {"Host", boolText(player_id == players.get_host())},
                     {"Script Host", boolText(player_id == players.get_script_host())},
                     {"Off The Radar", boolText(players.is_otr(player_id))}
+                }
+            },
+            {
+                width = total_w + spacing_x,
+                content =
+                {
+                    {"Interior", boolText(players.is_in_interior(player_id))},
+                    {"Interior ID", interiorcheck(player_id)},
+                    {"Visible", boolText(players.is_visible(player_id))},
                 }
             },
         }
@@ -12451,6 +12452,7 @@ end
 
 menu.toggle_loop(world2,"Nearby Vehicles Fly Away", {"flyawayvehicles"}, "", function()
     for k, veh in pairs(entities.get_all_vehicles_as_handles()) do
+        request_control2(veh)
         ENTITY.APPLY_FORCE_TO_ENTITY_CENTER_OF_MASS(veh, 1, 0, 0, 100, true, false, true)
         util.yield(10)
     end
@@ -12459,6 +12461,7 @@ end)
 local dont_stop = false
 	menu.toggle_loop(world2,"Blackhole Vehicles", {"blackholeveh"}, "", function(on)
 		for k, veh in pairs(entities.get_all_vehicles_as_handles()) do
+            request_control2(veh)
             local locspeed2 = speed
             local holecoords = ENTITY.GET_ENTITY_COORDS(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id), true)
                 NETWORK.NETWORK_REQUEST_CONTROL_OF_ENTITY(veh)
@@ -12497,6 +12500,7 @@ local dont_stop = false
 
     menu.toggle_loop(world2,"Blackhole Objects", {"objectblackhole"}, "", function(on)
 		for k, veh in pairs(entities.get_all_objects_as_handles()) do
+            request_control2(veh)
             local locspeed2 = speed
             local holecoords = ENTITY.GET_ENTITY_COORDS(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id), true)
                 NETWORK.NETWORK_REQUEST_CONTROL_OF_ENTITY(veh)
