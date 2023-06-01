@@ -3608,117 +3608,27 @@ menu.divider(crashes, "Weed Crashes")
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 	
 menu.divider(crashes, "Parachute Crashes")
-
-	menu.toggle(crashes, "Para Crash", {"ParaCrash"}, "Will Automatically Restart Script After", function(on)
-        if on then
-		for n = 0 , 1 do
-			PEDP = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(PLAYER.PLAYER_ID())
-				object_hash = 1043035044
-					STREAMING.REQUEST_MODEL(object_hash)
-				while not STREAMING.HAS_MODEL_LOADED(object_hash) do
-					util.yield()
-					end
-					PLAYER.SET_PLAYER_PARACHUTE_MODEL_OVERRIDE(PLAYER.PLAYER_ID(),object_hash)
-                    ENTITY.SET_ENTITY_COORDS_NO_OFFSET(PEDP, 0,0,500, 0, 0, 1) -- Original Code
-					WEAPON.GIVE_DELAYED_WEAPON_TO_PED(PEDP, 0xFBAB5776, 1000, false)
-					util.yield(1000)
-				for i = 0 , 1 do
-					PED.FORCE_PED_TO_OPEN_PARACHUTE(PEDP)
-					end
-					util.yield(1000)
-					menu.trigger_commands("tplsia")
-				bush_hash = 1585741317
-					STREAMING.REQUEST_MODEL(bush_hash)
-				while not STREAMING.HAS_MODEL_LOADED(bush_hash) do
-					util.yield()
-					end
-					PLAYER.SET_PLAYER_PARACHUTE_MODEL_OVERRIDE(PLAYER.PLAYER_ID(),bush_hash)
-                    ENTITY.SET_ENTITY_COORDS_NO_OFFSET(PEDP, 0,0,500, 0, 0, 1) -- Original Code
-					WEAPON.GIVE_DELAYED_WEAPON_TO_PED(PEDP, 0xFBAB5776, 1000, false)
-					util.yield(1000)
-				for i = 0 , 1 do
-					PED.FORCE_PED_TO_OPEN_PARACHUTE(PEDP)
-					end
-					util.yield(1000)
-					menu.trigger_commands("tplsia")
-                    end
-                else
-                    menu.trigger_commands("tpmazehelipad")
-                    util.restart_script()
-                end
-			end)
-
-    -- Parachute Crash 1
-
-	menu.toggle(crashes, "Para Crash V1", {"paracrashv1"}, "Will Automatically Restart Script After", function(on)
-        if on then
-		for n = 0 , 5 do
-			PEDP = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(PLAYER.PLAYER_ID())
-            heli_hash = util.joaat("p_crahsed_heli_s")
-					STREAMING.REQUEST_MODEL(heli_hash)
-				while not STREAMING.HAS_MODEL_LOADED(heli_hash) do
-					util.yield()
-					end
-					PLAYER.SET_PLAYER_PARACHUTE_MODEL_OVERRIDE(PLAYER.PLAYER_ID(),heli_hash)
-                    ENTITY.SET_ENTITY_COORDS_NO_OFFSET(PEDP, math.random(0, 2555), math.random(0, 2815), math.random(1, 1232), false, false, false) 
-                    --ENTITY.SET_ENTITY_COORDS_NO_OFFSET(PEDP, 0,0,500, 0, 0, 1) -- Original Code
-					WEAPON.GIVE_DELAYED_WEAPON_TO_PED(PEDP, 0xFBAB5776, 1000, false)
-					util.yield(1000)
-				for i = 0 , 20 do
-					PED.FORCE_PED_TO_OPEN_PARACHUTE(PEDP)
-					end
-					util.yield(1000)
-					menu.trigger_commands("tplsia")
-				post_hash = util.joaat("prop_traffic_01a")
-					STREAMING.REQUEST_MODEL(post_hash)
-				while not STREAMING.HAS_MODEL_LOADED(post_hash) do
-					util.yield()
-					end
-					PLAYER.SET_PLAYER_PARACHUTE_MODEL_OVERRIDE(PLAYER.PLAYER_ID(),post_hash)
-                    ENTITY.SET_ENTITY_COORDS_NO_OFFSET(PEDP, math.random(0, 2555), math.random(0, 2815), math.random(1, 1232), false, false, false) 
-                    --ENTITY.SET_ENTITY_COORDS_NO_OFFSET(PEDP, 0,0,500, 0, 0, 1) -- Original Code
-					WEAPON.GIVE_DELAYED_WEAPON_TO_PED(PEDP, 0xFBAB5776, 1000, false)
-					util.yield(1000)
-				for i = 0 , 20 do
-					PED.FORCE_PED_TO_OPEN_PARACHUTE(PEDP)
-					end
-					util.yield(1000)
-					menu.trigger_commands("tplsia")
-
-                    flag_hash = util.joaat("prop_beachflag_02")
-					STREAMING.REQUEST_MODEL(flag_hash)
-				while not STREAMING.HAS_MODEL_LOADED(flag_hash) do
-					util.yield()
-					end
-					PLAYER.SET_PLAYER_PARACHUTE_MODEL_OVERRIDE(PLAYER.PLAYER_ID(),flag_hash)
-                    ENTITY.SET_ENTITY_COORDS_NO_OFFSET(PEDP, math.random(0, 3000), math.random(0, 3000), math.random(0, 3000), false, false, false) 
-                    --ENTITY.SET_ENTITY_COORDS_NO_OFFSET(PEDP, 0,0,500, 0, 0, 1) -- Original Code
-					WEAPON.GIVE_DELAYED_WEAPON_TO_PED(PEDP, 0xFBAB5776, 1000, false)
-					util.yield(1000)
-				for i = 0 , 20 do
-					PED.FORCE_PED_TO_OPEN_PARACHUTE(PEDP)
-					end
-					util.yield(1000)
-					menu.trigger_commands("tplsia")
-                    end
-                else
-                    menu.trigger_commands("tpmazehelipad")
-                    util.restart_script()
-                end
-			end)
-
-        -- Parachute Crash 2
                 
-menu.toggle_loop(crashes, "Para Crash V2", {"paracrashv2"}, "", function()
+menu.toggle_loop(crashes, "Para Crash", {"paracrashv1"}, "Event (A0:336)", function()
     local pos = ENTITY.GET_ENTITY_COORDS(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id))
     local player = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)
     Fewd.BlockSyncs(player_id, function()
         util.yield(500)
 
+        local bush_hash = 1585741317
+        local object_hash = 1043035044
+        local heli_hash = util.joaat("p_crahsed_heli_s")
+        local flag_hash = util.joaat("prop_beachflag_02")
+        local post_hash = util.joaat("prop_traffic_01a")
         local crash_parachute = util.joaat("prop_logpile_06b")
         local parachute = util.joaat("p_parachute1_mp_dec")
 
         STREAMING.REQUEST_MODEL(crash_parachute)
+        STREAMING.REQUEST_MODEL(flag_hash)
+        STREAMING.REQUEST_MODEL(heli_hash)
+        STREAMING.REQUEST_MODEL(post_hash)
+        STREAMING.REQUEST_MODEL(bush_hash)
+        STREAMING.REQUEST_MODEL(object_hash)
         STREAMING.REQUEST_MODEL(parachute)
 
         for i = 1, 1 do
@@ -3729,33 +3639,48 @@ menu.toggle_loop(crashes, "Para Crash V2", {"paracrashv2"}, "", function()
             PED.FORCE_PED_TO_OPEN_PARACHUTE(player)
             util.yield(1000)
             TASK.CLEAR_PED_TASKS_IMMEDIATELY(player)
+            PLAYER.SET_PLAYER_PARACHUTE_MODEL_OVERRIDE(player_id, flag_hash)
+            WEAPON.GIVE_DELAYED_WEAPON_TO_PED(player, 0xFBAB5776, 1000, false)
+            ENTITY.SET_ENTITY_COORDS_NO_OFFSET(player, pos.x, pos.y, pos.z + 100, 0, 0, 1)
+            util.yield(1000)
+            PED.FORCE_PED_TO_OPEN_PARACHUTE(player)
+            util.yield(1000)
+            TASK.CLEAR_PED_TASKS_IMMEDIATELY(player)
+            PLAYER.SET_PLAYER_PARACHUTE_MODEL_OVERRIDE(player_id, heli_hash)
+            WEAPON.GIVE_DELAYED_WEAPON_TO_PED(player, 0xFBAB5776, 1000, false)
+            ENTITY.SET_ENTITY_COORDS_NO_OFFSET(player, pos.x, pos.y, pos.z + 100, 0, 0, 1)
+            util.yield(1000)
+            PED.FORCE_PED_TO_OPEN_PARACHUTE(player)
+            util.yield(1000)
+            TASK.CLEAR_PED_TASKS_IMMEDIATELY(player)
+            PLAYER.SET_PLAYER_PARACHUTE_MODEL_OVERRIDE(player_id, post_hash)
+            WEAPON.GIVE_DELAYED_WEAPON_TO_PED(player, 0xFBAB5776, 1000, false)
+            ENTITY.SET_ENTITY_COORDS_NO_OFFSET(player, pos.x, pos.y, pos.z + 100, 0, 0, 1)
+            util.yield(1000)
+            PED.FORCE_PED_TO_OPEN_PARACHUTE(player)
+            util.yield(1000)
+            TASK.CLEAR_PED_TASKS_IMMEDIATELY(player)
+            PLAYER.SET_PLAYER_PARACHUTE_MODEL_OVERRIDE(player_id, bush_hash)
+            WEAPON.GIVE_DELAYED_WEAPON_TO_PED(player, 0xFBAB5776, 1000, false)
+            ENTITY.SET_ENTITY_COORDS_NO_OFFSET(player, pos.x, pos.y, pos.z + 100, 0, 0, 1)
+            util.yield(1000)
+            PED.FORCE_PED_TO_OPEN_PARACHUTE(player)
+            util.yield(1000)
+            TASK.CLEAR_PED_TASKS_IMMEDIATELY(player)
+            PLAYER.SET_PLAYER_PARACHUTE_MODEL_OVERRIDE(player_id, object_hash)
+            WEAPON.GIVE_DELAYED_WEAPON_TO_PED(player, 0xFBAB5776, 1000, false)
+            ENTITY.SET_ENTITY_COORDS_NO_OFFSET(player, pos.x, pos.y, pos.z + 100, 0, 0, 1)
+            util.yield(1000)
+            PED.FORCE_PED_TO_OPEN_PARACHUTE(player)
+            util.yield(1000)
+            TASK.CLEAR_PED_TASKS_IMMEDIATELY(player)
         end
 
         PLAYER.SET_PLAYER_PARACHUTE_MODEL_OVERRIDE(player_id, parachute)
         util.yield(500)
+        menu.trigger_commands("tpmazehelipad")
     end)
 end)
-                
-
-menu.toggle_loop(crashes, "Para Crash V3", {"paracrashv3"}, "", function()
-    local ped = PLAYER.PLAYER_PED_ID()
-    local pos = ENTITY.GET_ENTITY_COORDS(ped, true)
-    local hashes = {util.joaat("prop_beach_parasol_02"), util.joaat("prop_parasol_04c")}
-    for i = 1, #hashes do
-        RqModel(hashes[i])
-        PLAYER.SET_PLAYER_PARACHUTE_MODEL_OVERRIDE(player_id, hashes[i])
-        ENTITY.SET_ENTITY_COORDS_NO_OFFSET(ped, 0, 0, 500, false, true, true)
-        WEAPON.GIVE_DELAYED_WEAPON_TO_PED(ped, 0xFBAB5776, 1000, false)
-        util.yield(200)
-        for i = 0 , 20 do
-            PED.FORCE_PED_TO_OPEN_PARACHUTE(ped)
-        end
-        util.yield(1200)
-    end
-    ENTITY.SET_ENTITY_COORDS_NO_OFFSET(ped, pos.x, pos.y, pos.z, false, true, true)
-end)
-
-        menu.divider(crashes, "________________________________________")
 
         local ents = {}
         local thingy = false
@@ -3964,36 +3889,36 @@ for i=1,1  do
     util.yield(10)
     local pedhash1 = util.joaat("MP_F_Freemode_01")
     local pedhash2 = util.joaat("MP_F_Freemode_01")
-    local pedhash3 = util.joaat("MP_F_Freemode_01")
+    local pedhash3 = util.joaat("mpfemale")
     while not STREAMING.HAS_MODEL_LOADED(pedhash1, pedhash2, pedhash3) do
         STREAMING.REQUEST_MODEL(pedhash1, pedhash2, pedhash3)
         util.yield(10)
     end
     local FinalRenderedCamRot = CAM.GET_FINAL_RENDERED_CAM_ROT(2).z
     SpawnedPeds1 = {}
-    local ped_amount = math_random(5, 15) -- Picks number between 5 and 15
+    local ped_amount = math_random(5, 12) -- Picks number between 5 and 12
     for i = 1, ped_amount do
         local pedtype = 0
         local PlayerPedCoords = ENTITY.GET_ENTITY_COORDS(player_ped, true)
         local coords = PlayerPedCoords
-        local loc1, loc2, loc3, pedt = math_random(0, 15), math_random(0, 15), math_random(0, 15), math_random(0, 15)
+        local loc1, loc2, loc3, pedt = math_random(0, 12), math_random(0, 12), math_random(0, 12), math_random(0, 12)
         coords.x = coords.x
         coords.y = coords.y
         coords.z = coords.z
         if loc1 == 1 then
-            coords.x = coords.x - math_random(0, 15)
+            coords.x = coords.x - math_random(0, 12)
         else
-            coords.x = coords.x + math_random(0, 15)
+            coords.x = coords.x + math_random(0, 12)
         end
         if loc2 == 1 then
-            coords.y = coords.y - math_random(0, 15)
+            coords.y = coords.y - math_random(0, 12)
         else
-            coords.y = coords.y + math_random(0, 15)
+            coords.y = coords.y + math_random(0, 12)
         end
         if loc3 == 1 then
-            coords.z = coords.z - math_random(0, 15)
+            coords.z = coords.z - math_random(0, 12)
         else
-            coords.z = coords.z + math_random(0, 15)
+            coords.z = coords.z + math_random(0, 12)
         end
         if pedt == 1 then
             pedtype = 0
@@ -4005,24 +3930,24 @@ for i=1,1  do
         for i = 1, ped_amount do
             local pedtype = 0
             local coords = PlayerPedCoords
-            local loc1, loc2, loc3, pedt = math_random(0, 15), math_random(0, 15), math_random(0, 15), math_random(0, 15)
+            local loc1, loc2, loc3, pedt = math_random(0, 12), math_random(0, 12), math_random(0, 12), math_random(0, 12)
             coords.x = coords.x
             coords.y = coords.y
             coords.z = coords.z
             if loc1 == 1 then
-                coords.x = coords.x - math_random(0, 15)
+                coords.x = coords.x - math_random(0, 12)
             else
-                coords.x = coords.x + math_random(0, 15)
+                coords.x = coords.x + math_random(0, 12)
             end
             if loc2 == 1 then
-                coords.y = coords.y - math_random(0, 15)
+                coords.y = coords.y - math_random(0, 12)
             else
-                coords.y = coords.y + math_random(0, 15)
+                coords.y = coords.y + math_random(0, 12)
             end
             if loc3 == 1 then
-                coords.z = coords.z - math_random(0, 15)
+                coords.z = coords.z - math_random(0, 12)
             else
-                coords.z = coords.z + math_random(0, 15)
+                coords.z = coords.z + math_random(0, 12)
             end
             if pedt == 1 then
                 pedtype = 0
@@ -4034,22 +3959,22 @@ for i=1,1  do
             for i = 1, ped_amount do
                 local pedtype = 0
                 local coords = PlayerPedCoords
-                local loc1, loc2, loc3, pedt = math_random(0, 15), math_random(0, 15), math_random(0, 15), math_random(0, 15)
+                local loc1, loc2, loc3, pedt = math_random(0, 12), math_random(0, 12), math_random(0, 12), math_random(0, 12)
                 coords.x = coords.x
                 coords.y = coords.y
                 coords.z = coords.z
                 if loc1 == 1 then
-                    coords.x = coords.x - math_random(0, 15)
+                    coords.x = coords.x - math_random(0, 12)
                 else
-                    coords.x = coords.x + math_random(0, 15)
+                    coords.x = coords.x + math_random(0, 12)
                 end
                 if loc2 == 1 then
-                    coords.y = coords.y - math_random(0, 15)
+                    coords.y = coords.y - math_random(0, 12)
                 else
-                    coords.y = coords.y + math_random(0, 15)
+                    coords.y = coords.y + math_random(0, 12)
                 end
                 if loc3 == 1 then
-                    coords.z = coords.z - math_random(0, 15)
+                    coords.z = coords.z - math_random(0, 12)
                 else
                     coords.z = coords.z + math_random(0, 15)
                 end
@@ -4111,7 +4036,7 @@ for i=1,1  do
         PED.SET_PED_RANDOM_COMPONENT_VARIATION(SpawnedPeds3[i], 0)
         PED.SET_PED_COMPONENT_VARIATION(SpawnedPeds3[i], 3, 0, 1, 0)
         util.yield(5000)
-        menu.trigger_commands("anticrashcamera off")
+        menu.trigger_commands("anticrashcamera ".."off")
         end
         util.yield(10)
         end
@@ -4119,13 +4044,13 @@ for i=1,1  do
         end
         ENTITY.SET_ENTITY_COORDS_NO_OFFSET(player_ped, old_coords.x, old_coords.y, old_coords.z)
         util.toast("Outfit Crash In Progress!\n" .. "\n" .. pedtype .. " Ped Types \n" .. "\n" .. ped_amount .. " Random Peds")
-        menu.trigger_commands("anticrashcamera off")
+        menu.trigger_commands("anticrashcamera ".."off")
     end
 end, nil, nil, COMMANDPERM_AGGRESSIVE)
 
 menu.action(crashes, "Outfit crash v2", {"daoutfitcrashv2"}, "Changes their outfit variations. Lasts around 30 seconds.", function(on)
     local math_random = math.random
-    menu.trigger_commands("anticrashcamera on")
+    menu.trigger_commands("anticrashcamera")
     menu.trigger_commands("mpfemale")
     util.yield(10)
     local player_ped = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)
@@ -4229,19 +4154,19 @@ menu.action(crashes, "Outfit crash v2", {"daoutfitcrashv2"}, "Changes their outf
         PED.SET_PED_RANDOM_COMPONENT_VARIATION(player_ped, 0)
         PED.SET_PED_COMPONENT_VARIATION(player_ped, 3, 0, 1, 0)
         util.yield(20000)
-        menu.trigger_commands("anticrashcamera off")
+        menu.trigger_commands("anticrashcamera ".."off")
         end
         util.yield(10)
         end
         util.toast("Outfit Crash In Progress!\n" .. "\n" .. pedtype .. " Ped Types \n" .. "\n" .. ped_amount .. " Random Peds")
-        menu.trigger_commands("anticrashcamera off")
+        menu.trigger_commands("anticrashcamera ".."off")
     end
 end, nil, nil, COMMANDPERM_AGGRESSIVE)
 
 
 menu.action(crashes, "Outfit crash v3", {"daoutfitcrashv3"}, "Changes your outfit variations. Lasts around 30 seconds.", function(on)
     local math_random = math.random
-    menu.trigger_commands("anticrashcamera on")
+    menu.trigger_commands("anticrashcamera")
     menu.trigger_commands("mpfemale")
     util.yield(10)
     local player_ped = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(players.user())
@@ -4346,12 +4271,12 @@ menu.action(crashes, "Outfit crash v3", {"daoutfitcrashv3"}, "Changes your outfi
         PED.SET_PED_RANDOM_COMPONENT_VARIATION(player_ped, 0)
         PED.SET_PED_COMPONENT_VARIATION(player_ped, 3, 0, 1, 0)
         util.yield(20000)
-        menu.trigger_commands("anticrashcamera off")
+        menu.trigger_commands("anticrashcamera ".."off")
         end
         util.yield(10)
         end
         util.toast("Outfit Crash In Progress!\n" .. "\n" .. pedtype .. " Ped Types \n" .. "\n" .. ped_amount .. " Random Peds")
-        menu.trigger_commands("anticrashcamera off")
+        menu.trigger_commands("anticrashcamera ".."off")
     end
 end, nil, nil, COMMANDPERM_AGGRESSIVE)
 
@@ -4440,8 +4365,6 @@ function CreateVehicle(Hash, Pos, static)
     ENTITY.FREEZE_ENTITY_POSITION(Vehicle, (static or false))
     return Vehicle
 end
-
-    menu.divider(crashes, "_________________________________________")
 
 menu.toggle_loop(crashes, "Sync Crash v1", {"crashv77"}, "", function()
     local cord = ENTITY.GET_ENTITY_COORDS(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id))
