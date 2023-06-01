@@ -7,7 +7,7 @@ util.require_natives(1676318796)
 util.require_natives(1663599433)
 
 local response = false
-local localversion = 1.51
+local localversion = 1.52
 local localKs = false
 async_http.init("raw.githubusercontent.com", "/Fewdys/GTA5-FewMod-Lua/main/FewModVersion.lua", function(output)
     currentVer = tonumber(output)
@@ -96,6 +96,7 @@ util.toast("Welcome " .. SOCIALCLUB.SC_ACCOUNT_INFO_GET_NICKNAME())
 util.toast("Loading FewMod...")
 util.log("Loading FewMod...")
 menu.trigger_commands("allguns")
+util.yield(2000)
 
 -- Memory Functions
 
@@ -139,7 +140,6 @@ function getVehicleModelHandlingData(modelInfo)
 	return util.call_foreign_function(GetHandlingDataFromIndex, memory.read_uint(modelInfo + 0x4B8))
 end
 
-util.yield(2000)
 p_getModelInfo = 0
 myModule("GVMI", "48 89 5C 24 ? 57 48 83 EC 20 8B 8A ? ? ? ? 48 8B DA", function (address)
 	p_getModelInfo = memory.rip(address + 0x2A)
@@ -793,6 +793,10 @@ end
 
 local function PM(player_id, message)
     menu.trigger_commands("sendpm"..PLAYER.GET_PLAYER_NAME(player_id).." "..message)
+end
+
+function randomObjectFromTable(t)
+    return t[math.random(1, #t)]
 end
 
 players.on_join(function(player_id)
@@ -1902,7 +1906,7 @@ crashes = menu.list(malicious, "Crashes", {}, "Crashes")
 
 menu.divider(crashes, "FewMod Lobby Crashes")
 
-menu.action(crashes, "FewMod All In One", {"FewModLobbyCrash"}, "Uses Multiple Crashes In The Menu", function()
+menu.action(crashes, "FewMod All In One", {"FewModLobbyCrash"}, "Uses Multiple Crashes In The Menu \nNote: Going Through All Them All Takes A Bit Of Time", function()
     local ped = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)
     local pos = ENTITY.GET_ENTITY_COORDS(ped, true)
     util.toast("If You Get Any Error Try Not To Worry About It")
@@ -1922,27 +1926,20 @@ menu.action(crashes, "FewMod All In One", {"FewModLobbyCrash"}, "Uses Multiple C
     util.yield(8000)
     util.toast("Done Jesus Crash")
     util.log("Done Jesus Crash")
-    menu.trigger_commands("E1CrashEvent" .. PLAYER.GET_PLAYER_NAME(player_id))
-    util.yield(23000)
-    util.toast("Done E1 Crash Event")
-    util.log("Done E1 Crash Event")
     menu.trigger_commands("BigChunxusCrash" .. PLAYER.GET_PLAYER_NAME(player_id))
     util.yield(20000)
     util.toast("Done Big Chunxus Crash")
     util.log("Done Big Chunxus Crash")
     menu.trigger_commands("clearworld")
-    menu.trigger_commands("da2T1Crash" .. PLAYER.GET_PLAYER_NAME(player_id))
-    util.toast("Done 2T1 Crash")
-    util.log("Done 2T1 Crash")
     menu.trigger_commands("weededcrash" .. PLAYER.GET_PLAYER_NAME(player_id))
     util.toast("Done Weed Crash")
     util.log("Done Weed Crash")
     menu.trigger_commands("Yachtyv4" .. PLAYER.GET_PLAYER_NAME(player_id))
-    util.yield(10000)
+    util.yield(7000)
     util.toast("Done Yacht Crash v4")
     util.log("Done Yacht Crash v4")
     menu.trigger_commands("Yachtyv5" .. PLAYER.GET_PLAYER_NAME(player_id))
-    util.yield(10000)
+    util.yield(7000)
     util.toast("Done Yacht Crash v5")
     util.log("Done Yacht Crash v5")
     menu.trigger_commands("musclecrash" .. PLAYER.GET_PLAYER_NAME(player_id))
@@ -1998,6 +1995,7 @@ menu.action(crashes, "FewMod All In One", {"FewModLobbyCrash"}, "Uses Multiple C
     util.log("All Crashes Completed")
     menu.trigger_commands("anticrashcamera".. " off")
     menu.trigger_commands("clearworld")
+    menu.trigger_commands("deleteropes")
 end)
 
 menu.divider(crashes, "Lobby Math Crashes")
@@ -3074,72 +3072,8 @@ menu.divider(crashes, "Component Crashes")
                 end, nil, nil, COMMANDPERM_AGGRESSIVE)
 
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-menu.divider(crashes, "Fragment Crashes")
-
-menu.toggle_loop(crashes, "Fragment Crash V1", {"FragmentCrashv1"}, "Skidded From 2take1", function(on_toggle)
-                if player_id ~= players.user() then
-                        local object = entities.create_object(util.joaat("prop_fragtest_cnst_04"), ENTITY.GET_ENTITY_COORDS(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)))
-                        OBJECT.BREAK_OBJECT_FRAGMENT_CHILD(object, 1, false)
-                        entities.delete_by_handle(object)
-                        local object = entities.create_object(util.joaat("prop_fragtest_cnst_04"), ENTITY.GET_ENTITY_COORDS(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)))
-                        OBJECT.BREAK_OBJECT_FRAGMENT_CHILD(object, 1, false)
-                        entities.delete_by_handle(object)
-                        local object = entities.create_object(util.joaat("prop_fragtest_cnst_04"), ENTITY.GET_ENTITY_COORDS(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)))
-                        OBJECT.BREAK_OBJECT_FRAGMENT_CHILD(object, 1, false)
-                        entities.delete_by_handle(object)
-                        local object = entities.create_object(util.joaat("prop_fragtest_cnst_04"), ENTITY.GET_ENTITY_COORDS(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)))
-                        OBJECT.BREAK_OBJECT_FRAGMENT_CHILD(object, 1, false)
-                        entities.delete_by_handle(object)
-                        local object = entities.create_object(util.joaat("prop_fragtest_cnst_04"), ENTITY.GET_ENTITY_COORDS(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)))
-                        OBJECT.BREAK_OBJECT_FRAGMENT_CHILD(object, 1, false)
-                        entities.delete_by_handle(object)
-                        local object = entities.create_object(util.joaat("prop_fragtest_cnst_04"), ENTITY.GET_ENTITY_COORDS(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)))
-                        OBJECT.BREAK_OBJECT_FRAGMENT_CHILD(object, 1, false)
-                        entities.delete_by_handle(object)
-                        local object = entities.create_object(util.joaat("prop_fragtest_cnst_04"), ENTITY.GET_ENTITY_COORDS(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)))
-                        OBJECT.BREAK_OBJECT_FRAGMENT_CHILD(object, 1, false)
-                        entities.delete_by_handle(object)
-                        local object = entities.create_object(util.joaat("prop_fragtest_cnst_04"), ENTITY.GET_ENTITY_COORDS(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)))
-                        OBJECT.BREAK_OBJECT_FRAGMENT_CHILD(object, 1, false)
-                        entities.delete_by_handle(object)
-                        local object = entities.create_object(util.joaat("prop_fragtest_cnst_04"), ENTITY.GET_ENTITY_COORDS(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)))
-                        OBJECT.BREAK_OBJECT_FRAGMENT_CHILD(object, 1, false)
-                        entities.delete_by_handle(object)
-                        local object = entities.create_object(util.joaat("prop_fragtest_cnst_04"), ENTITY.GET_ENTITY_COORDS(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)))
-                        OBJECT.BREAK_OBJECT_FRAGMENT_CHILD(object, 1, false)
-                        util.yield(1000)
-                        entities.delete_by_handle(object)
-                    end
-                end)
-
-                menu.toggle_loop(crashes, "Fragment Crash V2", {"fragmentv2"}, "", function(on_toggle)
-                    if player_id ~= players.user() then
-                    local TargetPlayerPed = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)
-                    local TargetPlayerPos = ENTITY.GET_ENTITY_COORDS(TargetPlayerPed, true)
-                    local Object_pizza2 = entities.create_object(util.joaat("prop_fragtest_cnst_04"), ENTITY.GET_ENTITY_COORDS(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)))
-                        OBJECT.BREAK_OBJECT_FRAGMENT_CHILD(object, 1, false)
-                    local Object_pizza2 = entities.create_object(util.joaat("prop_fragtest_cnst_04"), ENTITY.GET_ENTITY_COORDS(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)))
-                        OBJECT.BREAK_OBJECT_FRAGMENT_CHILD(object, 1, false)
-                    local Object_pizza2 = entities.create_object(util.joaat("prop_fragtest_cnst_04"), ENTITY.GET_ENTITY_COORDS(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)))
-                        OBJECT.BREAK_OBJECT_FRAGMENT_CHILD(object, 1, false)
-                    local Object_pizza2 = entities.create_object(util.joaat("prop_fragtest_cnst_04"), ENTITY.GET_ENTITY_COORDS(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)))
-                        OBJECT.BREAK_OBJECT_FRAGMENT_CHILD(object, 1, false)
-                    for i = 0, 100 do 
-                        local TargetPlayerPos = ENTITY.GET_ENTITY_COORDS(TargetPlayerPed, true);
-                        ENTITY.SET_ENTITY_COORDS_NO_OFFSET(Object_pizza2, TargetPlayerPos.x, TargetPlayerPos.y, TargetPlayerPos.z, false, true, true)
-                        ENTITY.SET_ENTITY_COORDS_NO_OFFSET(Object_pizza2, TargetPlayerPos.x, TargetPlayerPos.y, TargetPlayerPos.z, false, true, true)
-                        ENTITY.SET_ENTITY_COORDS_NO_OFFSET(Object_pizza2, TargetPlayerPos.x, TargetPlayerPos.y, TargetPlayerPos.z, false, true, true)
-                        ENTITY.SET_ENTITY_COORDS_NO_OFFSET(Object_pizza2, TargetPlayerPos.x, TargetPlayerPos.y, TargetPlayerPos.z, false, true, true)
-                    util.yield(10)
-                    entities.delete_by_handle(Object_pizza2)
-                    entities.delete_by_handle(Object_pizza2)
-                    entities.delete_by_handle(Object_pizza2)
-                    entities.delete_by_handle(Object_pizza2)
-                    return
-                    end
-                end
-            end)
+	
+    menu.divider(crashes, "Other Crashes")
 
     menu.action(crashes, "Cars Crash", {"CarCrashv3"}, "", function(on_toggle)
         local hashes = {1492612435, 3517794615, 3889340782, 3253274834}
@@ -3178,8 +3112,6 @@ menu.toggle_loop(crashes, "Fragment Crash V1", {"FragmentCrashv1"}, "Skidded Fro
             entities.delete_by_handle(v)
         end
     end)
-	
-    menu.divider(crashes, "Other Crashes")
 
     menu.action(crashes, "Script Crash", {}, "", function(on_toggle)
         menu.trigger_commands("scripthost")
@@ -3200,93 +3132,41 @@ menu.toggle_loop(crashes, "Fragment Crash V1", {"FragmentCrashv1"}, "Skidded Fro
         end)
     end)
 
-    menu.action(modelc, "FragTest X10", {"FragTestCrashv3"}, "", function()
+    menu.action(modelc, "FragTest X15 W Twist", {"FragTestCrashv3"}, "Causes (XJ)", function()
         Fewd.BlockSyncs(player_id, function()
-            local object = entities.create_object(util.joaat("prop_fragtest_cnst_04"), ENTITY.GET_ENTITY_COORDS(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)))
+            numberofft = 15
+            local cord = ENTITY.GET_ENTITY_COORDS(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id))
+            for numberofft = 0, 15 do
+            local object = entities.create_object(3613262246, cord)
+            local object2 = entities.create_object(util.joaat("prop_fragtest_cnst_04"), cord)
             OBJECT.BREAK_OBJECT_FRAGMENT_CHILD(object, 1, false)
-            entities.delete_by_handle(object)
-            local object = entities.create_object(util.joaat("prop_fragtest_cnst_04"), ENTITY.GET_ENTITY_COORDS(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)))
-            OBJECT.BREAK_OBJECT_FRAGMENT_CHILD(object, 1, false)
-            entities.delete_by_handle(object)
-            local object = entities.create_object(util.joaat("prop_fragtest_cnst_04"), ENTITY.GET_ENTITY_COORDS(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)))
-            OBJECT.BREAK_OBJECT_FRAGMENT_CHILD(object, 1, false)
-            entities.delete_by_handle(object)
-            local object = entities.create_object(util.joaat("prop_fragtest_cnst_04"), ENTITY.GET_ENTITY_COORDS(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)))
-            OBJECT.BREAK_OBJECT_FRAGMENT_CHILD(object, 1, false)
-            entities.delete_by_handle(object)
-            local object = entities.create_object(util.joaat("prop_fragtest_cnst_04"), ENTITY.GET_ENTITY_COORDS(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)))
-            OBJECT.BREAK_OBJECT_FRAGMENT_CHILD(object, 1, false)
-            entities.delete_by_handle(object)
-            local object = entities.create_object(util.joaat("prop_fragtest_cnst_04"), ENTITY.GET_ENTITY_COORDS(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)))
-            OBJECT.BREAK_OBJECT_FRAGMENT_CHILD(object, 1, false)
-            entities.delete_by_handle(object)
-            local object = entities.create_object(util.joaat("prop_fragtest_cnst_04"), ENTITY.GET_ENTITY_COORDS(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)))
-            OBJECT.BREAK_OBJECT_FRAGMENT_CHILD(object, 1, false)
-            entities.delete_by_handle(object)
-            local object = entities.create_object(util.joaat("prop_fragtest_cnst_04"), ENTITY.GET_ENTITY_COORDS(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)))
-            OBJECT.BREAK_OBJECT_FRAGMENT_CHILD(object, 1, false)
-            entities.delete_by_handle(object)
-            local object = entities.create_object(util.joaat("prop_fragtest_cnst_04"), ENTITY.GET_ENTITY_COORDS(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)))
-            OBJECT.BREAK_OBJECT_FRAGMENT_CHILD(object, 1, false)
-            entities.delete_by_handle(object)
-            local object = entities.create_object(util.joaat("prop_fragtest_cnst_04"), ENTITY.GET_ENTITY_COORDS(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)))
-            OBJECT.BREAK_OBJECT_FRAGMENT_CHILD(object, 1, false)
+            end
             util.yield(1000)
             entities.delete_by_handle(object)
         end)
 
     end)
 	
-	    menu.action(modelc, "Jesus Crash v1", {"JesusCrashv1"}, "Skid from x-force", function()
+	menu.action(modelc, "Jesus Crash v1", {"JesusCrashv1"}, "Skid from x-force", function()
         local ped = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)
-                local pos = players.get_position(player_id)
-                local mdl = util.joaat("u_m_m_jesus_01")
-                local veh_mdl = util.joaat("oppressor")
-                request_model(veh_mdl)
+        local pos = players.get_position(player_id)
+        local mdl = util.joaat("u_m_m_jesus_01")
+        local veh_mdl = util.joaat("oppressor")
+        request_model(veh_mdl)
         request_model(mdl)
-                        for i = 1, 10 do
-                                if not players.exists(player_id) then
-                                        return
-                                end
-                                local veh = entities.create_vehicle(veh_mdl, pos, 0)
-                                local jesus = entities.create_ped(2, mdl, pos, 0)
-                                PED.SET_PED_INTO_VEHICLE(jesus, veh, -1)
-                                util.yield(100)
-                                TASK.TASK_VEHICLE_HELI_PROTECT(jesus, veh, ped, 10.0, 0, 10, 0, 0)
-                                util.yield(1000)
-                                entities.delete_by_handle(jesus)
-                                entities.delete_by_handle(veh)
-                        end
-                STREAMING.SET_MODEL_AS_NO_LONGER_NEEDED(mdl)
-                STREAMING.SET_MODEL_AS_NO_LONGER_NEEDED(veh_mdl)
-    end)
-    menu.action(modelc, "E1CrashEvent", {"E1CrashEvent"}, "Skid from x-force", function()
-        local int_min = -2147483647
-        local int_max = 2147483647
-            for i = 1, 15 do
-            util.trigger_script_event(1 << player_id, {-555356783, 3, 85952, 99999, 1142667203, 526822745, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0})
-            end
-            util.yield()
-            for i = 1, 15 do
-            util.trigger_script_event(1 << player_id, {-555356783, 3, 85952, 99999, 1142667203, 526822745, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0})
-            end
-            util.trigger_script_event(1 << player_id, {-555356783, 3, 85952, 99999, 1142667203, 526822745, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0})
-    end)
-    menu.action(modelc, "Event 2", {"E2Crash"}, "Skid from x-force", function()
-        local int_min = -2147483647
-        local int_max = 2147483647
-            for i = 1, 15 do
-            util.trigger_script_event(1 << player_id, {-555356783, 3, 420, 69, 1337, 88, 360, 666, 6969, 696969, math.random(int_min, int_max), math.random(int_min, int_max),
-            math.random(int_min, int_max), math.random(int_min, int_max), math.random(int_min, int_max), math.random(int_min, int_max),
-            math.random(int_min, int_max), player_id, math.random(int_min, int_max), math.random(int_min, int_max), math.random(int_min, int_max)})
-            util.trigger_script_event(1 << player_id, {-555356783, 3, 420, 69, 1337, 88, 360, 666, 6969, 696969})
-            end
-            util.yield()
-            for i = 1, 15 do
-            util.trigger_script_event(1 << player_id, {-555356783, 3, 420, 69, 1337, 88, 360, 666, 6969, 696969, player_id, math.random(int_min, int_max)})
-            util.trigger_script_event(1 << player_id, {-555356783, 3, 420, 69, 1337, 88, 360, 666, 6969, 696969})
-            end
-            util.trigger_script_event(1 << player_id, {-555356783, 3, 420, 69, 1337, 88, 360, 666, 6969, 696969})
+        for i = 1, 10 do
+            if not players.exists(player_id) then return end
+            local veh = entities.create_vehicle(veh_mdl, pos, 0)
+            local jesus = entities.create_ped(2, mdl, pos, 0)
+            PED.SET_PED_INTO_VEHICLE(jesus, veh, -1)
+            util.yield(100)
+            TASK.TASK_VEHICLE_HELI_PROTECT(jesus, veh, ped, 10.0, 0, 10, 0, 0)
+            util.yield(1000)
+            entities.delete_by_handle(jesus)
+            entities.delete_by_handle(veh)
+        end
+        STREAMING.SET_MODEL_AS_NO_LONGER_NEEDED(mdl)
+        STREAMING.SET_MODEL_AS_NO_LONGER_NEEDED(veh_mdl)
     end)
 
     local pclpid = {}
@@ -3294,8 +3174,8 @@ menu.toggle_loop(crashes, "Fragment Crash V1", {"FragmentCrashv1"}, "Skidded Fro
     menu.action(modelc, "XC Crash (Clones Crash)", {"XCCrash"}, "Clones the player causing (XC)", function()
         local p = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)
         local c = ENTITY.GET_ENTITY_COORDS(p)
-        for i = 1, 25 do
-            local pclone = entities.create_ped(26, ENTITY.GET_ENTITY_MODEL(p), c, 0)
+        for i = 1, 35 do
+            local pclone = entities.create_ped(36, ENTITY.GET_ENTITY_MODEL(p), c, 0)
             pclpid [#pclpid + 1] = pclone 
             PED.CLONE_PED_TO_TARGET(p, pclone)
         end
@@ -3322,7 +3202,7 @@ menu.toggle_loop(crashes, "Fragment Crash V1", {"FragmentCrashv1"}, "Skidded Fro
         end
     end, nil, nil, COMMANDPERM_AGGRESSIVE)
 
-    menu.action(modelc, "Big Chunxus Cwash'", {"BigChunxusCrash"}, "Skid from x-force (Big CHUNGUS)", function()
+    menu.action(modelc, "Big Chunxus Crash", {"BigChunxusCrash"}, "Skid from x-force (Big CHUNGUS)", function()
         menu.trigger_commands("anticrashcamera".. " on")
         local ped = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)
         local pos = ENTITY.GET_ENTITY_COORDS(ped, true)
@@ -3446,9 +3326,9 @@ menu.toggle_loop(crashes, "Fragment Crash V1", {"FragmentCrashv1"}, "Skidded Fro
         menu.trigger_commands("anticrashcamera".. " off")
     end)
 	
-    -- This is a Prisuhm crash fixed by idk who, edited by me
+    --This is a Prisuhm crash fixed by idk who
 	
-	    local krustykrab = menu.list(crashes, "Crusty Crab Crash", {"CrustyCrabCrash"}, "It's risky to spectate, beware: it works on 2T1 users")
+	local krustykrab = menu.list(crashes, "Crusty Crab Crash", {"CrustyCrabCrash"}, "It's risky to spectate, beware: it works on 2T1 users")
 
     local peds = 5
     menu.slider(krustykrab, "Number of spatulas", {}, "Send spatulas ah~", 1, 50, 1, 1, function(amount)
@@ -3507,7 +3387,7 @@ menu.toggle_loop(crashes, "Fragment Crash V1", {"FragmentCrashv1"}, "Skidded Fro
 
     local nmcrashes = menu.list(crashes, "Normal Model Crashes", {}, "")
 
-    menu.action(nmcrashes, "Yatchy V1", {"Yachtyv1"}, "Crash event (A1:EA0FF6AD) sending prop yacht.", function()
+    menu.action(nmcrashes, "Yatchy V1", {"Yachtyv1"}, "Event (A1:EA0FF6AD) sending prop yacht.", function()
         local user = PLAYER.GET_PLAYER_PED(players.user_ped())
         local model = util.joaat("h4_yacht_refproxy")
         local pos = players.get_position(player_id)
@@ -3533,7 +3413,7 @@ menu.toggle_loop(crashes, "Fragment Crash V1", {"FragmentCrashv1"}, "Skidded Fro
         menu.trigger_commands("anticrashcamera ".."off")
     end)
     
-    menu.action(nmcrashes, "Yatchy V2", {"Yachtyv2"}, "Crash event (A1:E8958704) sending prop yacht001.", function()
+    menu.action(nmcrashes, "Yatchy V2", {"Yachtyv2"}, "Event (A1:E8958704) sending prop yacht001.", function()
         local user = PLAYER.GET_PLAYER_PED(players.user_ped())
         local model = util.joaat("h4_yacht_refproxy001")
         local pos = players.get_position(player_id)
@@ -3559,7 +3439,7 @@ menu.toggle_loop(crashes, "Fragment Crash V1", {"FragmentCrashv1"}, "Skidded Fro
         menu.trigger_commands("anticrashcamera ".."off")
     end)
     
-    menu.action(nmcrashes, "Yatchy V3", {"YachtCv3"}, "Crash event (A1:1A7AEACE) sending prop yacht002.", function()
+    menu.action(nmcrashes, "Yatchy V3", {"YachtCv3"}, "Event (A1:1A7AEACE) sending prop yacht002.", function()
         local user = PLAYER.GET_PLAYER_PED(players.user_ped())
         local model = util.joaat("h4_yacht_refproxy002")
         local pos = players.get_position(player_id)
@@ -3585,7 +3465,7 @@ menu.toggle_loop(crashes, "Fragment Crash V1", {"FragmentCrashv1"}, "Skidded Fro
         menu.trigger_commands("anticrashcamera ".."off")
     end)
     
-    menu.action(nmcrashes, "Yatchy V4", {"Yachtyv4"}, "Crash event (A1:408D3AA0) sending prop apayacht.", function()
+    menu.action(nmcrashes, "Yatchy V4", {"Yachtyv4"}, "Event (A1:408D3AA0) sending prop apayacht.", function()
         local user = PLAYER.GET_PLAYER_PED(players.user_ped())
         local model = util.joaat("h4_mp_apa_yach")
         local pos = players.get_position(player_id)
@@ -3611,7 +3491,7 @@ menu.toggle_loop(crashes, "Fragment Crash V1", {"FragmentCrashv1"}, "Skidded Fro
         menu.trigger_commands("anticrashcamera ".."off")
     end)
     
-    menu.action(nmcrashes, "Yatchy V5", {"Yachtyv5"}, "Crash event (A1:B36122B5) sending prop yachtwin.", function()
+    menu.action(nmcrashes, "Yatchy V5", {"Yachtyv5"}, "Event (A1:B36122B5) sending prop yachtwin.", function()
         local user = PLAYER.GET_PLAYER_PED(players.user_ped())
         local model = util.joaat("h4_mp_apa_yacht_win")
         local pos = players.get_position(player_id)
@@ -3637,16 +3517,7 @@ menu.toggle_loop(crashes, "Fragment Crash V1", {"FragmentCrashv1"}, "Skidded Fro
         menu.trigger_commands("anticrashcamera ".."off")
     end)
 
-    menu.action(crashes, "2T1Crash", {"da2T1Crash"}, "", function()
-        Fewd.BlockSyncs(player_id, function()
-            local object = entities.create_object(util.joaat("prop_fragtest_cnst_04"), ENTITY.GET_ENTITY_COORDS(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)))
-            OBJECT.BREAK_OBJECT_FRAGMENT_CHILD(object, 1, false)
-            util.yield(1000)
-            entities.delete_by_handle(object)
-        end)
-    end)
-
-   menu.action(crashes, "Unblockable V4", {"YachtCrash"}, "It should be fixed, for now", function()
+    menu.action(nmcrashes, "Yatchy V6", {"YachtCrash"}, "Event (A0:335) \nIt should be fixed, for now", function()
         local mdl = util.joaat("apa_mp_apa_yacht")
         local user = players.user_ped()
         menu.trigger_commands("anticrashcamera ".."on")
@@ -3677,7 +3548,6 @@ menu.toggle_loop(crashes, "Fragment Crash V1", {"FragmentCrashv1"}, "Skidded Fro
         end)
         menu.trigger_commands("anticrashcamera ".."off")
     end)
-
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 	
 menu.divider(crashes, "Weed Crashes")
@@ -3736,29 +3606,6 @@ menu.divider(crashes, "Weed Crashes")
     end)
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-menu.divider(crashes, "Rope Crashes")
-
-    menu.action(crashes, "Rope Crash Silent", {"silentropecrash"}, "", function(on_loop)
-        PHYSICS.ROPE_LOAD_TEXTURES()
-        local hashes = {2132890591, 2727244247}
-        local pc = ENTITY.GET_ENTITY_COORDS(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id))
-        local veh = VEHICLE.CREATE_VEHICLE(hashes[i], pc.x + 5, pc.y, pc.z, 0, true, true, false)
-        Utillitruck3_pos = ENTITY.GET_ENTITY_COORDS(veh)
-        local ped = PED.CREATE_PED(26, hashes[2], pc.x, pc.y, pc.z + 1, 0, true, false)
-        NETWORK.NETWORK_REQUEST_CONTROL_OF_ENTITY(veh); NETWORK.NETWORK_REQUEST_CONTROL_OF_ENTITY(ped)
-        ENTITY.SET_ENTITY_INVINCIBLE(ped, true)
-        ENTITY.SET_ENTITY_VISIBLE(ped, false, 0)
-        ENTITY.SET_ENTITY_VISIBLE(veh, false, 0)
-        local rope = PHYSICS.ADD_ROPE(pc.x + 5, pc.y, pc.z, 0, 0, 0, 1, 1, 0.0000000000000000000000000000000000001, 1, 1, true, true, true, 1, true, 0)
-        local vehc = ENTITY.GET_ENTITY_COORDS(veh); local pedc = ENTITY.GET_ENTITY_COORDS(ped)
-        PHYSICS.ATTACH_ENTITIES_TO_ROPE(rope, veh, ped, vehc.x, vehc.y, vehc.z, pedc.x, pedc.y, pedc.z, 2, 0, 0, "Center", "Center")
-        util.yield(1000)
-        NETWORK.NETWORK_REQUEST_CONTROL_OF_ENTITY(veh); NETWORK.NETWORK_REQUEST_CONTROL_OF_ENTITY(ped)
-        entities.delete_by_handle(veh); entities.delete_by_handle(ped)
-        PHYSICS.DELETE_CHILD_ROPE(rope)
-        PHYSICS.ROPE_UNLOAD_TEXTURES()
-    end)
 	
 menu.divider(crashes, "Parachute Crashes")
 
@@ -3908,76 +3755,7 @@ menu.toggle_loop(crashes, "Para Crash V3", {"paracrashv3"}, "", function()
     ENTITY.SET_ENTITY_COORDS_NO_OFFSET(ped, pos.x, pos.y, pos.z, false, true, true)
 end)
 
-menu.divider(crashes, "Item Crashes")
-
-      menu.toggle(crashes, "All Scenario Crashes", {"togglescenariocrashes"}, "It's risky to spectate using this but your call", function(on_toggle)
-        if on_toggle then
-            util.yield()
-            menu.trigger_commands("anticrashcamera")
-            util.yield()
-            menu.trigger_commands("bongoguitarscrash" .. PLAYER.GET_PLAYER_NAME(player_id))
-            util.yield(200)
-            menu.trigger_commands("cigarscrash" .. PLAYER.GET_PLAYER_NAME(player_id))
-            util.yield(200)
-            menu.trigger_commands("spatularcrash" .. PLAYER.GET_PLAYER_NAME(player_id))
-            util.yield(200)
-            menu.trigger_commands("barbellcrash" .. PLAYER.GET_PLAYER_NAME(player_id))
-            util.yield(200)
-            menu.trigger_commands("hammercrash" .. PLAYER.GET_PLAYER_NAME(player_id))
-            util.yield(200)
-            menu.trigger_commands("fishingcrash" .. PLAYER.GET_PLAYER_NAME(player_id))
-            util.yield(200)
-            menu.trigger_commands("jackhammercrash" .. PLAYER.GET_PLAYER_NAME(player_id))
-            util.yield(200)
-            menu.trigger_commands("broomcrash" .. PLAYER.GET_PLAYER_NAME(player_id))
-            util.yield(200)
-            menu.trigger_commands("drunkcrash" .. PLAYER.GET_PLAYER_NAME(player_id))
-            util.yield(200)
-            menu.trigger_commands("trowelcrash" .. PLAYER.GET_PLAYER_NAME(player_id))
-            util.yield(200)
-            menu.trigger_commands("wincleancrash" .. PLAYER.GET_PLAYER_NAME(player_id))
-            util.yield(200)
-            menu.trigger_commands("torchcrash" .. PLAYER.GET_PLAYER_NAME(player_id))
-            util.yield(200)
-            menu.trigger_commands("coffeecrash" .. PLAYER.GET_PLAYER_NAME(player_id))
-            util.yield(200)
-        else
-            util.yield()
-            menu.trigger_commands("bongoguitarscrash" .. PLAYER.GET_PLAYER_NAME(player_id))
-            util.yield(200)
-            menu.trigger_commands("cigarscrash" .. PLAYER.GET_PLAYER_NAME(player_id))
-            util.yield(200)
-            menu.trigger_commands("spatularcrash" .. PLAYER.GET_PLAYER_NAME(player_id))
-            util.yield(200)
-            menu.trigger_commands("barbellcrash" .. PLAYER.GET_PLAYER_NAME(player_id))
-            util.yield(200)
-            menu.trigger_commands("hammercrash" .. PLAYER.GET_PLAYER_NAME(player_id))
-            util.yield(200)
-            menu.trigger_commands("fishingcrash" .. PLAYER.GET_PLAYER_NAME(player_id))
-            util.yield(200)
-            menu.trigger_commands("jackhammercrash" .. PLAYER.GET_PLAYER_NAME(player_id))
-            util.yield(200)
-            menu.trigger_commands("broomcrash" .. PLAYER.GET_PLAYER_NAME(player_id))
-            util.yield(200)
-            menu.trigger_commands("drunkcrash" .. PLAYER.GET_PLAYER_NAME(player_id))
-            util.yield(200)
-            menu.trigger_commands("trowelcrash" .. PLAYER.GET_PLAYER_NAME(player_id))
-            util.yield(200)
-            menu.trigger_commands("wincleancrash" .. PLAYER.GET_PLAYER_NAME(player_id))
-            util.yield(200)
-            menu.trigger_commands("torchcrash" .. PLAYER.GET_PLAYER_NAME(player_id))
-            util.yield(200)
-            menu.trigger_commands("coffeecrash" .. PLAYER.GET_PLAYER_NAME(player_id))
-            util.yield(200)
-            menu.trigger_commands("noentities")
-            util.yield(200)
-            menu.trigger_commands("noentities")
-            util.yield()
-            menu.trigger_commands("anticrashcamera")
-            end
-        end)
-
-        menu.divider(crashes, "_________________________________________")
+        menu.divider(crashes, "________________________________________")
 
         local ents = {}
         local thingy = false
@@ -5167,38 +4945,37 @@ menu.divider(kicks, "Base Kicks")
         end
     end)
 
+    ------------------------------------------------------------------------------------------------------------------
+
+    local rp = {
+        0x4D6514A3,
+        0x748F3A2A,
+        0x1A9736DA,
+        0x3D1B7A2F,
+        0x1A126315,
+        0xD937A5E9,
+        0x23DDE6DB,
+        0x991F8C36
+    }
+
+    --The Original Was By Addict Script But I Edited It To Make It Less Aids
+
     menu.toggle_loop(friendly, "Drop RP (Attach)", {"dropfigures"}, "", function()
         local ped = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)
         if ENTITY.DOES_ENTITY_EXIST(ped) then
             local coords = players.get_position(player_id)
             coords.z = coords.z + 1.5
-            local random_hash = 0x4D6514A3
-            local random_int = math.random(1, 8)
-            if random_int == 1 then
-                random_hash = 0x4D6514A3
-            elseif random_int == 2 then
-                random_hash = 0x748F3A2A
-            elseif random_int == 3 then
-                random_hash = 0x1A9736DA
-            elseif random_int == 4 then
-                random_hash = 0x3D1B7A2F
-            elseif random_int == 5 then
-                random_hash = 0x1A126315
-            elseif random_int == 6 then
-                random_hash = 0xD937A5E9
-            elseif random_int == 7 then
-                random_hash = 0x23DDE6DB
-            elseif random_int == 8 then
-                random_hash = 0x991F8C36
-            end
+            local random_hash = randomObjectFromTable(rp)
             STREAMING.REQUEST_MODEL(random_hash)
             if STREAMING.HAS_MODEL_LOADED(random_hash) == false then  
                 STREAMING.REQUEST_MODEL(random_hash)
             end
             OBJECT.CREATE_AMBIENT_PICKUP(-1009939663, coords.x, coords.y, coords.z, 0, 1, random_hash, false, true)
-            util.yield(1600)
+            util.yield(1580)
         end
     end)
+
+    ------------------------------------------------------------------------------------------------------------------
 
     menu.toggle_loop(friendly, "Give Casino Chips", {"dropchips"}, "Idk if its safe for the new DLC", function(toggle)
         local ped = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)
@@ -5214,239 +4991,102 @@ menu.divider(kicks, "Base Kicks")
         end
     end)
 
+    ------------------------------------------------------------------------------------------------------------------
+
+    local gunsnarmour = {
+        0x741C684A,
+        0x68605A36,
+        0x6C5B941A,
+        0xD3A39366,
+        0x550447A9,
+        0xF99E15D0,
+        0xF99E15D0,
+        0xA421A532,
+        0xF33C83B0,
+        0xDF711959,
+        0xB2B5325E,
+        0x85CAA9B1,
+        0xB2930A14,
+        0xFE2A352C,
+        0x693583AD,
+        0x1D9588D3,
+        0x3A4C2AD2,
+        0x4BFB42D1,
+        0x4D36C349,
+        0x2F36B434,
+        0x8F707C18,
+        0xA9355DCD,
+        0x96B412A3,
+        0x9299C95B,
+        0x5E0683A1,
+        0x2DD30479,
+        0x1CD604C7,
+        0x7C119D58,
+        0xF9AFB48F,
+        0x8967B4F3,
+        0x3B662889,
+        0x2E764125,
+        0xFD16169E,
+        0xCB13D282,
+        0xC69DE3FF,
+        0x278D8734,
+        0x295691A9,
+        0x81EE601E,
+        0x88EAACA7,
+        0x872DC888,
+        0x094AA1CF,
+        0xE33D8630,
+        0x80AB931C,
+        0x6E717A95,
+        0x1CD2CF66,
+        0x6773257D,
+        0x20796A82,
+        0x116FC4E6, 
+        0xE4BD2FC6,
+        0xDE58E0B3,
+        0x77F3F2DD,
+        0xC02CF125,
+        0x881AB0A8,
+        0x84837FD7,
+        0xF25A01B9,
+        0x815D66E8,
+        0xFA51ABF5,
+        0xC5B72713,
+        0x5307A4EC,
+        0x9CF13918,
+        0x0968339D,
+        0xBFEE6C3B,
+        0xEBF89D5F,
+        0x22B15640,
+        0x763F7121,
+        0xF92F486C,
+        0x602941D0,
+        0x31EA45C9,
+        0xBED46EC5,
+        0x079284A9,
+        0x624F7213,
+        0xC01EB678,
+        0x5C517D97,
+        0xBD4DE242,
+        0xE013E01C,
+        0x6E4E65C2
+    }
+
+    --The Original Was By Addict Script But I Edited It To Make It Less Aids
+
     menu.toggle_loop(friendly, "Drop Guns & Armor", {"dropguns"}, "", function()
         local coords = players.get_position(player_id)
         coords.z = coords.z + 1.5
-        local random_hash = 0x6E4E65C2
-        local random_int = math.random(1, 75)
-        if random_int == 1 then
-            random_hash = 0x741C684A
-            util.yield(200)
-        elseif random_int == 2 then
-            random_hash = 0x68605A36
-            util.yield(200)
-        elseif random_int == 3 then
-            random_hash = 0x6C5B941A
-            util.yield(200)
-        elseif random_int == 4 then
-            random_hash = 0xD3A39366
-            util.yield(200)
-        elseif random_int == 5 then
-            random_hash = 0x550447A9
-            util.yield(200)
-        elseif random_int == 6 then
-            random_hash = 0xF99E15D0
-            util.yield(200)
-        elseif random_int == 7 then
-            random_hash = 0xA421A532
-            util.yield(200)
-        elseif random_int == 8 then
-            random_hash = 0xF33C83B0
-            util.yield(200)
-        elseif random_int == 10 then
-            random_hash = 0xDF711959
-            util.yield(200)
-        elseif random_int == 11 then
-            random_hash = 0xB2B5325E
-            util.yield(200)
-        elseif random_int == 12 then
-            random_hash = 0x85CAA9B1
-            util.yield(200)
-        elseif random_int == 13 then
-            random_hash = 0xB2930A14
-            util.yield(200)
-        elseif random_int == 14 then
-            random_hash = 0xFE2A352C
-            util.yield(200)
-        elseif random_int == 15 then
-            random_hash = 0x693583AD
-            util.yield(200)
-        elseif random_int == 16 then
-            random_hash = 0x1D9588D3
-            util.yield(200)
-        elseif random_int == 17 then
-            random_hash = 0x3A4C2AD2
-            util.yield(200)
-        elseif random_int == 18 then
-            random_hash = 0x4BFB42D1
-            util.yield(200)
-        elseif random_int == 19 then
-            random_hash = 0x4D36C349
-            util.yield(200)
-        elseif random_int == 20 then
-            random_hash = 0x2F36B434
-            util.yield(200)
-        elseif random_int == 21 then
-            random_hash = 0x8F707C18
-            util.yield(200)
-        elseif random_int == 22 then
-            random_hash = 0xA9355DCD
-            util.yield(200)
-        elseif random_int == 23 then
-            random_hash = 0x96B412A3
-            util.yield(200)
-        elseif random_int == 24 then
-            random_hash = 0x9299C95B
-            util.yield(200)
-        elseif random_int == 25 then
-            random_hash = 0x5E0683A1
-            util.yield(200)
-        elseif random_int == 26 then
-            random_hash = 0x2DD30479
-            util.yield(200)
-        elseif random_int == 27 then
-            random_hash = 0x1CD604C7
-            util.yield(200)
-        elseif random_int == 28 then
-            random_hash = 0x7C119D58
-            util.yield(200)
-        elseif random_int == 29 then
-            random_hash = 0xF9AFB48F
-            util.yield(200)
-        elseif random_int == 30 then
-            random_hash = 0x8967B4F3
-            util.yield(200)
-        elseif random_int == 31 then
-            random_hash = 0x3B662889
-            util.yield(200)
-        elseif random_int == 32 then
-            random_hash = 0x2E764125
-            util.yield(200)
-        elseif random_int == 33 then
-            random_hash = 0xFD16169E
-            util.yield(200)
-        elseif random_int == 34 then
-            random_hash = 0xCB13D282
-            util.yield(200)
-        elseif random_int == 35 then
-            random_hash = 0xC69DE3FF
-            util.yield(200)
-        elseif random_int == 36 then
-            random_hash = 0x278D8734
-            util.yield(200)
-        elseif random_int == 37 then
-            random_hash = 0x295691A9
-            util.yield(200)
-        elseif random_int == 38 then
-            random_hash = 0x81EE601E
-            util.yield(200)
-        elseif random_int == 39 then
-            random_hash = 0x88EAACA7
-            util.yield(200)
-        elseif random_int == 40 then
-            random_hash = 0x872DC888
-            util.yield(200)
-        elseif random_int == 41 then
-            random_hash = 0x094AA1CF
-            util.yield(200)
-        elseif random_int == 42 then
-            random_hash = 0xE33D8630
-            util.yield(200)
-        elseif random_int == 43 then
-            random_hash = 0x80AB931C
-            util.yield(200)
-        elseif random_int == 44 then
-            random_hash = 0x6E717A95
-            util.yield(200)
-        elseif random_int == 45 then
-            random_hash = 0x1CD2CF66
-            util.yield(200)
-        elseif random_int == 46 then
-            random_hash = 0x6773257D
-            util.yield(200)
-        elseif random_int == 47 then
-            random_hash = 0x20796A82
-            util.yield(200)
-        elseif random_int == 48 then
-            random_hash = 0x116FC4E6
-            util.yield(200)
-        elseif random_int == 49 then
-            random_hash = 0xE4BD2FC6
-            util.yield(200)
-        elseif random_int == 50 then
-            random_hash = 0xDE58E0B3
-            util.yield(200)
-        elseif random_int == 51 then
-            random_hash = 0x77F3F2DD
-            util.yield(200)
-        elseif random_int == 52 then
-            random_hash = 0xC02CF125
-            util.yield(200)
-        elseif random_int == 53 then
-            random_hash = 0x881AB0A8
-            util.yield(200)
-        elseif random_int == 54 then
-            random_hash = 0x84837FD7
-            util.yield(200)
-        elseif random_int == 55 then
-            random_hash = 0xF25A01B9
-            util.yield(200)
-        elseif random_int == 56 then
-            random_hash = 0x815D66E8
-            util.yield(200)
-        elseif random_int == 57 then
-            random_hash = 0xFA51ABF5
-            util.yield(200)
-        elseif random_int == 58 then
-            random_hash = 0xC5B72713
-            util.yield(200)
-        elseif random_int == 59 then
-            random_hash = 0x5307A4EC
-            util.yield(200)
-        elseif random_int == 60 then
-            random_hash = 0x9CF13918
-            util.yield(200)
-        elseif random_int == 61 then
-            random_hash = 0x0968339D
-            util.yield(200)
-        elseif random_int == 62 then
-            random_hash = 0xBFEE6C3B
-            util.yield(200)
-        elseif random_int == 63 then
-            random_hash = 0xEBF89D5F
-            util.yield(200)
-        elseif random_int == 64 then
-            random_hash = 0x22B15640
-            util.yield(200)
-        elseif random_int == 65 then
-            random_hash = 0x763F7121
-            util.yield(200)
-        elseif random_int == 66 then
-            random_hash = 0xF92F486C
-            util.yield(200)
-        elseif random_int == 67 then
-            random_hash = 0x602941D0
-            util.yield(200)
-        elseif random_int == 68 then
-            random_hash = 0x31EA45C9
-            util.yield(200)
-        elseif random_int == 69 then
-            random_hash = 0xBED46EC5
-            util.yield(200)
-        elseif random_int == 70 then
-            random_hash = 0x079284A9
-            util.yield(200)
-        elseif random_int == 71 then
-            random_hash = 0x624F7213
-            util.yield(200)
-        elseif random_int == 72 then
-            random_hash = 0xC01EB678
-            util.yield(200)
-        elseif random_int == 73 then
-            random_hash = 0x5C517D97
-            util.yield(200)
-        elseif random_int == 74 then
-            random_hash = 0xBD4DE242
-            util.yield(200)
-        elseif random_int == 75 then
-            random_hash = 0xE013E01C
-        end
-        STREAMING.REQUEST_MODEL(random_hash)
+        local random_hash
+        random_hash = randomObjectFromTable(gunsnarmour)
         if STREAMING.HAS_MODEL_LOADED(random_hash) == true then  
             STREAMING.REQUEST_MODEL(random_hash)
         end
         OBJECT.CREATE_AMBIENT_PICKUP(random_hash, coords.x, coords.y, coords.z, 0, 1, random_hash, false, true)
+        util.yield(250)
     end)
+
+    ------------------------------------------------------------------------------------------------------------------
 
     menu.action(friendly, "Win Crimial Damange", {}, "always win the challenge", function()
         local fcartable = {}
@@ -7847,6 +7487,8 @@ end
     ------------------------------------------------------------------------------------------------------------------------------------------------------
     
     menu.divider(online, "Lobby Crashes")
+
+    -- Originally Just An Edit Of Some Parachute Crash
     
     menu.action(online, "Fewdy's Parachute Crash", {"FewModParachute"}, "It's Meh - Blocked By Good Menu's", function()
     
@@ -8241,6 +7883,8 @@ end
         entities.delete_by_handle(veh); entities.delete_by_handle(ped)
         PHYSICS.DELETE_CHILD_ROPE(rope)
         PHYSICS.ROPE_UNLOAD_TEXTURES()
+        util.yield(10000)
+        menu.trigger_commands("deleteropes")
     end)
     
     menu.action(online, "Crash Sesion V1", {}, "", function(on_loop)
@@ -18524,6 +18168,111 @@ menu.action(uwuself, "Stop all sounds", {"stopsounds"}, "", function()
 end)
 
 --------------------------------------------------------------------------------------------------------------------------------------------------------
+--Pos Spoofing Extension
+
+menu.divider(path, "Random Warping")
+
+menu.slider_float(path, "Random Radius", {"radius"}, "sets the radius the random position can be in", 0, 10000, 1000, 100, function (value)
+    radius = value / 100;
+end)
+
+menu.slider(path, "Randomm Interval (ms)", {"interval (ms)"}, "sets interval between warps", 0, 15000, 2000, 50, function (value)
+    interval = value
+end)
+
+--Taken From WiriScript
+function get_ground_z(pos)
+    local pGroundZ = memory.alloc(4)
+    MISC.GET_GROUND_Z_FOR_3D_COORD(pos.x, pos.y, pos.z, pGroundZ, false, true)
+    local groundz = memory.read_float(pGroundZ)
+    return groundz
+end
+
+function random_pos()
+    changed_pos.x = pos.x + math.random(-radius, radius)
+    changed_pos.y = pos.y + math.random(-radius, radius)
+    changed_pos.z += 50;
+    changed_pos.z = get_ground_z(changed_pos)
+end
+
+menu.toggle_loop(path, "Randomize Position", {"randwarp"}, "spoofs your position to a random place within a radius around your current position at the given interval", function ()
+
+    if pos then
+        random_pos();
+        menu.trigger_commands("spoofedposition " .. tostring(changed_pos.x) .. ", " .. tostring(changed_pos.y) .. ", " .. tostring(changed_pos.z))
+        util.yield(interval)
+    else
+        util.toast("Failed Lmao")
+    end
+end)
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------
+
+menu.divider(path, "Slight Offset")
+
+menu.toggle_loop(path, "Offset Position", {"offsetpos"}, "spoofs your position a slight offset from your actual ped when ADS'ing", function ()
+
+    if PED.GET_PED_CONFIG_FLAG(players.user_ped(), 78, false) then
+        changed_pos.x = pos.x + x_off
+        changed_pos.y = pos.y + y_off
+        changed_pos.z += 50;
+        changed_pos.z = get_ground_z(changed_pos)
+    elseif not aim_only then
+        changed_pos.x = pos.x + x_off
+        changed_pos.y = pos.y + y_off
+        changed_pos.z += 50;
+        changed_pos.z = get_ground_z(changed_pos)
+    else
+        changed_pos = pos
+    end
+    menu.trigger_commands("spoofedposition " .. tostring(changed_pos.x) .. ", " .. tostring(changed_pos.y) .. ", " .. tostring(changed_pos.z))
+
+end, function() menu.trigger_commands("spoofpos off") end)
+
+menu.toggle(path, "Only When Aiming", {},"only offset pos when aiming", function()
+    aim_only = not aim_only
+end)
+
+menu.slider_float(path, "X Offse", {}, "sets the x offset for offset position", -100, 100, 0, 5, function (value)
+    x_off = value / 100;
+end)
+
+menu.slider_float(path, "Y Offse", {}, "sets the y offset for offset position", -100, 100, 0, 5, function (value)
+    y_off = value / 100;
+end)
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------
+
+menu.divider(path, "Fake Lag")
+
+menu.toggle_loop(path, "Fake Lag", {"fakelag"}, "makes your position update only after every certain number of ms", function ()
+
+    if pos then
+        if not aim_only_fake_lag then
+            changed_pos = pos
+            menu.trigger_commands("spoofedposition " .. tostring(changed_pos.x) .. ", " .. tostring(changed_pos.y) .. ", " .. tostring(changed_pos.z))
+            util.yield(fakelag_ms)
+        elseif  aim_only_fake_lag and PED.GET_PED_CONFIG_FLAG(players.user_ped(), 78, false) then
+            changed_pos = pos
+            menu.trigger_commands("spoofedposition " .. tostring(changed_pos.x) .. ", " .. tostring(changed_pos.y) .. ", " .. tostring(changed_pos.z))
+            util.yield(fakelag_ms)
+        else
+            changed_pos = pos
+            menu.trigger_commands("spoofedposition " .. tostring(changed_pos.x) .. ", " .. tostring(changed_pos.y) .. ", " .. tostring(changed_pos.z))
+        end
+    end
+
+end, function() menu.trigger_commands("spoofpos off") end)
+
+menu.toggle(path, "Only When Aiming", {},"only fakelag when aiming", function()
+    aim_only_fake_lag  = not aim_only_fake_lag
+end)
+
+menu.slider(path, "Fakelag MS (ms)", {}, "sets interval between position updates", 0, 1000, 0, 5, function (value)
+    fakelag_ms = value
+end)
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------
 
 local resources_dir = filesystem.scripts_dir() .. '\\FewMod\\'.. '\\textures\\'
 local needletexture = filesystem.scripts_dir() .. '\\FewMod\\'.. '\\textures\\'.. '\\needle.png'
@@ -18568,8 +18317,6 @@ green = {
 if not filesystem.exists(resources_dir) then
     util.toast("You Are Missing The FewMod Folder & or Required Textures, Please Install It From Github Using The Hyperlink Found In Stand>Misc \nhttps://github.com/Fewdys/GTA5-FewMod-Lua")
     util.log("You Are Missing The FewMod Folder & or Required Textures, Please Install It From Github Using The Hyperlink Found In Stand>Misc \nhttps://github.com/Fewdys/GTA5-FewMod-Lua")
-    util.yield(300)
-    goto posextention
 elseif filesystem.exists(resources_dir) then
 
     if not filesystem.exists(needletexture) then
@@ -18760,118 +18507,8 @@ elseif filesystem.exists(resources_dir) then
     end)
 end
 
---------------------------------------------------------------------------------------------------------------------------------------------------------
---------------------------------------------------------------------------------------------------------------------------------------------------------
---------------------------------------------------------------------------------------------------------------------------------------------------------
-::posextention::
-
-menu.divider(path, "Random Warping")
-
-menu.slider_float(path, "Random Radius", {"radius"}, "sets the radius the random position can be in", 0, 10000, 1000, 100, function (value)
-    radius = value / 100;
-end)
-
-menu.slider(path, "Randomm Interval (ms)", {"interval (ms)"}, "sets interval between warps", 0, 15000, 2000, 50, function (value)
-    interval = value
-end)
-
--- stolen from wiri scirpt sorry your code is in this mess
-function get_ground_z(pos)
-    local pGroundZ = memory.alloc(4)
-    MISC.GET_GROUND_Z_FOR_3D_COORD(pos.x, pos.y, pos.z, pGroundZ, false, true)
-    local groundz = memory.read_float(pGroundZ)
-    return groundz
-end
-
-function random_pos()
-    changed_pos.x = pos.x + math.random(-radius, radius)
-    changed_pos.y = pos.y + math.random(-radius, radius)
-    changed_pos.z += 50;
-    changed_pos.z = get_ground_z(changed_pos)
-end
-
-menu.toggle_loop(path, "Randomize Position", {"randwarp"}, "spoofs your position to a random place within a radius around your current position at the given interval", function ()
-
-    if pos then
-        random_pos();
-        menu.trigger_commands("spoofedposition " .. tostring(changed_pos.x) .. ", " .. tostring(changed_pos.y) .. ", " .. tostring(changed_pos.z))
-        util.yield(interval)
-    else
-        util.toast("Failed Lmao")
-    end
-end)
-
---------------------------------------------------------------------------------------------------------------------------------------------------------
---------------------------------------------------------------------------------------------------------------------------------------------------------
---------------------------------------------------------------------------------------------------------------------------------------------------------
---------------------------------------------------------------------------------------------------------------------------------------------------------
-
-menu.divider(path, "Slight Offset")
-
-menu.toggle_loop(path, "Offset Position", {"offsetpos"}, "spoofs your position a slight offset from your actual ped when ADS'ing", function ()
-
-    if PED.GET_PED_CONFIG_FLAG(players.user_ped(), 78, false) then
-        changed_pos.x = pos.x + x_off
-        changed_pos.y = pos.y + y_off
-        changed_pos.z += 50;
-        changed_pos.z = get_ground_z(changed_pos)
-    elseif not aim_only then
-        changed_pos.x = pos.x + x_off
-        changed_pos.y = pos.y + y_off
-        changed_pos.z += 50;
-        changed_pos.z = get_ground_z(changed_pos)
-    else
-        changed_pos = pos
-    end
-    menu.trigger_commands("spoofedposition " .. tostring(changed_pos.x) .. ", " .. tostring(changed_pos.y) .. ", " .. tostring(changed_pos.z))
-
-end, function() menu.trigger_commands("spoofpos off") end)
-
-menu.toggle(path, "Only When Aiming", {},"only offset pos when aiming", function()
-    aim_only = not aim_only
-end)
-
-menu.slider_float(path, "X Offse", {}, "sets the x offset for offset position", -100, 100, 0, 5, function (value)
-    x_off = value / 100;
-end)
-
-menu.slider_float(path, "Y Offse", {}, "sets the y offset for offset position", -100, 100, 0, 5, function (value)
-    y_off = value / 100;
-end)
-
---------------------------------------------------------------------------------------------------------------------------------------------------------
---------------------------------------------------------------------------------------------------------------------------------------------------------
---------------------------------------------------------------------------------------------------------------------------------------------------------
---------------------------------------------------------------------------------------------------------------------------------------------------------
-
-menu.divider(path, "Fake Lag")
-
-menu.toggle_loop(path, "Fake Lag", {"fakelag"}, "makes your position update only after every certain number of ms", function ()
-
-    if pos then
-        if not aim_only_fake_lag then
-            changed_pos = pos
-            menu.trigger_commands("spoofedposition " .. tostring(changed_pos.x) .. ", " .. tostring(changed_pos.y) .. ", " .. tostring(changed_pos.z))
-            util.yield(fakelag_ms)
-        elseif  aim_only_fake_lag and PED.GET_PED_CONFIG_FLAG(players.user_ped(), 78, false) then
-            changed_pos = pos
-            menu.trigger_commands("spoofedposition " .. tostring(changed_pos.x) .. ", " .. tostring(changed_pos.y) .. ", " .. tostring(changed_pos.z))
-            util.yield(fakelag_ms)
-        else
-            changed_pos = pos
-            menu.trigger_commands("spoofedposition " .. tostring(changed_pos.x) .. ", " .. tostring(changed_pos.y) .. ", " .. tostring(changed_pos.z))
-        end
-    end
-
-end, function() menu.trigger_commands("spoofpos off") end)
-
-menu.toggle(path, "Only When Aiming", {},"only fakelag when aiming", function()
-    aim_only_fake_lag  = not aim_only_fake_lag
-end)
-
-menu.slider(path, "Fakelag MS (ms)", {}, "sets interval between position updates", 0, 1000, 0, 5, function (value)
-    fakelag_ms = value
-end)
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+--For Pos Spoofing Extension
 
 while true do
     pos = players.get_position(players.user())
@@ -18882,5 +18519,3 @@ while true do
 
     util.yield()
 end
-
--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
