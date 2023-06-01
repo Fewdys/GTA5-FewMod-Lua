@@ -3132,7 +3132,7 @@ menu.divider(crashes, "Component Crashes")
         end)
     end)
 
-    menu.action(modelc, "FragTest X15 W Twist", {"FragTestCrashv3"}, "Causes (XJ & XF)", function()
+    menu.action(modelc, "FragTest X15 With Twist", {"FragTestCrashv3"}, "Causes (XJ & XF)", function()
         Fewd.BlockSyncs(player_id, function()
             numberofft = 15
             local cord = ENTITY.GET_ENTITY_COORDS(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id))
@@ -3141,7 +3141,7 @@ menu.divider(crashes, "Component Crashes")
             local object2 = entities.create_object(util.joaat("prop_fragtest_cnst_04"), cord)
             OBJECT.BREAK_OBJECT_FRAGMENT_CHILD(object, 1, false)
             end
-            util.yield(1000)
+            util.yield(5000)
             menu.trigger_commands("clearworld")
         end)
 
