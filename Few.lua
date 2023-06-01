@@ -3885,29 +3885,29 @@ menu.action(crashes, "Outfit Crash", {"daoutfitcrashv1"}, "Event (XS) \nChanges 
     local player_ped = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)
     local FinalRenderedCamRot = CAM.GET_FINAL_RENDERED_CAM_ROT(2).z
     SpawnedPeds1 = {}
-    local ped_amount = math_random(3, 8) -- Picks number between 3 and 10
+    local ped_amount = math_random(1, 5) -- Picks number between 1 and 5
     for i = 1, ped_amount do
         local pedtype = 0
         local PlayerPedCoords = ENTITY.GET_ENTITY_COORDS(player_ped, true)
         local coords = PlayerPedCoords
-        local loc1, loc2, loc3, pedt = math_random(0, 15), math_random(0, 15), math_random(0, 15), math_random(0, 15)
+        local loc1, loc2, loc3, pedt = math_random(0, 25), math_random(0, 25), math_random(0, 25), math_random(0, 25)
         coords.x = coords.x
         coords.y = coords.y
         coords.z = coords.z
         if loc1 == 1 then
-            coords.x = coords.x - math_random(0, 15)
+            coords.x = coords.x - math_random(0, 25)
         else
-            coords.x = coords.x + math_random(0, 15)
+            coords.x = coords.x + math_random(0, 25)
         end
         if loc2 == 1 then
-            coords.y = coords.y - math_random(0, 15)
+            coords.y = coords.y - math_random(0, 25)
         else
-            coords.y = coords.y + math_random(0, 15)
+            coords.y = coords.y + math_random(0, 25)
         end
         if loc3 == 1 then
-            coords.z = coords.z - math_random(0, 15)
+            coords.z = coords.z - math_random(0, 25)
         else
-            coords.z = coords.z + math_random(0, 15)
+            coords.z = coords.z + math_random(0, 25)
         end
         if pedt == 1 then
             pedtype = 0
@@ -3915,28 +3915,28 @@ menu.action(crashes, "Outfit Crash", {"daoutfitcrashv1"}, "Event (XS) \nChanges 
             pedtype = 3
         end
         SpawnedPeds2 = {}
-        local ped_amount = math_random(3, 8)
+        local ped_amount = math_random(1, 5)
         for i = 1, ped_amount do
             local pedtype = 0
             local coords = PlayerPedCoords
-            local loc1, loc2, loc3, pedt = math_random(0, 15), math_random(0, 15), math_random(0, 15), math_random(0, 15)
+            local loc1, loc2, loc3, pedt = math_random(0, 25), math_random(0, 25), math_random(0, 25), math_random(0, 25)
             coords.x = coords.x
             coords.y = coords.y
             coords.z = coords.z
             if loc1 == 1 then
-                coords.x = coords.x - math_random(0, 15)
+                coords.x = coords.x - math_random(0, 25)
             else
-                coords.x = coords.x + math_random(0, 15)
+                coords.x = coords.x + math_random(0, 25)
             end
             if loc2 == 1 then
-                coords.y = coords.y - math_random(0, 15)
+                coords.y = coords.y - math_random(0, 25)
             else
-                coords.y = coords.y + math_random(0, 15)
+                coords.y = coords.y + math_random(0, 25)
             end
             if loc3 == 1 then
-                coords.z = coords.z - math_random(0, 15)
+                coords.z = coords.z - math_random(0, 25)
             else
-                coords.z = coords.z + math_random(0, 15)
+                coords.z = coords.z + math_random(0, 25)
             end
             if pedt == 1 then
                 pedtype = 0
@@ -3944,28 +3944,28 @@ menu.action(crashes, "Outfit Crash", {"daoutfitcrashv1"}, "Event (XS) \nChanges 
                 pedtype = 3
             end
             SpawnedPeds3 = {}
-            local ped_amount = math_random(3, 8)
+            local ped_amount = math_random(1, 5)
             for i = 1, ped_amount do
                 local pedtype = 0
                 local coords = PlayerPedCoords
-                local loc1, loc2, loc3, pedt = math_random(0, 15), math_random(0, 15), math_random(0, 15), math_random(0, 15)
+                local loc1, loc2, loc3, pedt = math_random(0, 25), math_random(0, 25), math_random(0, 25), math_random(0, 25)
                 coords.x = coords.x
                 coords.y = coords.y
                 coords.z = coords.z
                 if loc1 == 1 then
-                    coords.x = coords.x - math_random(0, 15)
+                    coords.x = coords.x - math_random(0, 25)
                 else
-                    coords.x = coords.x + math_random(0, 15)
+                    coords.x = coords.x + math_random(0, 25)
                 end
                 if loc2 == 1 then
-                    coords.y = coords.y - math_random(0, 15)
+                    coords.y = coords.y - math_random(0, 25)
                 else
-                    coords.y = coords.y + math_random(0, 15)
+                    coords.y = coords.y + math_random(0, 25)
                 end
                 if loc3 == 1 then
-                    coords.z = coords.z - math_random(0, 15)
+                    coords.z = coords.z - math_random(0, 25)
                 else
-                    coords.z = coords.z + math_random(0, 15)
+                    coords.z = coords.z + math_random(0, 25)
                 end
                 if pedt == 1 then
                     pedtype = 0
@@ -3986,7 +3986,7 @@ menu.action(crashes, "Outfit Crash", {"daoutfitcrashv1"}, "Event (XS) \nChanges 
         end
         util.yield(10)
         end
-        util.toast("Outfit Crash In Progress!\n" .. "\n" .. pedtype .. " Ped Types \n" .. "\n" .. ped_amount .. " Random Peds")
+        menu.trigger_commands("clearworld")
     end
 end, nil, nil, COMMANDPERM_AGGRESSIVE)
 
