@@ -3117,7 +3117,7 @@ menu.divider(crashes, "Component Crashes")
         menu.trigger_commands("scripthost")
         util.yield(25)
         menu.trigger_commands("givesh" .. players.get_name(player_id))
-        util.power_crash(player_id)
+        Fewd.power_crash(player_id)
     end)
 
     local modelc = menu.list(crashes, "Model Crashes", {}, "")
