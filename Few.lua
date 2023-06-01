@@ -3982,11 +3982,12 @@ menu.action(crashes, "Outfit Crash", {"daoutfitcrashv1"}, "Event (XS) \nChanges 
     for i = 1, ped_amount do
         PED.SET_PED_RANDOM_COMPONENT_VARIATION(player_ped, 0)
         PED.SET_PED_COMPONENT_VARIATION(player_ped, 3, 0, 1, 0)
-        util.yield(13500)
+        util.yield(8000)
         end
         util.yield(10)
         end
         menu.trigger_commands("clearworld")
+        util.restart_script()
     end
 end, nil, nil, COMMANDPERM_AGGRESSIVE)
 
