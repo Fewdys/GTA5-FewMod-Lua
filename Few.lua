@@ -3878,185 +3878,14 @@ end)
 
 --------------------------------------------------------------------------------------------------------------------------------
 
-menu.action(crashes, "Outfit crash v1", {"daoutfitcrashv1"}, "Changes freemode ped outfit variations and gives them homing launchers. Similar to a bro hug. Will have to turn off anticrashcamera yourself.", function(on)
-    menu.trigger_commands("anticrashcamera on")
-    local player_ped = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)
-    local old_coords = ENTITY.GET_ENTITY_COORDS(player_ped)
-for i=1,1  do
-    ENTITY.SET_ENTITY_COORDS_NO_OFFSET(player_ped, -1329.5868, -3041.565, 65.06483)
+menu.action(crashes, "Outfit Crash", {"daoutfitcrashv1"}, "Event (XS) \nChanges outfit variations. Lasts around 30 seconds.", function(on)
     local math_random = math.random
-    local joaat = util.joaat
-    util.yield(10)
-    local pedhash1 = util.joaat("MP_F_Freemode_01")
-    local pedhash2 = util.joaat("MP_F_Freemode_01")
-    local pedhash3 = util.joaat("mpfemale")
-    while not STREAMING.HAS_MODEL_LOADED(pedhash1, pedhash2, pedhash3) do
-        STREAMING.REQUEST_MODEL(pedhash1, pedhash2, pedhash3)
-        util.yield(10)
-    end
-    local FinalRenderedCamRot = CAM.GET_FINAL_RENDERED_CAM_ROT(2).z
-    SpawnedPeds1 = {}
-    local ped_amount = math_random(5, 12) -- Picks number between 5 and 12
-    for i = 1, ped_amount do
-        local pedtype = 0
-        local PlayerPedCoords = ENTITY.GET_ENTITY_COORDS(player_ped, true)
-        local coords = PlayerPedCoords
-        local loc1, loc2, loc3, pedt = math_random(0, 12), math_random(0, 12), math_random(0, 12), math_random(0, 12)
-        coords.x = coords.x
-        coords.y = coords.y
-        coords.z = coords.z
-        if loc1 == 1 then
-            coords.x = coords.x - math_random(0, 12)
-        else
-            coords.x = coords.x + math_random(0, 12)
-        end
-        if loc2 == 1 then
-            coords.y = coords.y - math_random(0, 12)
-        else
-            coords.y = coords.y + math_random(0, 12)
-        end
-        if loc3 == 1 then
-            coords.z = coords.z - math_random(0, 12)
-        else
-            coords.z = coords.z + math_random(0, 12)
-        end
-        if pedt == 1 then
-            pedtype = 0
-        else
-            pedtype = 3
-        end
-        SpawnedPeds2 = {}
-        local ped_amount = math_random(7, 10)
-        for i = 1, ped_amount do
-            local pedtype = 0
-            local coords = PlayerPedCoords
-            local loc1, loc2, loc3, pedt = math_random(0, 12), math_random(0, 12), math_random(0, 12), math_random(0, 12)
-            coords.x = coords.x
-            coords.y = coords.y
-            coords.z = coords.z
-            if loc1 == 1 then
-                coords.x = coords.x - math_random(0, 12)
-            else
-                coords.x = coords.x + math_random(0, 12)
-            end
-            if loc2 == 1 then
-                coords.y = coords.y - math_random(0, 12)
-            else
-                coords.y = coords.y + math_random(0, 12)
-            end
-            if loc3 == 1 then
-                coords.z = coords.z - math_random(0, 12)
-            else
-                coords.z = coords.z + math_random(0, 12)
-            end
-            if pedt == 1 then
-                pedtype = 0
-            else
-                pedtype = 3
-            end
-            SpawnedPeds3 = {}
-            local ped_amount = math_random(7, 10)
-            for i = 1, ped_amount do
-                local pedtype = 0
-                local coords = PlayerPedCoords
-                local loc1, loc2, loc3, pedt = math_random(0, 12), math_random(0, 12), math_random(0, 12), math_random(0, 12)
-                coords.x = coords.x
-                coords.y = coords.y
-                coords.z = coords.z
-                if loc1 == 1 then
-                    coords.x = coords.x - math_random(0, 12)
-                else
-                    coords.x = coords.x + math_random(0, 12)
-                end
-                if loc2 == 1 then
-                    coords.y = coords.y - math_random(0, 12)
-                else
-                    coords.y = coords.y + math_random(0, 12)
-                end
-                if loc3 == 1 then
-                    coords.z = coords.z - math_random(0, 12)
-                else
-                    coords.z = coords.z + math_random(0, 15)
-                end
-                if pedt == 1 then
-                    pedtype = 0
-                else
-                    pedtype = 3
-                end
-        SpawnedPeds1[i] = entities.create_ped(pedtype, pedhash1, coords, FinalRenderedCamRot)
-        SpawnedPeds2[i] = entities.create_ped(pedtype, pedhash2, coords, FinalRenderedCamRot)
-        SpawnedPeds3[i] = entities.create_ped(pedtype, pedhash3, coords, FinalRenderedCamRot)
-        ENTITY.ATTACH_ENTITY_TO_ENTITY(SpawnedPeds1[i], SpawnedPeds2[i], PlayerPedCoords, 0, 0, 0, 0, 0, 0, 0, 0, true, true, false, 0, true)
-        ENTITY.ATTACH_ENTITY_TO_ENTITY(SpawnedPeds2[i], SpawnedPeds3[i], PlayerPedCoords, 0, 0, 0, 0, 0, 0, 0, 0, true, true, false, 0, true)
-        ENTITY.SET_ENTITY_INVINCIBLE(SpawnedPeds1[i], true)
-        ENTITY.SET_ENTITY_AS_MISSION_ENTITY(SpawnedPeds1[i], true, true)
-        TASK.TASK_START_SCENARIO_IN_PLACE(SpawnedPeds1[i], "Walk_Facility", 0, false)
-        ENTITY.SET_ENTITY_INVINCIBLE(SpawnedPeds2[i], true)
-        ENTITY.SET_ENTITY_AS_MISSION_ENTITY(SpawnedPeds2[i], true, true)
-        TASK.TASK_START_SCENARIO_IN_PLACE(SpawnedPeds2[i], "Walk_Facility", 0, false)
-        ENTITY.SET_ENTITY_INVINCIBLE(SpawnedPeds3[i], true)
-        ENTITY.SET_ENTITY_AS_MISSION_ENTITY(SpawnedPeds3[i], true, true)
-        TASK.TASK_START_SCENARIO_IN_PLACE(SpawnedPeds3[i], "Walk_Facility", 0, false)
-        ENTITY.SET_ENTITY_VISIBLE(SpawnedPeds1[i], true)
-        ENTITY.SET_ENTITY_VISIBLE(SpawnedPeds2[i], true)
-        ENTITY.SET_ENTITY_VISIBLE(SpawnedPeds3[i], true)
-        MISC.SHOOT_SINGLE_BULLET_BETWEEN_COORDS(coords.x, coords.y, coords.z + 1, coords.x, coords.y, coords.z, 0, true, util.joaat("weapon_stungun"), players.user_ped(), false, true, 1.0)
-        util.yield(5)
-        local coords = ENTITY.GET_ENTITY_COORDS(ped1, true)
-        WEAPON.GIVE_WEAPON_TO_PED(SpawnedPeds1[i], util.joaat('WEAPON_HOMINGLAUNCHER'), 9999, true, true)
-        local obj
-        repeat
-            obj = WEAPON.GET_CURRENT_PED_WEAPON_ENTITY_INDEX(SpawnedPeds1[i], 0)
-        until obj ~= 0 or util.yield()
-        ENTITY.DETACH_ENTITY(obj, true, true) 
-        util.yield(1)
-        FIRE.ADD_EXPLOSION(coords.x, coords.y, coords.z, 0, 1.0, false, true, 0.0, false)
-        WEAPON.GIVE_WEAPON_TO_PED(SpawnedPeds2[i], util.joaat('WEAPON_HOMINGLAUNCHER'), 9999, true, true)
-        repeat
-            obj = WEAPON.GET_CURRENT_PED_WEAPON_ENTITY_INDEX(SpawnedPeds2[i], 0)
-        until obj ~= 0 or util.yield()
-        ENTITY.DETACH_ENTITY(obj, true, true) 
-        util.yield(1)
-        FIRE.ADD_EXPLOSION(coords.x, coords.y, coords.z, 0, 1.0, false, true, 0.0, false)
-        WEAPON.GIVE_WEAPON_TO_PED(SpawnedPeds3[i], util.joaat('WEAPON_HOMINGLAUNCHER'), 9999, true, true)
-        repeat
-            obj = WEAPON.GET_CURRENT_PED_WEAPON_ENTITY_INDEX(SpawnedPeds3[i], 0)
-        until obj ~= 0 or util.yield()
-        ENTITY.DETACH_ENTITY(obj, true, true) 
-        util.yield(1)
-        FIRE.ADD_EXPLOSION(coords.x, coords.y, coords.z, 0, 1.0, false, true, 0.0, false)
-    end
-    for i = 1, ped_amount do
-        PED.SET_PED_RANDOM_COMPONENT_VARIATION(player_ped, 0)
-        PED.SET_PED_COMPONENT_VARIATION(player_ped, 3, 0, 1, 0)
-        PED.SET_PED_RANDOM_COMPONENT_VARIATION(SpawnedPeds1[i], 0)
-        PED.SET_PED_COMPONENT_VARIATION(SpawnedPeds1[i], 3, 0, 1, 0)
-        PED.SET_PED_RANDOM_COMPONENT_VARIATION(SpawnedPeds2[i], 0)
-        PED.SET_PED_COMPONENT_VARIATION(SpawnedPeds2[i], 3, 0, 1, 0)
-        PED.SET_PED_RANDOM_COMPONENT_VARIATION(SpawnedPeds3[i], 0)
-        PED.SET_PED_COMPONENT_VARIATION(SpawnedPeds3[i], 3, 0, 1, 0)
-        util.yield(5000)
-        menu.trigger_commands("anticrashcamera ".."off")
-        end
-        util.yield(10)
-        end
-        menu.trigger_commands("clearworld")
-        end
-        ENTITY.SET_ENTITY_COORDS_NO_OFFSET(player_ped, old_coords.x, old_coords.y, old_coords.z)
-        util.toast("Outfit Crash In Progress!\n" .. "\n" .. pedtype .. " Ped Types \n" .. "\n" .. ped_amount .. " Random Peds")
-        menu.trigger_commands("anticrashcamera ".."off")
-    end
-end, nil, nil, COMMANDPERM_AGGRESSIVE)
-
-menu.action(crashes, "Outfit crash v2", {"daoutfitcrashv2"}, "Changes their outfit variations. Lasts around 30 seconds.", function(on)
-    local math_random = math.random
-    menu.trigger_commands("anticrashcamera")
     menu.trigger_commands("mpfemale")
     util.yield(10)
     local player_ped = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)
     local FinalRenderedCamRot = CAM.GET_FINAL_RENDERED_CAM_ROT(2).z
     SpawnedPeds1 = {}
-    local ped_amount = math_random(7, 10) -- Picks number between 7 and 10
+    local ped_amount = math_random(3, 8) -- Picks number between 3 and 10
     for i = 1, ped_amount do
         local pedtype = 0
         local PlayerPedCoords = ENTITY.GET_ENTITY_COORDS(player_ped, true)
@@ -4086,7 +3915,7 @@ menu.action(crashes, "Outfit crash v2", {"daoutfitcrashv2"}, "Changes their outf
             pedtype = 3
         end
         SpawnedPeds2 = {}
-        local ped_amount = math_random(7, 10)
+        local ped_amount = math_random(3, 8)
         for i = 1, ped_amount do
             local pedtype = 0
             local coords = PlayerPedCoords
@@ -4115,7 +3944,7 @@ menu.action(crashes, "Outfit crash v2", {"daoutfitcrashv2"}, "Changes their outf
                 pedtype = 3
             end
             SpawnedPeds3 = {}
-            local ped_amount = math_random(7, 10)
+            local ped_amount = math_random(3, 8)
             for i = 1, ped_amount do
                 local pedtype = 0
                 local coords = PlayerPedCoords
@@ -4153,130 +3982,11 @@ menu.action(crashes, "Outfit crash v2", {"daoutfitcrashv2"}, "Changes their outf
     for i = 1, ped_amount do
         PED.SET_PED_RANDOM_COMPONENT_VARIATION(player_ped, 0)
         PED.SET_PED_COMPONENT_VARIATION(player_ped, 3, 0, 1, 0)
-        util.yield(20000)
-        menu.trigger_commands("anticrashcamera ".."off")
+        util.yield(13500)
         end
         util.yield(10)
         end
         util.toast("Outfit Crash In Progress!\n" .. "\n" .. pedtype .. " Ped Types \n" .. "\n" .. ped_amount .. " Random Peds")
-        menu.trigger_commands("anticrashcamera ".."off")
-    end
-end, nil, nil, COMMANDPERM_AGGRESSIVE)
-
-
-menu.action(crashes, "Outfit crash v3", {"daoutfitcrashv3"}, "Changes your outfit variations. Lasts around 30 seconds.", function(on)
-    local math_random = math.random
-    menu.trigger_commands("anticrashcamera")
-    menu.trigger_commands("mpfemale")
-    util.yield(10)
-    local player_ped = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(players.user())
-    local FinalRenderedCamRot = CAM.GET_FINAL_RENDERED_CAM_ROT(2).z
-    SpawnedPeds1 = {}
-    local ped_amount = math_random(7, 10) -- Picks number between 7 and 10
-    for i = 1, ped_amount do
-        local pedtype = 0
-        local PlayerPedCoords = ENTITY.GET_ENTITY_COORDS(player_ped, true)
-        local coords = PlayerPedCoords
-        local loc1, loc2, loc3, pedt = math_random(0, 15), math_random(0, 15), math_random(0, 15), math_random(0, 15)
-        coords.x = coords.x
-        coords.y = coords.y
-        coords.z = coords.z
-        if loc1 == 1 then
-            coords.x = coords.x - math_random(0, 15)
-        else
-            coords.x = coords.x + math_random(0, 15)
-        end
-        if loc2 == 1 then
-            coords.y = coords.y - math_random(0, 15)
-        else
-            coords.y = coords.y + math_random(0, 15)
-        end
-        if loc3 == 1 then
-            coords.z = coords.z - math_random(0, 15)
-        else
-            coords.z = coords.z + math_random(0, 15)
-        end
-        if pedt == 1 then
-            pedtype = 0
-        else
-            pedtype = 3
-        end
-        SpawnedPeds2 = {}
-        local ped_amount = math_random(7, 10)
-        for i = 1, ped_amount do
-            local pedtype = 0
-            local coords = PlayerPedCoords
-            local loc1, loc2, loc3, pedt = math_random(0, 15), math_random(0, 15), math_random(0, 15), math_random(0, 15)
-            coords.x = coords.x
-            coords.y = coords.y
-            coords.z = coords.z
-            if loc1 == 1 then
-                coords.x = coords.x - math_random(0, 15)
-            else
-                coords.x = coords.x + math_random(0, 15)
-            end
-            if loc2 == 1 then
-                coords.y = coords.y - math_random(0, 15)
-            else
-                coords.y = coords.y + math_random(0, 15)
-            end
-            if loc3 == 1 then
-                coords.z = coords.z - math_random(0, 15)
-            else
-                coords.z = coords.z + math_random(0, 15)
-            end
-            if pedt == 1 then
-                pedtype = 0
-            else
-                pedtype = 3
-            end
-            SpawnedPeds3 = {}
-            local ped_amount = math_random(7, 10)
-            for i = 1, ped_amount do
-                local pedtype = 0
-                local coords = PlayerPedCoords
-                local loc1, loc2, loc3, pedt = math_random(0, 15), math_random(0, 15), math_random(0, 15), math_random(0, 15)
-                coords.x = coords.x
-                coords.y = coords.y
-                coords.z = coords.z
-                if loc1 == 1 then
-                    coords.x = coords.x - math_random(0, 15)
-                else
-                    coords.x = coords.x + math_random(0, 15)
-                end
-                if loc2 == 1 then
-                    coords.y = coords.y - math_random(0, 15)
-                else
-                    coords.y = coords.y + math_random(0, 15)
-                end
-                if loc3 == 1 then
-                    coords.z = coords.z - math_random(0, 15)
-                else
-                    coords.z = coords.z + math_random(0, 15)
-                end
-                if pedt == 1 then
-                    pedtype = 0
-                else
-                    pedtype = 3
-                end
-        ENTITY.SET_ENTITY_INVINCIBLE(player_ped, true)
-        ENTITY.SET_ENTITY_AS_MISSION_ENTITY(player_ped, true, true)
-        TASK.TASK_START_SCENARIO_IN_PLACE(player_ped, "Walk_Facility", 0, false)
-        ENTITY.SET_ENTITY_VISIBLE(player_ped, true)
-        MISC.SHOOT_SINGLE_BULLET_BETWEEN_COORDS(coords.x, coords.y, coords.z + 1, coords.x, coords.y, coords.z, 0, true, util.joaat("weapon_stungun"), players.user_ped(), false, true, 1.0)
-        util.yield(5)
-        --menu.trigger_commands("anticrashcamera off")
-    end
-    for i = 1, ped_amount do
-        PED.SET_PED_RANDOM_COMPONENT_VARIATION(player_ped, 0)
-        PED.SET_PED_COMPONENT_VARIATION(player_ped, 3, 0, 1, 0)
-        util.yield(20000)
-        menu.trigger_commands("anticrashcamera ".."off")
-        end
-        util.yield(10)
-        end
-        util.toast("Outfit Crash In Progress!\n" .. "\n" .. pedtype .. " Ped Types \n" .. "\n" .. ped_amount .. " Random Peds")
-        menu.trigger_commands("anticrashcamera ".."off")
     end
 end, nil, nil, COMMANDPERM_AGGRESSIVE)
 
