@@ -880,6 +880,10 @@ end)
         end
     end
 
+    menu.action(malicious, "Clean Up", {"cleanup"}, "Cleans Everything Up \nHere For Redundancy" function()
+        menu.trigger_commands("clearworld")
+    end)
+
     menu.toggle_loop(malicious, "Attach All Nearby Entities", {"attachallnearby"}, "Will Likely Get An Access Violation lol", function(on_toggle)
         local tar = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)
         objects = entities.get_all_objects_as_handles()
