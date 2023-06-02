@@ -8989,22 +8989,10 @@ menu.toggle_loop(uwuvehicle, "Bulletproof", {}, "", function(on)
     end
 end)
 
-infcms = false
-menu.toggle(vehicles, "Infinite Countermeasures", {"infinitecms"}, "It will give infinite countermeasures.", function(on)
-    infcms = on
-end)
-
 if player_cur_car ~= 0 then
     if everythingproof then
         ENTITY.SET_ENTITY_PROOFS(player_cur_car, true, true, true, true, true, true, true, true)
     end
-
-    if infcms then
-        if VEHICLE.GET_VEHICLE_COUNTERMEASURE_AMMO(player_cur_car) < 100 then
-            VEHICLE.SET_VEHICLE_COUNTERMEASURE_AMMO(player_cur_car, 100)
-        end
-    end
-
 end
 
 --------------------------------------------------------------------------------------------------------------------------------------------------------
