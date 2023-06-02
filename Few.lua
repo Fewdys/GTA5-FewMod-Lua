@@ -4186,8 +4186,8 @@ menu.toggle_loop(crashes, "Sync Crash v1", {"crashv77"}, "", function()
     MISC.SHOOT_SINGLE_BULLET_BETWEEN_COORDS(cord.x, cord.y, cord.z + 1, cord.x, cord.y, cord.z, 0, true, util.joaat("weapon_heavysniper_mk2"), players.user_ped(), false, true, 1.0)
     ENTITY.DETACH_ENTITY(object, object)
     entities.delete_by_handle(object)
-    menu.trigger_commands("superc 3")
-    menu.trigger_commands("superc 4")
+    menu.trigger_commands("clearworld")
+    menu.trigger_commands("clearworld")
 end)
 
 menu.toggle_loop(crashes, "Sync Crash v2", {"crashv78"}, "", function()
@@ -4209,8 +4209,8 @@ menu.toggle_loop(crashes, "Sync Crash v2", {"crashv78"}, "", function()
     MISC.SHOOT_SINGLE_BULLET_BETWEEN_COORDS(cord.x, cord.y, cord.z + 1, cord.x, cord.y, cord.z, 0, true, util.joaat("weapon_heavysniper_mk2"), players.user_ped(), false, true, 1.0)
     ENTITY.DETACH_ENTITY(object, object)
     entities.delete_by_handle(object)
-    menu.trigger_commands("superc 3")
-    menu.trigger_commands("superc 4")
+    menu.trigger_commands("clearworld")
+    menu.trigger_commands("clearworld")
 end)
 
 menu.toggle_loop(crashes, "Sync Crash v3", {"crashv79"}, "", function()
@@ -4248,8 +4248,8 @@ menu.toggle_loop(crashes, "Sync Crash v3", {"crashv79"}, "", function()
     MISC.SHOOT_SINGLE_BULLET_BETWEEN_COORDS(cord.x, cord.y, cord.z + 1, cord.x, cord.y, cord.z, 0, true, util.joaat("weapon_heavysniper_mk2"), players.user_ped(), false, true, 1.0)
     ENTITY.DETACH_ENTITY(object, object)
     entities.delete_by_handle(object)
-    menu.trigger_commands("superc 3")
-    menu.trigger_commands("superc 4")
+    menu.trigger_commands("clearworld")
+    menu.trigger_commands("clearworld")
 end)
 
 -------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -18297,7 +18297,6 @@ elseif filesystem.exists(resources_dir) then
                 if VEHICLE.IS_VEHICLE_IN_BURNOUT(vehicle) or math.abs(vecs.x) > 3 then 
                     directx.draw_texture(traction_control, 0.01, 0.01, 0.5, 0.5, lights_x_pos + 0.11, lights_y_pos, 0, orange)
                 end
-        
             end
             util.yield()
         end
