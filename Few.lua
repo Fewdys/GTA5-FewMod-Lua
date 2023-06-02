@@ -7,7 +7,7 @@ util.require_natives(1676318796)
 util.require_natives(1663599433)
 
 local response = false
-local localversion = 1.54
+local localversion = 1.55
 local localKs = false
 async_http.init("raw.githubusercontent.com", "/Fewdys/GTA5-FewMod-Lua/main/FewModVersion.lua", function(output)
     currentVer = tonumber(output)
@@ -1008,6 +1008,104 @@ end)
 
     menu.action(trolling, "Launch Vehicle", {"vehiclefly"}, "Sends players vehicle flying", function()
         send_player_vehicle_flying(player_id)
+    end)
+
+    menu.toggle_loop(trolling, "Windmills V2", {"togglemillsv1"}, "", function(on_toggle)
+        Fewd.BlockSyncs(player_id, function()
+                local object = entities.create_object(util.joaat("prop_windmill_01"), ENTITY.GET_ENTITY_COORDS(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)))
+                OBJECT.BREAK_OBJECT_FRAGMENT_CHILD(object, 1, true)
+                entities.delete_by_handle(object)
+                local object = entities.create_object(util.joaat("prop_windmill_01"), ENTITY.GET_ENTITY_COORDS(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)))
+                OBJECT.BREAK_OBJECT_FRAGMENT_CHILD(object, 1, true)
+                entities.delete_by_handle(object)
+                local object = entities.create_object(util.joaat("prop_windmill_01"), ENTITY.GET_ENTITY_COORDS(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)))
+                OBJECT.BREAK_OBJECT_FRAGMENT_CHILD(object, 1, true)
+                entities.delete_by_handle(object)
+                local object = entities.create_object(util.joaat("prop_windmill_01"), ENTITY.GET_ENTITY_COORDS(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)))
+                OBJECT.BREAK_OBJECT_FRAGMENT_CHILD(object, 1, true)
+                entities.delete_by_handle(object)
+                local object = entities.create_object(util.joaat("prop_windmill_01"), ENTITY.GET_ENTITY_COORDS(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)))
+                OBJECT.BREAK_OBJECT_FRAGMENT_CHILD(object, 1, true)
+                entities.delete_by_handle(object)
+                local object = entities.create_object(util.joaat("prop_windmill_01"), ENTITY.GET_ENTITY_COORDS(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)))
+                OBJECT.BREAK_OBJECT_FRAGMENT_CHILD(object, 1, true)
+                entities.delete_by_handle(object)
+                local object = entities.create_object(util.joaat("prop_windmill_01"), ENTITY.GET_ENTITY_COORDS(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)))
+                OBJECT.BREAK_OBJECT_FRAGMENT_CHILD(object, 1, true)
+                entities.delete_by_handle(object)
+                local object = entities.create_object(util.joaat("prop_windmill_01"), ENTITY.GET_ENTITY_COORDS(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)))
+                OBJECT.BREAK_OBJECT_FRAGMENT_CHILD(object, 1, true)
+                entities.delete_by_handle(object)
+                local object = entities.create_object(util.joaat("prop_windmill_01"), ENTITY.GET_ENTITY_COORDS(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)))
+                OBJECT.BREAK_OBJECT_FRAGMENT_CHILD(object, 1, true)
+                entities.delete_by_handle(object)
+                local object = entities.create_object(util.joaat("prop_windmill_01"), ENTITY.GET_ENTITY_COORDS(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)))
+                OBJECT.BREAK_OBJECT_FRAGMENT_CHILD(object, 1, true)
+                util.yield(1000)
+                entities.delete_by_handle(object)
+            end)
+        end)
+
+    menu.toggle_loop(trolling, "Attach Windmills", {"attachmills"}, "", function()
+        local id = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)
+        local playerpos = ENTITY.GET_ENTITY_COORDS(id)
+        playerpos.z = playerpos.z + 3
+        local khanjali = util.joaat("prop_windmill_01")
+        STREAMING.REQUEST_MODEL(khanjali)
+        while not STREAMING.HAS_MODEL_LOADED(khanjali) do
+            util.yield()
+        end
+        local vehicle1 = entities.create_object(khanjali, ENTITY.GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(PLAYER.GET_PLAYER_PED(player_id), 0, 2, 3), ENTITY.GET_ENTITY_HEADING(id))
+            ENTITY.ATTACH_ENTITY_TO_ENTITY(vehicle1, id, playerpos, 0, 0, 0, 0, 0, 0, 0, 0, true, true, false, 0, true)
+            ENTITY.SET_ENTITY_VISIBLE(vehicle1, true, 0)
+        local vehicle2 = entities.create_object(khanjali, playerpos, 0)
+            ENTITY.ATTACH_ENTITY_TO_ENTITY(vehicle1, id, playerpos, 0, 0, 0, 0, 0, 0, 0, 0, true, true, false, 0, true)
+            ENTITY.SET_ENTITY_VISIBLE(vehicle1, true, 0)
+        local vehicle3 = entities.create_object(khanjali, playerpos, 0)
+            ENTITY.ATTACH_ENTITY_TO_ENTITY(vehicle1, id, playerpos, 0, 0, 0, 0, 0, 0, 0, 0, true, true, false, 0, true)
+            ENTITY.SET_ENTITY_VISIBLE(vehicle1, true, 0)
+        local vehicle4 = entities.create_object(khanjali, playerpos, 0)
+            ENTITY.ATTACH_ENTITY_TO_ENTITY(vehicle1, id, playerpos, 0, 0, 0, 0, 0, 0, 0, 0, true, true, false, 0, true)
+            ENTITY.SET_ENTITY_VISIBLE(vehicle1, true, 0)
+        NETWORK.NETWORK_REQUEST_CONTROL_OF_ENTITY(vehicle1)
+        NETWORK.NETWORK_REQUEST_CONTROL_OF_ENTITY(vehicle2)
+        NETWORK.NETWORK_REQUEST_CONTROL_OF_ENTITY(vehicle3)
+        NETWORK.NETWORK_REQUEST_CONTROL_OF_ENTITY(vehicle4)
+        ENTITY.ATTACH_ENTITY_TO_ENTITY(vehicle2, vehicle1, 0, 0, 3, 0, 0, 0, -180, 0, false, true, false, 0, true)
+        ENTITY.ATTACH_ENTITY_TO_ENTITY(vehicle3, vehicle1, 0, 3, 3, 0, 0, 0, -180, 0, false, true, false, 0, true)
+        ENTITY.ATTACH_ENTITY_TO_ENTITY(vehicle4, vehicle1, 0, 3, 0, 0, 0, 0, 0, 0, false, true, false, 0, true)
+        ENTITY.SET_ENTITY_VISIBLE(vehicle1, true)
+        util.yield(10)
+    end)
+
+    menu.action(trolling, "Clear Windmill's", {"clearwindmills"}, "", function()
+        local count = 0
+        for k,ent in pairs(entities.get_all_objects_as_handles()) do
+            ENTITY.SET_ENTITY_AS_MISSION_ENTITY(ent, false, false)
+            entities.delete_by_handle(ent)
+            count = count + 1
+            util.yield()
+        end
+    end)
+
+    menu.toggle_loop(trolling, "Attach All Nearby Entities", {"attachallnearby"}, "", function(on_toggle)
+        local tar = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)
+        objects = entities.get_all_objects_as_handles()
+        vehicles = entities.get_all_vehicles_as_handles()
+        peds = entities.get_all_peds_as_handles()
+        for i, ent in pairs(peds) do
+            if not is_ped_player(ped) then
+                ENTITY.ATTACH_ENTITY_TO_ENTITY(ent, tar, 0, 0.0, -0.20, 2.00, 1.0, 1.0,1, true, true, true, false, 0, true)
+            end
+        end
+        for i, ent in pairs(vehicles) do
+            if not is_ped_player(VEHICLE.GET_PED_IN_VEHICLE_SEAT(ent, -1)) then
+                ENTITY.ATTACH_ENTITY_TO_ENTITY(ent, tar, 0, 0.0, -0.20, 2.00, 1.0, 1.0,1, true, true, true, false, 0, true)
+            end
+        end
+        for i, ent in pairs(objects) do
+            ENTITY.ATTACH_ENTITY_TO_ENTITY(ent, tar, 0, 0.0, -0.20, 2.00, 1.0, 1.0,1, true, true, true, false, 0, true)
+        end
     end)
 
     menu.action(trolling, "Cage Vehicle", {"cage"}, "", function()
@@ -3102,12 +3200,136 @@ menu.divider(crashes, "Component Crashes")
         end
     end)
 
+    local scrshs = menu.list(crashes, "Script Crashes", {}, "")
+
     menu.action(crashes, "Script Crash", {}, "", function(on_toggle)
         menu.trigger_commands("scripthost")
         util.yield(25)
         menu.trigger_commands("givesh" .. players.get_name(player_id))
         Fewd.power_crash(player_id)
     end)
+
+    menu.toggle_loop(scrash, "SE Crash (S0)", {"crashs0"}, "A very strong SE/SH crash.", function(on_toggle)
+        local int_min = -2147483647
+        local int_max = 2147483647
+        for i = 1, 15 do
+            util.trigger_script_event(1 << player_id, {879177392, 3, 7264839016258354765, 10597, 73295, 3274114858851387039, 4862623901289893625, 54483, math.random(int_min, int_max), math.random(int_min, int_max), 
+            math.random(int_min, int_max), math.random(int_min, int_max), math.random(int_min, int_max), math.random(int_min, int_max),
+            math.random(int_min, int_max), player_id, math.random(int_min, int_max), math.random(int_min, int_max), math.random(int_min, int_max)})
+            util.trigger_script_event(1 << player_id, {879177392, 3, 7264839016258354765, 10597, 73295, 3274114858851387039, 4862623901289893625, 54483})
+        end
+        menu.trigger_commands("givesh" .. players.get_name(player_id))
+        util.yield()
+        for i = 1, 15 do
+            util.trigger_script_event(1 << player_id, {879177392, 3, 7264839016258354765, 10597, 73295, 3274114858851387039, 4862623901289893625, 54483, player_id, math.random(int_min, int_max)})
+            util.trigger_script_event(1 << player_id, {879177392, 3, 7264839016258354765, 10597, 73295, 3274114858851387039, 4862623901289893625, 54483})
+            util.trigger_script_event(1 << player_id, {879177392, 3, 7264839016258354765, 10597, 73295, 3274114858851387039, 4862623901289893625, 54483})
+        end
+    end)
+
+    menu.toggle_loop(scrash, "SE Crash (S1)", {"crashs1"}, "A very strong SE/SH crash.", function(on_toggle)
+        local int_min = -2147483647
+        local int_max = 2147483647
+            for i = 1, 15 do
+                util.trigger_script_event(1 << player_id, {-904555865, 0, 2291045226935366863, 3941791475669737503, 4412177719075258724, 1343321191, 3457004567006375106, 7887301962187726958, -890968357, 415984063236915669, 1084786880, -452708595, 3922984074620229282, 1929770021948630845, 1437514114, 4913381462110453197, 2254569481770203512, 483555136, 743446330622376960, 2252773221044983930, 513716686466719435, 9003636501510659402, 627697547355134532, 1535056389, 436406710, 4096191743719688606, 4258288501459434149, math.random(int_min, int_max), math.random(int_min, int_max), 
+                math.random(int_min, int_max), math.random(int_min, int_max), math.random(int_min, int_max), math.random(int_min, int_max),
+                math.random(int_min, int_max), player_id, math.random(int_min, int_max), math.random(int_min, int_max), math.random(int_min, int_max)})
+                util.trigger_script_event(1 << player_id, {-904555865, 0, 2291045226935366863, 3941791475669737503, 4412177719075258724, 1343321191, 3457004567006375106, 7887301962187726958, -890968357, 415984063236915669, 1084786880, -452708595, 3922984074620229282, 1929770021948630845, 1437514114, 4913381462110453197, 2254569481770203512, 483555136, 743446330622376960, 2252773221044983930, 513716686466719435, 9003636501510659402, 627697547355134532, 1535056389, 436406710, 4096191743719688606, 4258288501459434149})
+            end
+            menu.trigger_commands("givesh" .. players.get_name(player_id))
+            util.yield()
+            for i = 1, 15 do
+                util.trigger_script_event(1 << player_id, {-904555865, 0, 2291045226935366863, 3941791475669737503, 4412177719075258724, 1343321191, 3457004567006375106, 7887301962187726958, -890968357, 415984063236915669, 1084786880, -452708595, 3922984074620229282, 1929770021948630845, 1437514114, 4913381462110453197, 2254569481770203512, 483555136, 743446330622376960, 2252773221044983930, 513716686466719435, 9003636501510659402, 627697547355134532, 1535056389, 436406710, 4096191743719688606, 4258288501459434149, player_id, math.random(int_min, int_max)})
+                util.trigger_script_event(1 << player_id, {-904555865, 0, 2291045226935366863, 3941791475669737503, 4412177719075258724, 1343321191, 3457004567006375106, 7887301962187726958, -890968357, 415984063236915669, 1084786880, -452708595, 3922984074620229282, 1929770021948630845, 1437514114, 4913381462110453197, 2254569481770203512, 483555136, 743446330622376960, 2252773221044983930, 513716686466719435, 9003636501510659402, 627697547355134532, 1535056389, 436406710, 4096191743719688606, 4258288501459434149})
+                util.trigger_script_event(1 << player_id, {-904555865, 0, 2291045226935366863, 3941791475669737503, 4412177719075258724, 1343321191, 3457004567006375106, 7887301962187726958, -890968357, 415984063236915669, 1084786880, -452708595, 3922984074620229282, 1929770021948630845, 1437514114, 4913381462110453197, 2254569481770203512, 483555136, 743446330622376960, 2252773221044983930, 513716686466719435, 9003636501510659402, 627697547355134532, 1535056389, 436406710, 4096191743719688606, 4258288501459434149})
+            end
+        end)
+
+        
+
+        menu.toggle_loop(scrash, "SE Crash (S3)", {"crashs3"}, "A very strong SE/SH crash.", function(on_toggle)
+            local int_min = -2147483647
+            local int_max = 2147483647
+            for i = 1, 15 do
+                util.trigger_script_event(1 << player_id, {-1990614866, 0, 0, math.random(int_min, int_max), math.random(int_min, int_max), 
+                math.random(int_min, int_max), math.random(int_min, int_max), math.random(int_min, int_max), math.random(int_min, int_max),
+                math.random(int_min, int_max), player_id, math.random(int_min, int_max), math.random(int_min, int_max), math.random(int_min, int_max)})
+                util.trigger_script_event(1 << player_id, {-1990614866, 0, 0})
+                end
+                menu.trigger_commands("givesh" .. players.get_name(player_id))
+                util.yield()
+            for i = 1, 15 do
+                util.trigger_script_event(1 << player_id, {-1990614866, 0, 0, player_id, math.random(int_min, int_max)})
+                util.trigger_script_event(1 << player_id, {-1990614866, 0, 0})
+                util.trigger_script_event(1 << player_id, {-1990614866, 0, 0})
+                end
+            end)  
+
+        menu.toggle_loop(scrash, "SE Crash (S4)", {"crashs4"}, "A very strong SE/SH crash.", function(on_toggle)
+            local int_min = -2147483647
+            local int_max = 2147483647
+            for i = 1, 15 do
+                util.trigger_script_event(1 << player_id, {697566862, 3, 10, 9, 1, 1, 1, math.random(int_min, int_max), math.random(int_min, int_max), 
+                math.random(int_min, int_max), math.random(int_min, int_max), math.random(int_min, int_max), math.random(int_min, int_max),
+                math.random(int_min, int_max), player_id, math.random(int_min, int_max), math.random(int_min, int_max), math.random(int_min, int_max)})
+                util.trigger_script_event(1 << player_id, {697566862, 3, 10, 9, 1, 1, 1})
+                end
+                menu.trigger_commands("givesh" .. players.get_name(player_id))
+                util.yield()
+            for i = 1, 15 do
+                util.trigger_script_event(1 << player_id, {697566862, 3, 10, 9, 1, 1, 1, player_id, math.random(int_min, int_max)})
+                util.trigger_script_event(1 << player_id, {697566862, 3, 10, 9, 1, 1, 1})
+                util.trigger_script_event(1 << player_id, {697566862, 3, 10, 9, 1, 1, 1})
+                end
+            end)      
+
+   menu.toggle_loop(scrash, "SE Crash (S7)", {"crashs7"}, "A very strong SE/SH crash.", function(on_toggle)
+        local int_min = -2147483647
+        local int_max = 2147483647
+        for i = 1, 15 do
+            util.trigger_script_event(1 << player_id, {548471420, 3, 804923209, 1128590390, 136699892, -168325547, -814593329, 1630974017, 1101362956, 1510529262, 2, 1875285955, 633832161, -1097780228, math.random(int_min, int_max), math.random(int_min, int_max), 
+            math.random(int_min, int_max), math.random(int_min, int_max), math.random(int_min, int_max), math.random(int_min, int_max),
+            math.random(int_min, int_max), player_id, math.random(int_min, int_max), math.random(int_min, int_max), math.random(int_min, int_max)})
+            util.trigger_script_event(1 << player_id, {548471420, 3, 804923209, 1128590390, 136699892, -168325547, -814593329, 1630974017, 1101362956, 1510529262, 2, 1875285955, 633832161, -1097780228})
+            end
+            menu.trigger_commands("givesh" .. players.get_name(player_id))
+            util.yield()
+        for i = 1, 15 do
+            util.trigger_script_event(1 << player_id, {548471420, 3, 804923209, 1128590390, 136699892, -168325547, -814593329, 1630974017, 1101362956, 1510529262, 2, 1875285955, 633832161, -1097780228, player_id, math.random(int_min, int_max)})
+            util.trigger_script_event(1 << player_id, {548471420, 3, 804923209, 1128590390, 136699892, -168325547, -814593329, 1630974017, 1101362956, 1510529262, 2, 1875285955, 633832161, -1097780228})
+            util.trigger_script_event(1 << player_id, {548471420, 3, 804923209, 1128590390, 136699892, -168325547, -814593329, 1630974017, 1101362956, 1510529262, 2, 1875285955, 633832161, -1097780228})
+            end
+        end)
+
+        menu.toggle_loop(scrash, "SUS Crash", {"togglesus"}, "This one is bound to hurt.", function(on_toggle)
+
+                local int_min = -2147483647
+                local int_max = 2147483647
+                    for i = 1, 15 do
+                        util.trigger_script_event(1 << player_id, {879177392, 3, 7264839016258354765, 10597, 73295, 3274114858851387039, 4862623901289893625, 54483, player_id, math.random(int_min, int_max), math.random(int_min, int_max), 
+                        math.random(int_min, int_max), math.random(int_min, int_max), math.random(int_min, int_max), math.random(int_min, int_max),
+                        math.random(int_min, int_max), player_id, math.random(int_min, int_max), math.random(int_min, int_max), math.random(int_min, int_max)})
+                        util.trigger_script_event(1 << player_id, {879177392, 3, 7264839016258354765, 10597, 73295, 3274114858851387039, 4862623901289893625, 54483})
+                        end
+                        util.yield()
+                    for i = 1, 15 do
+                        util.trigger_script_event(1 << player_id, {879177392, 3, 7264839016258354765, 10597, 73295, 3274114858851387039, 4862623901289893625, 54483, player_id, math.random(int_min, int_max)})
+                        util.trigger_script_event(1 << player_id, {879177392, 3, 7264839016258354765, 10597, 73295, 3274114858851387039, 4862623901289893625, 54483, math.random(int_min, int_max)})
+                        util.trigger_script_event(1 << player_id, {879177392, 3, 7264839016258354765, 10597, 73295, 3274114858851387039, 4862623901289893625, 54483, player_id, math.random(int_min, int_max)})
+                        util.trigger_script_event(1 << player_id, {879177392, 3, 7264839016258354765, 10597, 73295, 3274114858851387039, 4862623901289893625, 54483})
+                        util.trigger_script_event(1 << player_id, {548471420, 3, 804923209, 1128590390, 136699892, -168325547, -814593329, 1630974017, 1101362956, 1510529262, 2, 1875285955, 633832161, -1097780228})
+                        util.trigger_script_event(1 << player_id, {697566862, 3, 10, 9, 1, 1, 1})
+                        util.trigger_script_event(1 << player_id, {-1990614866, 0, 0})
+                        util.trigger_script_event(1 << player_id, {-904555865, 0, 2291045226935366863, 3941791475669737503, 4412177719075258724, 1343321191, 3457004567006375106, 7887301962187726958, -890968357, 415984063236915669, 1084786880, -452708595, 3922984074620229282, 1929770021948630845, 1437514114, 4913381462110453197, 2254569481770203512, 483555136, 743446330622376960, 2252773221044983930, 513716686466719435, 9003636501510659402, 627697547355134532, 1535056389, 436406710, 4096191743719688606, 4258288501459434149})
+                        end
+                        menu.trigger_commands("explode" .. players.get_name(player_id))
+                        util.yield(100)
+                        menu.trigger_commands("givesh" .. players.get_name(player_id))
+                        util.trigger_script_event(1 << player_id, {548471420, 3, 804923209, 1128590390, 136699892, -168325547, -814593329, 1630974017, 1101362956, 1510529262, 2, 1875285955, 633832161, -1097780228})
+                        util.trigger_script_event(1 << player_id, {697566862, 3, 10, 9, 1, 1, 1})
+                        util.trigger_script_event(1 << player_id, {-1990614866, 0, 0})
+                        util.trigger_script_event(1 << player_id, {-904555865, 0, 2291045226935366863, 3941791475669737503, 4412177719075258724, 1343321191, 3457004567006375106, 7887301962187726958, -890968357, 415984063236915669, 1084786880, -452708595, 3922984074620229282, 1929770021948630845, 1437514114, 4913381462110453197, 2254569481770203512, 483555136, 743446330622376960, 2252773221044983930, 513716686466719435, 9003636501510659402, 627697547355134532, 1535056389, 436406710, 4096191743719688606, 4258288501459434149})
+                    end)
 
     local modelc = menu.list(crashes, "Model Crashes", {}, "")
 
@@ -4457,6 +4679,32 @@ menu.divider(kicks, "Base Kicks")
 
     ------------------------------------------------------------------------------------------------------------------
 
+    local figures = {
+        0x4D6514A3,
+        0x748F3A2A,
+        0x1A9736DA,
+        0x3D1B7A2F,
+        0x1A126315,
+        0xD937A5E9,
+        0x23DDE6DB,
+        0x991F8C36
+    }
+
+    menu.toggle_loop(drops, "Drop All Figures Fast", {"figures"}, "", function()
+        local coords = players.get_position(player_id)
+        coords.z = coords.z + 1.5
+        local random_hash
+        random_hash = randomObjectFromTable(figures)
+        STREAMING.REQUEST_MODEL(random_hash)
+        if STREAMING.HAS_MODEL_LOADED(random_hash) == false then  
+            STREAMING.REQUEST_MODEL(random_hash)
+        end
+        OBJECT.CREATE_AMBIENT_PICKUP(-1009939663, coords.x, coords.y, coords.z, 0, 1, random_hash, false, true)
+        util.yield(50)
+    end)
+
+    ------------------------------------------------------------------------------------------------------------------
+
     local rp = {
         0x4D6514A3,
         0x748F3A2A,
@@ -4653,6 +4901,11 @@ menu.divider(kicks, "Base Kicks")
             util.toast(players.get_name(player_id).. " Must be in a vehicle")
         end
     end)
+
+    menu.action(tpthem, "Fix loading screen", {"fixme"}, "Try to fix player's infinite loading screen by giving him script host and teleporting to nearest apartment.", function()
+        menu.trigger_commands("givesh" .. players.get_name(player_id))
+        menu.trigger_commands("aptme" .. players.get_name(player_id))
+        end, nil, nil, COMMANDPERM_FRIENDLY)
 
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -11428,7 +11681,7 @@ end)
 --------------------------------------------------------------------------------------------------------------------------------
 -- Misc
 
-menu.hyperlink(misc, "Github Link For Manual Updating", "https://github.com/Fewdys/GTA5-FewMod-Lua")
+menu.hyperlink(misc, "Github Link", "https://github.com/Fewdys/GTA5-FewMod-Lua")
 
 menu.action(misc, "Alternative - Update FewMod", {}, "Grabs The Newest Version Of Script From \nLink: https://github.com/Fewdys/GTA5-FewMod-Lua", function()
     async_http.init('raw.githubusercontent.com','/Fewdys/GTA5-FewMod/main/Few.lua',function(a)
@@ -11449,7 +11702,11 @@ menu.action(misc, "Alternative - Update FewMod", {}, "Grabs The Newest Version O
     async_http.dispatch()
 end)
 
-menu.toggle_loop(misc, "Clear All Notifications", {"clearnotifs"}, "I recommend you use Console so you can see the log on screen when people try to crash you with this enabled.", function()
+menu.action(misc, "Clear All Notifications", {}, "", function()
+    menu.trigger_commands("clearnotifications")
+end)
+
+menu.toggle_loop(misc, "Clear All Notifications Loop", {"clearnotifs"}, "I recommend you use Console so you can see the log on screen when people try to crash you with this enabled.", function()
     Clear_Stand_Notifs = menu.ref_by_path("Stand>Clear Notifications")
     Clear_Minimap_Notifs = menu.ref_by_path("Game>Remove Notifications Above Minimap")
         menu.trigger_command(Clear_Stand_Notifs)
@@ -11474,8 +11731,29 @@ menu.toggle(misc, "Stand ID", {}, "It makes you invisible to other stand users, 
     end
 end)
 
-menu.action(misc, "Clear Notifications", {}, "", function()
-    menu.trigger_commands("clearnotifications")
+menu.toggle(misc, "Rejoin Failed Joins", {"rejoinfail"}, "Joins previously failed transitions, Joins previously failed sessions but if failed will join new public.", function(state)
+    local message_hash = HUD.GET_WARNING_SCREEN_MESSAGE_HASH()
+    local my_player_id = players.user_ped()
+    local playerstatus = {0, 1} -- This tells the player status, 0 for story mode and 1 for online mode.
+    local message_hashes = {15890625, -398982408, -587688989} 
+    if state then
+        if message_hash == message_hashes then
+            PAD.SET_CONTROL_VALUE_NEXT_FRAME(2, 201, 1.0)
+            util.yield(200)
+        end
+
+        if my_player_id == playerstatus then
+            NETWORK.NETWORK_JOIN_PREVIOUSLY_FAILED_TRANSITION(0, true)
+            NETWORK.NETWORK_JOIN_PREVIOUSLY_FAILED_SESSION(0, true)
+
+            wait_session_transition()
+            util.toast("Trying To Rejoin")
+            menu.trigger_commands("rejoin ")
+        else
+            util.toast("Failed To Join")
+            menu.trigger_commands("go newpublic")
+        end
+    end
 end)
 
 menu.action(misc, "Cage Self", {"cageself"}, "", function(cl)
@@ -11546,13 +11824,27 @@ menu.action(misc, "Skybase", {"skybase"}, "", function(cl)
     end
 end)
 
+island_block = 0
+menu.action(misc, "Sky Island", {""}, "", function(sky_island)
+    local c = {}
+    c.x = 0
+    c.y = 0
+    c.z = 500
+    PED.SET_PED_COORDS_KEEP_VEHICLE(players.user_ped(), c.x, c.y, c.z+5)
+    if island_block == 0 or not ENTITY.DOES_ENTITY_EXIST(island_block) then
+        request_model_load(1054678467)
+        island_block = entities.create_object(1054678467, c)
+    end
+    skybase[#skybase + 1] = island_block
+end)
+
 menu.action(misc, "TP To Skybase", {"tpskybase"}, "Please Only Spawn 1 \nThe Position Is A Fixed Position", function()
     menu.trigger_commands("doors on")
     menu.trigger_commands("nodeathbarriers on")
     ENTITY.SET_ENTITY_COORDS_NO_OFFSET(players.user_ped(), -236.19, -811.11, 348.60, false, false, false)
 end)
 
-menu.action(misc, "Delete Skybase", {"delskybase"}, "", function()
+menu.action(misc, "Delete Skybase/Island", {"delskybase"}, "", function()
     local entitycount = 0
     for i, object in ipairs(skybase) do
         ENTITY.SET_ENTITY_AS_MISSION_ENTITY(object, false, false)
