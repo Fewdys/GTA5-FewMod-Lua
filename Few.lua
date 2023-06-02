@@ -7,7 +7,7 @@ util.require_natives(1676318796)
 util.require_natives(1663599433)
 
 local response = false
-local localversion = 1.57
+local localversion = 1.58
 local localKs = false
 async_http.init("raw.githubusercontent.com", "/Fewdys/GTA5-FewMod-Lua/main/FewModVersion.lua", function(output)
     currentVer = tonumber(output)
@@ -73,22 +73,17 @@ local bookmarksForBlips = {}
 local defaultColor = 5
 local defaultSprite = 1
 local defaulScale = 7.000000
-local defaultBookmark = "default_library"
 
 local spawned_objects = {}
 local ladder_objects = {}
-local remove_projectiles = false
 local int_min = -2147483647
 local int_max = 2147483647
 local skybase = {}
-local ladder_objects = {}
 
 local wallbr = util.joaat("bkr_prop_biker_bblock_mdm3")
 local floorbr = util.joaat("bkr_prop_biker_landing_zone_01")
-local launch_vehicle = {"Throw Up", "Throw Go Ahead", "Throw Back", "Throw Down", "Catapul"}
 local invites = {"Yacht", "Office", "Clubhouse", "Office Garage", "Custom Auto Shop", "Apartment"}
 local style_names = {"Normal", "Semi-Rushed", "Reverse", "Ignore Lights", "Avoid Traffic", "Avoid Traffic Extremely", "Sometimes Overtake Traffic"}
-local drivingStyles = {786603, 1074528293, 8388614, 1076, 2883621, 786468, 262144, 786469, 512, 5, 6}
 local interior_stuff = {0, 233985, 169473, 169729, 169985, 170241, 177665, 177409, 185089, 184833, 184577, 163585, 167425, 167169}
 
 util.toast("Welcome " .. SOCIALCLUB.SC_ACCOUNT_INFO_GET_NICKNAME())
@@ -96,7 +91,7 @@ util.toast("Welcome " .. SOCIALCLUB.SC_ACCOUNT_INFO_GET_NICKNAME())
 util.toast("Loading FewMod...")
 util.log("Loading FewMod...")
 menu.trigger_commands("allguns")
-util.yield(2100)
+util.yield(2150)
 
 -- Memory Functions
 
@@ -236,38 +231,6 @@ Fewd = {
             end
             util.yield()
         end
-    end,
-
-    cwash_in_progwess = function()
-        kitty_alpha = 0
-        kitty_alpha_incr = 0.01
-        kitty_alpha_thread = util.create_thread(function (thr)
-            while true do
-                kitty_alpha = kitty_alpha + kitty_alpha_incr
-                if kitty_alpha > 1 then
-                    kitty_alpha = 1
-                elseif kitty_alpha < 0 then 
-                    kitty_alpha = 0
-                    util.stop_thread()
-                end
-                util.yield(5)
-            end
-        end)
-
-        kitty_thread = util.create_thread(function (thr)
-            starttime = os.clock()
-            local alpha = 0
-            while true do
-                timepassed = os.clock() - starttime
-                if timepassed > 3 then
-                    kitty_alpha_incr = -0.01
-                end
-                if kitty_alpha == 0 then
-                    util.stop_thread()
-                end
-                util.yield(5)
-            end
-        end)
     end,
 
     modded_vehicles = {
@@ -460,19 +423,6 @@ Fewd = {
         end
     end,
 
-    disableProjectileLoop = function(projectile) --This Was Taken From Ryze
-        util.create_thread(function()
-            util.create_tick_handler(function()
-                WEAPON.REMOVE_ALL_PROJECTILES_OF_TYPE(projectile, false)
-                return remove_projectiles
-            end)
-        end)
-    end,
-
-    yieldModelLoad = function(hash)
-        while not STREAMING.HAS_MODEL_LOADED(hash) do util.yield() end
-    end,
-
     get_control_request = function(ent)
         if not NETWORK.NETWORK_HAS_CONTROL_OF_ENTITY(ent) then
             NETWORK.NETWORK_REQUEST_CONTROL_OF_ENTITY(ent)
@@ -549,101 +499,6 @@ Fewd = {
     STAT_GET_INT = function(Stat)
         STATS.STAT_GET_INT(util.joaat(util.getMPX() .. Stat), util.Int_PTR, -1)
         return memory.read_int(util.Int_PTR)
-    end,
-
-    getNightclubDailyEarnings = function()
-        local popularity = math.floor(util.STAT_GET_INT("CLUB_POPULARITY") / 10)
-        if popularity > 90 then return 10000
-        elseif popularity > 85 then return 9000
-        elseif popularity > 80 then return 8000
-        elseif popularity > 75 then return 7000
-        elseif popularity > 70 then return 6000
-        elseif popularity > 65 then return 5500
-        elseif popularity > 60 then return 5000
-        elseif popularity > 55 then return 4500
-        elseif popularity > 50 then return 4000
-        elseif popularity > 45 then return 3500
-        elseif popularity > 40 then return 3000
-        elseif popularity > 35 then return 2500
-        elseif popularity > 30 then return 2000
-        elseif popularity > 25 then return 1500
-        elseif popularity > 20 then return 1000
-        elseif popularity > 15 then return 750
-        elseif popularity > 10 then return 500
-        elseif popularity > 5 then return 250
-        else return 100
-        end
-    end,
-
-    playerIsTargetingEntity = function(playerPed)
-        local playerList = players.list(true, true, true)
-        for k, playerPid in pairs(playerList) do
-            if PLAYER.IS_PLAYER_TARGETTING_ENTITY(playerPid, playerPed) or PLAYER.IS_PLAYER_FREE_AIMING_AT_ENTITY  (playerPid, playerPed) then 
-                if not isWhitelisted(playerPid) then
-                    karma[playerPed] = {
-                        player_id = playerPid, 
-                        ped = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(playerPid)
-                    }
-                    return true 
-                end
-            end
-        end
-        karma[playerPed] = nil
-        return false 
-    end,
-
-    explodePlayer = function(ped, loop)
-        local pos = ENTITY.GET_ENTITY_COORDS(ped)
-        local blamedPlayer = PLAYER.PLAYER_PED_ID() 
-        if blameExpPlayer and blameExp then 
-            blamedPlayer = PLAYER.GET_PLAYER_PED(blameExpPlayer)
-        elseif blameExp then
-            local playerList = players.list(true, true, true)
-            blamedPlayer = PLAYER.GET_PLAYER_PED(math.random(0, #playerList))
-        end
-        if not loop and PED.IS_PED_IN_ANY_VEHICLE(ped, true) then
-            for i = 0, 50, 1 do --50 explosions to account for armored vehicles
-                if ownExp or blameExp then 
-                    owned_explosion(blamedPlayer, pos)
-                else
-                    explosion(pos)
-                end
-                util.yield(10)
-            end
-        elseif ownExp or blameExp then
-            owned_explosion(blamedPlayer, pos)
-        else
-            explosion(pos)
-        end
-        util.yield(10)
-    end,
-
-    get_coords = function(entity)
-        entity = entity or PLAYER.PLAYER_PED_ID()
-        return ENTITY.GET_ENTITY_COORDS(entity, true)
-    end,
-
-    play_all = function(sound, sound_group, wait_for)
-        for i=0, 31, 1 do
-            AUDIO.PLAY_SOUND_FROM_ENTITY(-1, sound, PLAYER.GET_PLAYER_PED(i), sound_group, true, 20)
-        end
-        util.yield(wait_for)
-    end,
-
-    explode_all = function(earrape_type, wait_for)
-        for i=0, 31, 1 do
-            coords = util.get_coords(PLAYER.GET_PLAYER_PED(i))
-            FIRE.ADD_EXPLOSION(coords.x, coords.y, coords.z, 0, 100, true, false, 150, false)
-            if earrape_type == EARRAPE_BED then
-                AUDIO.PLAY_SOUND_FROM_COORD(-1, "Bed", coords.x, coords.y, coords.z, "WastedSounds", true, 999999999, true)
-            end
-            if earrape_type == EARRAPE_FLASH then
-                AUDIO.PLAY_SOUND_FROM_COORD(-1, "MP_Flash", coords.x, coords.y, coords.z, "WastedSounds", true, 999999999, true)
-                AUDIO.PLAY_SOUND_FROM_COORD(-1, "MP_Flash", coords.x, coords.y, coords.z, "WastedSounds", true, 999999999, true)
-                AUDIO.PLAY_SOUND_FROM_COORD(-1, "MP_Flash", coords.x, coords.y, coords.z, "WastedSounds", true, 999999999, true)
-            end
-        end
-        util.yield(wait_for)
     end,
 
     kicks = {
@@ -799,6 +654,97 @@ function randomObjectFromTable(t)
     return t[math.random(1, #t)]
 end
 
+function RequestControl(entity)
+    local tick = 0
+    while not NETWORK.NETWORK_HAS_CONTROL_OF_ENTITY(entity) and tick < 100000 do
+        util.yield()
+        NETWORK.NETWORK_REQUEST_CONTROL_OF_ENTITY(entity)
+        tick = tick + 1
+    end
+end
+
+function is_ped_player(ped)
+    if PED.GET_PED_TYPE(ped) >= 4 then
+        return false
+    else
+        return true
+    end
+end
+
+local function load_weapon_asset(hash)
+    while not WEAPON.HAS_WEAPON_ASSET_LOADED(hash) do
+        WEAPON.REQUEST_WEAPON_ASSET(hash)
+        util.yield(50)
+    end
+end
+
+local function passive_mode_kill(player_id)
+    local ped = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)
+    local hash = 0x787F0BB
+
+    local audible = true
+    local visible = true
+
+    request_model(hash)
+    load_weapon_asset(hash)
+    
+    for i = 0, 50 do
+        if PLAYER.IS_PLAYER_DEAD(player_id) then
+            util.toast("Successfully Killed " .. players.get_name(player_id))
+            return
+        end
+
+        local coords = ENTITY.GET_ENTITY_COORDS(ped)
+        MISC.SHOOT_SINGLE_BULLET_BETWEEN_COORDS(coords.x, coords.y, coords.z, coords.x, coords.y, coords.z - 2, 100, 0, hash, 0, audible, not visible, 2500)
+    end
+
+    util.toast("Could Not Kill " .. players.get_name(player_id) .. ". \nPlayer Either Can't Be Ragdolled Or Is In GodMode")
+end
+
+local function send_player_vehicle_flying(player_id)
+    local ped = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)
+    local vehicle = PED.GET_VEHICLE_PED_IS_IN(ped, false)
+
+    if vehicle == 0 then
+        return
+    end
+
+    NETWORK.NETWORK_REQUEST_CONTROL_OF_ENTITY(vehicle)
+    ENTITY.APPLY_FORCE_TO_ENTITY_CENTER_OF_MASS(vehicle, 1, 0, 100, 40, true, true, true, true)
+end
+
+function EatMyShorts(player_id)
+    for i, v in pairs(useforce) do
+        request_stream_of_entity(v, 1)
+    end
+    for i = 1, 2 do
+        local coords = player_coords(player_id)
+        coords.x = coords.x
+        coords.y = coords.y + -30
+        coords.z = coords.z
+        vehicle1 = entities.create_vehicle(184361638, coords, 0.0)
+        object = entities.create_object(1890640474, coords, 0.0)
+        ENTITY.SET_ENTITY_AS_MISSION_ENTITY(vehicle1, true, true)
+        ENTITY.SET_ENTITY_AS_MISSION_ENTITY(object, true, true)
+        ENTITY.SET_ENTITY_VISIBLE(vehicle1, true, 0)
+        ENTITY.SET_ENTITY_VISIBLE(object, true, 0)
+        ENTITY.SET_ENTITY_VELOCITY(vehicle1, 5, 3, 3)
+        ENTITY.SET_ENTITY_VELOCITY(object, 3, 4, 5)
+        ENTITY.SET_ENTITY_ROTATION(object, math.random(0, 360), math.random(0, 360), math.random(0, 360), 0, true)
+        for i = 1, 3 do
+            ENTITY.ATTACH_ENTITY_TO_ENTITY(vehicle1, object, 0, 0, 0, 0, 0, 0, 0, true, true, false, 0, true)
+            local vehicle2 = entities.create_vehicle(868868440, coords, 0.0)
+            ENTITY.SET_ENTITY_AS_MISSION_ENTITY(vehicle2, true, true)
+            local ent_coords = ENTITY.GET_ENTITY_COORDS(object, true)
+            FIRE.ADD_EXPLOSION(ent_coords.x, ent_coords.y, ent_coords.z, 0, 1.0, false, true, 0.0, false)
+            ENTITY.APPLY_FORCE_TO_ENTITY_CENTER_OF_MASS(vehicle2, 1, 0, -100, 0, true, false, true)
+            ENTITY.SET_ENTITY_VISIBLE(vehicle2, true, 0)
+            util.yield(300)
+            ENTITY.DETACH_ENTITY(vehicle1, object)
+        end
+    end
+end
+
 players.on_join(function(player_id)
 
     menu.divider(menu.player_root(player_id), "Lua Shit")
@@ -860,25 +806,6 @@ end)
     menu.action(menu.player_root(player_id), "Steamroll Crash", {}, "Stand's Crash", function()
         menu.trigger_commands("steamroll"..PLAYER.GET_PLAYER_NAME(player_id))
     end)
-
-    function RequestControl(entity)
-        local tick = 0
-        while not NETWORK.NETWORK_HAS_CONTROL_OF_ENTITY(entity) and tick < 100000 do
-            util.yield()
-            NETWORK.NETWORK_REQUEST_CONTROL_OF_ENTITY(entity)
-            tick = tick + 1
-        end
-    end
-
-    -------------------------------------------------------------------------------------------------------
-
-    function is_ped_player(ped)
-        if PED.GET_PED_TYPE(ped) >= 4 then
-            return false
-        else
-            return true
-        end
-    end
 
     menu.action(malicious, "Clean Up", {"cleanup"}, "Cleans Everything Up \nHere For Redundancy", function()
         menu.trigger_commands("clearworld")
@@ -991,48 +918,6 @@ end)
             menu.set_value(freeze_toggle, false)
         end
     end)
-
-    local function load_weapon_asset(hash)
-        while not WEAPON.HAS_WEAPON_ASSET_LOADED(hash) do
-            WEAPON.REQUEST_WEAPON_ASSET(hash)
-            util.yield(50)
-        end
-    end
-
-    local function passive_mode_kill(player_id)
-        local ped = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)
-        local hash = 0x787F0BB
-    
-        local audible = true
-        local visible = true
-    
-        request_model(hash)
-        load_weapon_asset(hash)
-        
-        for i = 0, 50 do
-            if PLAYER.IS_PLAYER_DEAD(player_id) then
-                util.toast("Successfully Killed " .. players.get_name(player_id))
-                return
-            end
-    
-            local coords = ENTITY.GET_ENTITY_COORDS(ped)
-            MISC.SHOOT_SINGLE_BULLET_BETWEEN_COORDS(coords.x, coords.y, coords.z, coords.x, coords.y, coords.z - 2, 100, 0, hash, 0, audible, not visible, 2500)
-        end
-    
-        util.toast("Could Not Kill " .. players.get_name(player_id) .. ". \nPlayer Either Can't Be Ragdolled Or Is In GodMode")
-    end
-
-    local function send_player_vehicle_flying(player_id)
-        local ped = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)
-        local vehicle = PED.GET_VEHICLE_PED_IS_IN(ped, false)
-    
-        if vehicle == 0 then
-            return
-        end
-    
-        NETWORK.NETWORK_REQUEST_CONTROL_OF_ENTITY(vehicle)
-        ENTITY.APPLY_FORCE_TO_ENTITY_CENTER_OF_MASS(vehicle, 1, 0, 100, 40, true, true, true, true)
-    end
 
     menu.action(trolling, "Passive Mode kill", {}, "(DOESN'T WORK ON NO RAGDOLL PLAYERS) Kills The Player in Passive Mode", function ()
         passive_mode_kill(player_id)
@@ -1698,243 +1583,11 @@ end)
         end
     end)
 
-playerposition = function(entity, distance)
-	if not ENTITY.DOES_ENTITY_EXIST(entity) then
-    end
-	local coords = ENTITY.GET_ENTITY_FORWARD_VECTOR(entity)
-	coords:mul(distance)
-	coords:add(ENTITY.GET_ENTITY_COORDS(entity, true))
-	return coords
-end
-
-function GetLocalPed()
-    return PLAYER.PLAYER_PED_ID()
-end
-
-NetworkControl = function(entity, timeOut)
-	timeOut = timeOut or 1000
-	local start = util.current_time_millis()
-	while not NETWORK.NETWORK_REQUEST_CONTROL_OF_ENTITY(entity) and
-	util.current_time_millis() - start < timeOut do
-		util.yield_once()
-	end
-	return util.current_time_millis() - start < timeOut
-end
-
-local function deletehandlers(list)
-    for _, entity in pairs(list) do
-        if ENTITY.DOES_ENTITY_EXIST(entity) then
-            ENTITY.SET_ENTITY_AS_MISSION_ENTITY(entity, false, false)
-            NetworkControl(entity)
-            entities.delete_by_handle(entity)
-        end
-    end
-end
-
-function attach_ladder(hash, aY, aZ, a_, b0, b1, b2, b3, player_id)
-    while not STREAMING.HAS_MODEL_LOADED(hash) do
-        STREAMING.REQUEST_MODEL(hash)
-        util.yield()
-    end
-    playerped3 = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)
-    table_ladder[attach] = OBJECT.CREATE_OBJECT(hash, 1.55, 3.35, 0, true, true)
-    ENTITY.ATTACH_ENTITY_TO_ENTITY(
-        table_ladder[attach],
-        playerped3,
-        0,
-        aY,
-        aZ,
-        a_,
-        b0,
-        b2,
-        b1,
-        false,
-        true,
-        true,
-        false,
-        0,
-        false
-    )
-    ENTITY.SET_ENTITY_VISIBLE(table_ladder[attach], b3)
-    STREAMING.SET_MODEL_AS_NO_LONGER_NEEDED(hash)
-    attach = attach + 1
-end
-
-function RqModel(hash)
-    STREAMING.REQUEST_MODEL(hash)
-    local count = 0
-    util.toast("Requesting model...")
-    while not STREAMING.HAS_MODEL_LOADED(hash) and count < 100 do
-        STREAMING.REQUEST_MODEL(hash)
-        count = count + 1
-        util.yield(10)
-    end
-    if not STREAMING.HAS_MODEL_LOADED(hash) then
-        util.toast("Tried for 1 second, couldn't load this specified model!")
-    end
-end
-
-    function entity_fuck(player_id)
-        while true do
-        for _, entity in ipairs(entities.get_all_objects_as_handles(entities.get_all_vehicles_as_handles(entities.get_all_peds_as_handles()))) do
-            if ENTITY.DOES_ENTITY_EXIST(entity) and not ENTITY.IS_ENTITY_A_MISSION_ENTITY(entity) and not PED.IS_PED_A_PLAYER(NETWORK.NETWORK_GET_PLAYER_INDEX_FROM_PED(entity)) then
-                local entityCoords = ENTITY.GET_ENTITY_COORDS(entity)
-                local height = 100.0
-                ENTITY.SET_ENTITY_COORDS_NO_OFFSET(entity, entityCoords.x + math.random(-100, 100), entityCoords.y + math.random(-100, 100), height)
-                ENTITY.SET_ENTITY_VELOCITY(entity, math.random(-10, 10), math.random(-10, 10), math.random(30, 50))
-                ENTITY.SET_ENTITY_MAX_SPEED(entity, 500.0)
-                ENTITY.SET_ENTITY_ROTATION(entity, math.random(-180, 180), math.random(-180, 180), math.random(-180, 180), 0, 1)
-                end
-            end
-            util.yield(1)
-        end
-    end
-
-    function veh_entity_fuck(player_id)
-        while true do
-        for _, entity in ipairs(entities.get_all_vehicles_as_handles()) do
-            if ENTITY.DOES_ENTITY_EXIST(entity) and not ENTITY.IS_ENTITY_A_MISSION_ENTITY(entity) and not PED.IS_PED_A_PLAYER(NETWORK.NETWORK_GET_PLAYER_INDEX_FROM_PED(entity)) then
-                local entityCoords = ENTITY.GET_ENTITY_COORDS(entity)
-                local height = 100.0
-                ENTITY.SET_ENTITY_COORDS_NO_OFFSET(entity, entityCoords.x, entityCoords.y, height)
-                ENTITY.SET_ENTITY_VELOCITY(entity, math.random(-10, 10), math.random(-10, 10), math.random(30, 50))
-                ENTITY.SET_ENTITY_MAX_SPEED(entity, 500.0)
-                ENTITY.SET_ENTITY_ROTATION(entity, math.random(-180, 180), math.random(-180, 180), math.random(-180, 180), 0, 1)
-                end
-            end
-            util.yield(1)
-        end
-    end
-
-    function veh_entity_fly(player_id)
-        while true do
-        for _, entity in ipairs(entities.get_all_vehicles_as_handles()) do
-            if ENTITY.DOES_ENTITY_EXIST(entity) and not ENTITY.IS_ENTITY_A_MISSION_ENTITY(entity) and not PED.IS_PED_A_PLAYER(NETWORK.NETWORK_GET_PLAYER_INDEX_FROM_PED(entity)) then
-                local entityCoords = ENTITY.GET_ENTITY_COORDS(entity)
-                local holecoords = ENTITY.GET_ENTITY_COORDS(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id), true)
-                vcoords = ENTITY.GET_ENTITY_COORDS(veh, true)
-                speed = 100
-                local x_vec = (holecoords['x']-vcoords['x'])*speed
-                local y_vec = (holecoords['y']-vcoords['y'])*speed
-                local z_vec = ((holecoords['z']+hole_zoff)-vcoords['z'])*speed
-                ENTITY.SET_ENTITY_VELOCITY(entity, math.random(-10, 10), math.random(-10, 10), math.random(30, 50))
-                ENTITY.SET_ENTITY_MAX_SPEED(entity, 500.0)
-                ENTITY.SET_ENTITY_ROTATION(entity, math.random(-180, 180), math.random(-180, 180), math.random(-180, 180), 0, 1)
-                end
-            end
-            util.yield(1)
-        end
-    end
-
-    function obj_entity_fuck(player_id)
-        while true do
-        for _, entity in ipairs(entities.get_all_objects_as_handles()) do
-            if ENTITY.DOES_ENTITY_EXIST(entity) and not ENTITY.IS_ENTITY_A_MISSION_ENTITY(entity) and not PED.IS_PED_A_PLAYER(NETWORK.NETWORK_GET_PLAYER_INDEX_FROM_PED(entity)) then
-                local entityCoords = ENTITY.GET_ENTITY_COORDS(entity)
-                local height = 100.0
-                ENTITY.SET_ENTITY_COORDS_NO_OFFSET(entity, entityCoords.x, entityCoords.y, height)
-                ENTITY.SET_ENTITY_VELOCITY(entity, math.random(-10, 10), math.random(-10, 10), math.random(30, 50))
-                ENTITY.SET_ENTITY_MAX_SPEED(entity, 500.0)
-                ENTITY.SET_ENTITY_ROTATION(entity, math.random(-180, 180), math.random(-180, 180), math.random(-180, 180), 0, 1)
-                end
-            end
-            util.yield(1)
-        end
-    end
-
-    function ped_entity_fuck(player_id)
-        while true do
-        for _, entity in ipairs(entities.get_all_peds_as_handles()) do
-            if ENTITY.DOES_ENTITY_EXIST(entity) and not ENTITY.IS_ENTITY_A_MISSION_ENTITY(entity) and not PED.IS_PED_A_PLAYER(NETWORK.NETWORK_GET_PLAYER_INDEX_FROM_PED(entity)) then
-                local entityCoords = ENTITY.GET_ENTITY_COORDS(entity)
-                local height = 100.0
-                ENTITY.SET_ENTITY_COORDS_NO_OFFSET(entity, entityCoords.x + math.random(-100, 100), entityCoords.y + math.random(-100, 100), height)
-                ENTITY.SET_ENTITY_VELOCITY(entity, math.random(-10, 10), math.random(-10, 10), math.random(30, 50))
-                ENTITY.SET_ENTITY_MAX_SPEED(entity, 500.0)
-                ENTITY.SET_ENTITY_ROTATION(entity, math.random(-180, 180), math.random(-180, 180), math.random(-180, 180), 0, 1)
-                end
-            end
-            util.yield(1)
-        end
-    end
-
-    function pickup_entity_fuck(player_id)
-        while true do
-        for _, entity in ipairs(entities.get_all_pickups_as_handles()) do
-            if ENTITY.DOES_ENTITY_EXIST(entity) and not ENTITY.IS_ENTITY_A_MISSION_ENTITY(entity) and not PED.IS_PED_A_PLAYER(NETWORK.NETWORK_GET_PLAYER_INDEX_FROM_PED(entity)) then
-                local entityCoords = ENTITY.GET_ENTITY_COORDS(entity)
-                local height = 100.0
-                ENTITY.SET_ENTITY_COORDS_NO_OFFSET(entity, entityCoords.x + math.random(-100, 100), entityCoords.y + math.random(-100, 100), height)
-                ENTITY.SET_ENTITY_VELOCITY(entity, math.random(-10, 10), math.random(-10, 10), math.random(30, 50))
-                ENTITY.SET_ENTITY_MAX_SPEED(entity, 500.0)
-                ENTITY.SET_ENTITY_ROTATION(entity, math.random(-180, 180), math.random(-180, 180), math.random(-180, 180), 0, 1)
-                end
-            end
-            util.yield(1)
-        end
-    end
-
-    function Push_Player_Up(player_id)
-        local TargetPlayerPed = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)
-        local Target = ENTITY.GET_ENTITY_COORDS(TargetPlayerPed, true)
-        local hydra_req = util.joaat("freigh")
-        local cargo_req = util.joaat("metrotrain")
-        for i = 1, 10 do
-        request_model(hydra_req)
-        request_model(cargo_req)
-        local hydra = entities.create_vehicle(hydra_req, Target, 0.0)
-        local cargoplane = entities.create_vehicle(cargo_req, Target, 0.0)
-        ENTITY.SET_ENTITY_VISIBLE(hydra, false, 0)
-        ENTITY.SET_ENTITY_VISIBLE(cargoplane, false, 0)
-        ENTITY.SET_ENTITY_AS_MISSION_ENTITY(hydra, true, true)
-        ENTITY.SET_ENTITY_AS_MISSION_ENTITY(cargoplane, true, true)
-        ENTITY.SET_ENTITY_COORDS_NO_OFFSET(cargoplane, Target.x + math.random(-3000, 3000), Target.y + math.random(-3000, 3000), Target.z + math.random(-3000, 3000))
-        ENTITY.SET_ENTITY_COORDS_NO_OFFSET(hydra, Target.x + math.random(-3000, 3000), Target.y + math.random(-3000, 3000), Target.z + math.random(-3000, 3000))
-        ENTITY.ATTACH_ENTITY_TO_ENTITY(cargoplane, hydra, -1, 0.0, 0.0, 20.0, 0.0, 0.0, 0.0, false, false, false, false, 0, true)
-        ENTITY.SET_ENTITY_ROTATION(cargoplane, math.random(0, 360), math.random(0, 360), math.random(0, 360), 0, true)
-        ENTITY.SET_ENTITY_ROTATION(hydra, math.random(0, 360), math.random(0, 360), math.random(0, 360), 0, true)
-        ENTITY.SET_ENTITY_VELOCITY(cargoplane, math.random(-10, 10), math.random(-10, 10), math.random(30, 50))
-        ENTITY.SET_ENTITY_VELOCITY(hydra, math.random(-10, 10), math.random(-10, 10), math.random(30, 50))
-        end
-    end
-
     local useforce = {
         184361638,
         1890640474,
         868868440,
     }
-
-    function EatMyShorts(player_id)
-        for i, v in pairs(useforce) do
-            request_stream_of_entity(v, 1)
-        end
-        for i = 1, 2 do
-            local coords = player_coords(player_id)
-            coords.x = coords.x
-            coords.y = coords.y + -30
-            coords.z = coords.z
-            vehicle1 = entities.create_vehicle(184361638, coords, 0.0)
-            object = entities.create_object(1890640474, coords, 0.0)
-            ENTITY.SET_ENTITY_AS_MISSION_ENTITY(vehicle1, true, true)
-            ENTITY.SET_ENTITY_AS_MISSION_ENTITY(object, true, true)
-            ENTITY.SET_ENTITY_VISIBLE(vehicle1, true, 0)
-            ENTITY.SET_ENTITY_VISIBLE(object, true, 0)
-            ENTITY.SET_ENTITY_VELOCITY(vehicle1, 5, 3, 3)
-            ENTITY.SET_ENTITY_VELOCITY(object, 3, 4, 5)
-            ENTITY.SET_ENTITY_ROTATION(object, math.random(0, 360), math.random(0, 360), math.random(0, 360), 0, true)
-            for i = 1, 3 do
-                ENTITY.ATTACH_ENTITY_TO_ENTITY(vehicle1, object, 0, 0, 0, 0, 0, 0, 0, true, true, false, 0, true)
-                local vehicle2 = entities.create_vehicle(868868440, coords, 0.0)
-                ENTITY.SET_ENTITY_AS_MISSION_ENTITY(vehicle2, true, true)
-                local ent_coords = ENTITY.GET_ENTITY_COORDS(object, true)
-                FIRE.ADD_EXPLOSION(ent_coords.x, ent_coords.y, ent_coords.z, 0, 1.0, false, true, 0.0, false)
-                ENTITY.APPLY_FORCE_TO_ENTITY_CENTER_OF_MASS(vehicle2, 1, 0, -100, 0, true, false, true)
-                ENTITY.SET_ENTITY_VISIBLE(vehicle2, true, 0)
-                util.yield(300)
-                ENTITY.DETACH_ENTITY(vehicle1, object)
-            end
-        end
-    end
 
 local crash_ents = {}
    local BrokenScenarioPeds = {
@@ -3947,34 +3600,6 @@ local hashes = {
     2099682835,
 }
 
-function deletehandlers(list)
-    for _, entity in pairs(list) do
-        if ENTITY.DOES_ENTITY_EXIST(entity) then
-            ENTITY.SET_ENTITY_AS_MISSION_ENTITY(entity, false, false)
-            NetworkControl(entity)
-            entities.delete_by_handle(entity)
-        end
-    end
-end
-
-function RqModel(hash)
-    STREAMING.REQUEST_MODEL(hash)
-    local count = 0
-    util.toast("Requesting model...")
-    while not STREAMING.HAS_MODEL_LOADED(hash) and count < 100 do
-        STREAMING.REQUEST_MODEL(hash)
-        count = count + 1
-        util.yield(10)
-    end
-    if not STREAMING.HAS_MODEL_LOADED(hash) then
-        util.toast("Tried for 1 second, couldn't load this specified model!")
-    end
-end
-
-function GetLocalPed()
-    return PLAYER.PLAYER_PED_ID()
-end
-
 local vehicleType = { 'kosatka', 'hydra', 'cargoplane', 'cargoplane2', 'luxor', 'bombushka', 'volatol', 'armytrailer2', 'flatbed', 'tug', 'cargobob', 'cargobob2'}
  local coords = {
     {-1718.5878, -982.02405, 322.83115},
@@ -4214,57 +3839,6 @@ menu.divider(kicks, "Base Kicks")
         menu.trigger_commands("otr")
         ENTITY.SET_ENTITY_COORDS_NO_OFFSET(my_ped, my_pos.x, my_pos.y, my_pos.z)
     end)
-
-    local function GiveWeapon(attacker)
-        if (weapon0 == true) then
-            WEAPON.REQUEST_WEAPON_ASSET(unarmed, 31, 0)
-            WEAPON.GIVE_WEAPON_TO_PED(attacker, unarmed, 1, false, true)
-        elseif (weapon1 == true) then
-            WEAPON.REQUEST_WEAPON_ASSET(machete, 31, 0)
-            WEAPON.GIVE_WEAPON_TO_PED(attacker, machete, 1, false, true)
-        elseif (weapon2 == true) then
-            WEAPON.REQUEST_WEAPON_ASSET(pistol, 31, 0)
-            WEAPON.GIVE_WEAPON_TO_PED(attacker, pistol, 1, false, true)
-        elseif (weapon3 == true) then
-            WEAPON.REQUEST_WEAPON_ASSET(stungun, 31, 0)
-            WEAPON.GIVE_WEAPON_TO_PED(attacker, stungun, 1, false, true)
-        elseif (weapon4 == true) then
-            WEAPON.REQUEST_WEAPON_ASSET(atomizer, 31, 0)
-            WEAPON.GIVE_WEAPON_TO_PED(attacker, atomizer, 1, false, true)
-        elseif (weapon5 == true) then
-            WEAPON.REQUEST_WEAPON_ASSET(shotgun, 31, 0)
-            WEAPON.GIVE_WEAPON_TO_PED(attacker, shotgun, 1, false, true)
-        elseif (weapon6 == true) then
-            WEAPON.REQUEST_WEAPON_ASSET(sniper, 31, 0)
-            WEAPON.GIVE_WEAPON_TO_PED(attacker, sniper, 1, false, true)
-        elseif (weapon7 == true) then
-            WEAPON.REQUEST_WEAPON_ASSET(microsmg, 31, 0)
-            WEAPON.GIVE_WEAPON_TO_PED(attacker, microsmg, 1, false, true)
-        elseif (weapon8 == true) then
-            WEAPON.REQUEST_WEAPON_ASSET(minigun, 31, 0)
-            WEAPON.GIVE_WEAPON_TO_PED(attacker, minigun, 1, false, true)
-        elseif (weapon9 == true) then
-            WEAPON.REQUEST_WEAPON_ASSET(RPG, 31, 0)
-            WEAPON.GIVE_WEAPON_TO_PED(attacker, RPG, 1, false, true)
-        elseif (weapon10 == true) then
-            WEAPON.REQUEST_WEAPON_ASSET(hellbringer, 31, 0)
-            WEAPON.GIVE_WEAPON_TO_PED(attacker, hellbringer, 1, false, true)
-        elseif (weapon11 == true) then
-            WEAPON.REQUEST_WEAPON_ASSET(railgun, 31, 0)
-            WEAPON.GIVE_WEAPON_TO_PED(attacker, railgun, 1, false, true)
-        end
-    end
-
-    local function setAttribute(attacker)
-        PED.SET_PED_COMBAT_ATTRIBUTES(attacker, 38, true)
-        PED.SET_PED_COMBAT_ATTRIBUTES(attacker, 5, true)
-        PED.SET_PED_COMBAT_ATTRIBUTES(attacker, 0, true)
-        PED.SET_PED_COMBAT_ATTRIBUTES(attacker, 12, true)
-        PED.SET_PED_COMBAT_ATTRIBUTES(attacker, 22, true)
-        PED.SET_PED_COMBAT_ATTRIBUTES(attacker, 54, true)
-        PED.SET_PED_COMBAT_RANGE(attacker, 4)
-        PED.SET_PED_COMBAT_ABILITY(attacker, 3)
-    end
 
     local pclpid = {}
     
@@ -4858,37 +4432,12 @@ menu.action(vehicle, "Attach to Car Trunk", {""}, "Attach to player's car (syncs
     end
 end)
 
---[[menu.action(attachc, "Clear World", {"clearworldv2"}, "Clean Up The Mess It Might Have Made", function()
-    util.yield(0500)
-    menu.trigger_commands("clearworld")
-end)]]
-
-
 menu.action(attachc, "Detach", {"detach"}, "unstuck yourself \nDetach Will Not Work When Spectating", function()
     local p = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)
     ENTITY.DETACH_ENTITY(p, false, false)
     ENTITY.DETACH_ENTITY(players.user_ped(), false, false)
     TASK.CLEAR_PED_TASKS(PLAYER.PLAYER_PED_ID())
 end)
-
---menu.toggle_loop(attachc, "Attach To Player 'Test' (Super Scuffed)", {""}, "Attach to player (scuffed sync for everyone)", function()
-        --local p = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)
-        --local c = ENTITY.GET_ENTITY_COORDS(p)
-        --local boneId = ENTITY.GET_ENTITY_BONE_INDEX_BY_NAME(p, "head")
-        --local item = 322248450 --[[util.joaat("prop_elecbox_12")]]
-        --util.yield_once()
-        --request_model(item)
-        --local object = entities.create_object(item, c)
-        --ENTITY.FREEZE_ENTITY_POSITION(object)
-        --ENTITY.SET_ENTITY_VISIBLE(object, false)
-        --ENTITY.ATTACH_ENTITY_TO_ENTITY(item, p, 0, 0.0--[[x]], -5.0--[[z]], -25--[[y]], 0.0--[[verticle (flip)]], 0.0--[[horizontal (go sideways)]], 0.0--[[w (turn)]], 1.0, 1, true, true, true, true, 0, true)
-        --ENTITY.ATTACH_ENTITY_TO_ENTITY(p, object, 0, 0.0--[[x]], -5.0--[[z]], -25--[[y]], 0.0--[[verticle (flip)]], 0.0--[[horizontal (go sideways)]], 0.0--[[w (turn)]], 1.0, 1, true, true, true, true, 0, true)
-        --ENTITY.ATTACH_ENTITY_TO_ENTITY(players.user_ped(), p, 0, 0.0--[[x]], 0.0--[[z]], 1.65--[[y]], 0.0--[[verticle (flip)]], 0.0--[[horizontal (go sideways)]], 0.0--[[w (turn)]], 1.0, 1, true, true, true, true, 0, true)
-        --util.yield_once()
-        --ENTITY.ATTACH_ENTITY_TO_ENTITY(players.user_ped(), object, 0, 0.0--[[x]], 0.0--[[z]], 1.65--[[y]], 0.0--[[verticle (flip)]], 0.0--[[horizontal (go sideways)]], 0.0--[[w (turn)]], 1.0, 1, true, true, true, true, 0, true)
-        --util.yield(0300)
-        --menu.trigger_commands("cleararea")
---end)
 
 function play_animstationary(dict, name, duration)
     ped = PLAYER.PLAYER_PED_ID()
@@ -4965,7 +4514,7 @@ end)
         local player_vehicle = PED.GET_VEHICLE_PED_IS_IN(player_ped, include_last_vehicle_for_player_functions)
         if NETWORK.NETWORK_REQUEST_CONTROL_OF_ENTITY(player_vehicle) then
             VEHICLE.SET_VEHICLE_FIXED(player_vehicle)
-            util.toast(players.get_name(player_id) .. " Repaired vehicle")
+            util.toast(players.get_name(player_id) .. " Repaired Vehicle")
         else
             util.toast("Control of the vehicle could not be obtained or the player is not in a vehicle.")
         end
@@ -4981,18 +4530,7 @@ end)
         end
     end)
 
-   	menu.action(vehicle, "Disable Vehicle", {}, "It's better than stand", function(toggle)
-        --local p = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)
-        local veh = PED.GET_VEHICLE_PED_IS_IN(p, false)
-        if (PED.IS_PED_IN_ANY_VEHICLE(p)) then
-            TASK.CLEAR_PED_TASKS_IMMEDIATELY(p)
-        else
-            local veh2 = PED.GET_VEHICLE_PED_IS_TRYING_TO_ENTER(p)
-            entities.delete_by_handle(veh2)
-        end
-    end)
-
-    menu.action(vehicle, "Disable Vehicle v2", {}, "Unblockable by stand '10/02'", function(toggle)
+    menu.action(vehicle, "Disable Vehicle", {}, "Unblockable by stand '10/02'", function(toggle)
         local player_ped = PLAYER.GET_PLAYER_PED(player_id)
         local player_vehicle = PED.GET_VEHICLE_PED_IS_IN(player_ped, include_last_vehicle_for_player_functions)
         local is_running = VEHICLE.GET_IS_VEHICLE_ENGINE_RUNNING(player_vehicle)
@@ -7587,7 +7125,7 @@ end
             for i = 1, 10 do
                 AUDIO.PLAY_SOUND_FROM_COORD(-1, '5s', pc.x, pc.y, pc.z, 'MP_MISSION_COUNTDOWN_SOUNDSET', 1, 10000, 0)
             end
-            util.yield_once()
+            util.yield()
         end
     end)
 
@@ -7816,109 +7354,6 @@ function ent_func.get_distance_between(pos1, pos2)
 	return pos1:distance(pos2)
 end
 
-function ent_func.get_vehicle_from_ped(ped)
-	if PED.IS_PED_IN_ANY_VEHICLE(ped, false) then
-		return PED.GET_VEHICLE_PED_IS_IN(ped, false)
-    else
-        return 0
-	end
-end
-
-function ent_func.get_entity_control(entity)
-    --looks if the entity exists--
-    if entity > 0 then
-        --if you have control and the session is started then return the entity--
-        if NETWORK.NETWORK_HAS_CONTROL_OF_ENTITY(entity) and util.is_session_started() then
-            return entity
-        end
-        --if we have not yet have control of the entity then get the network id from the entity--
-        local network_id = NETWORK.NETWORK_GET_NETWORK_ID_FROM_ENTITY(entity)
-        local has_control = false
-        --set that we can take control--
-        NETWORK.SET_NETWORK_ID_CAN_MIGRATE(network_id, true)
-
-        local loops = 15
-        --while you not be able to take control loop 15 times with an yield of 15 milis--
-        while not has_control do
-            --request control--
-            has_control = NETWORK.NETWORK_REQUEST_CONTROL_OF_ENTITY(entity)
-            loops = loops - 1
-            util.yield(15)
-            if loops <= 0 then
-                break
-            end
-        end
-    end
-    --return the entity--
-    return entity
-end
-
-function ent_func.get_entity_control_onces(entity)
-    --looks if the entity exists--
-    if entity > 0 then
-        --if you have control and the session is started then return the entity--
-        if NETWORK.NETWORK_HAS_CONTROL_OF_ENTITY(entity) and util.is_session_started() then
-            return entity
-        end
-        --if we have not yet have control of the entity then get the network id from the entity and set that you can take control--
-        local network_id = NETWORK.NETWORK_GET_NETWORK_ID_FROM_ENTITY(entity)
-        NETWORK.SET_NETWORK_ID_CAN_MIGRATE(network_id, true)
-        has_control = NETWORK.NETWORK_REQUEST_CONTROL_OF_ENTITY(entity)
-    end
-    --return the entity--
-    if has_control then 
-        return entity
-    else
-        return false
-    end
-end
-
---based on how jacks does it but just got the idea with the spectating and the rest i did myself so no skid just idea--
-function ent_func.get_player_vehicle_in_control(player_id, options)
-    local user_ped = players.user_ped()
-    local target_ped = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)
-
-    --calculate the distance between you and the player your trying to get the vehicle control from--
-    local user_pos = ENTITY.GET_ENTITY_COORDS(target_ped)
-    local target_pos = ENTITY.GET_ENTITY_COORDS(user_ped)
-    local dist = ent_func.get_distance_between(user_pos, target_pos)
-
-    --to see if you are spectating the player your trying to take vehicle controll from--
-    local is_spectating = menu.ref_by_command_name("spectate" .. players.get_name(player_id):lower()).value
-
-    --getting the vehicle from the ped--
-    local vehicle = ent_func.get_vehicle_from_ped(target_ped)
-    --if the options and the vehicle is 0 then return 0--
-    if options and vehicle == 0 then
-        return 0
-    end
-    --if vehicle is is 0 and the player is not you and the distance is higher then a 100 and you are not spectating then--
-    if vehicle == 0 and target_ped != user_ped and dist > 1000 and not is_spectating then
-        util.toast("Spectating")
-        --turn on spectating--
-        menu.trigger_commands("spectate" .. players.get_name(player_id) .. " on")
-
-        --loop 30 times or stop looping if you have the vehicle of the player--
-        local loop = 30
-        while vehicle == 0 and loop > 0 do
-            util.yield(100)
-            vehicle = ent_func.get_vehicle_from_ped(target_ped)
-            loop = loop - 1
-        end
-    end
-
-    --taking control off the vehicle--
-    ent_func.get_entity_control(vehicle)
-
-    --if you were not spectating before you turn off spectating
-    if not is_spectating then
-      menu.trigger_commands("spectate" .. players.get_name(player_id) .. " off")
-    end
-
-    --return the controlled vehicle--
-    return vehicle
-end
-
 function ent_func.get_entity_player_is_aiming_at(player)
 	if not PLAYER.IS_PLAYER_FREE_AIMING(player) then
 		return 0
@@ -7932,97 +7367,6 @@ function ent_func.get_entity_player_is_aiming_at(player)
 		entity = PED.GET_VEHICLE_PED_IS_IN(entity, false)
 	end
 	return entity
-end
-
---thanks to noshirt.cat for helping me with this--
-function ent_func.getClosestVehicle(pos)
-	local closestDist = 999999999999
-	local closestveh = nil
-    for entities.get_all_vehicles_as_pointers() as veh do
-	      local vehpos = entities.get_position(veh)
-	      local dist = pos:distance(vehpos)
-	      if (dist < closestDist) then
-	    	closestDist = dist
-	    	closestveh = veh
-	      end
-    end
-    if closestveh != nil then
-        return entities.pointer_to_handle(closestveh)
-    end
-end
-
-function ent_func.getClosestPed(pos)
-	local closestDist = 999999999999
-	local closestped = nil
-    for entities.get_all_peds_as_pointers() as ped do
-        local ped_handle = entities.pointer_to_handle(ped)
-        if not ENTITY.IS_ENTITY_DEAD(ped_handle) and not PED.IS_PED_IN_ANY_VEHICLE(ped_handle) and ped_handle != players.user_ped() then
-	      local pedpos = entities.get_position(ped)
-	      local dist = pos:distance(pedpos)
-	      if (dist < closestDist) then
-	    	closestDist = dist
-	    	closestped = ped_handle
-	      end
-        end
-    end
-    if closestped != nil then
-        return closestped
-    end
-end
-
---changed it a bit but credit to SATTY for this--
-function ent_func.getClosestPlayer(myPos)
-    local closestDist = 999999999999
-    local closest_player = nil
-    local myVehicle = ent_func.get_vehicle_from_ped(players.user_ped())
-    if myVehicle == 0 then
-        myVehicle = 1
-    end
-    for players.list(false, true, true) as player_id do
-		local ped = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)
-		if not ENTITY.IS_ENTITY_DEAD(ped) then
-            local playerpos = players.get_position(player_id)
-            local dist = ent_func.get_distance_between(myPos, playerpos)
-            local playerVehicle = ent_func.get_vehicle_from_ped(ped)
-            if (dist < closestDist) and (playerVehicle != myVehicle) and not players.is_in_interior(player_id) then
-                closestDist = dist
-                closest_player = player_id
-            end
-		end
-    end
-    if closest_player != nil and closest_player != players.user() then
-        return closest_player
-    end
-end
-
-function ent_func.slerp(q1, q2, t)
-    local cosTheta = q1.x * q2.x + q1.y * q2.y + q1.z * q2.z + q1.w * q2.w
-    local startInterp, finishInterp
-
-    if cosTheta < 0.0 then
-        cosTheta = -cosTheta
-        q2.x = -q2.x
-        q2.y = -q2.y
-        q2.z = -q2.z
-        q2.w = -q2.w
-    end
-
-    if (1.0 - cosTheta) > 0.0001 then
-        local theta = math.acos(cosTheta)
-        local sinTheta = math.sin(theta)
-        startInterp = math.sin((1.0 - t) * theta) / sinTheta
-        finishInterp = math.sin(t * theta) / sinTheta
-    else
-        startInterp = 1.0 - t
-        finishInterp = t
-    end
-
-    local x = startInterp * q1.x + finishInterp * q2.x
-    local y = startInterp * q1.y + finishInterp * q2.y
-    local z = startInterp * q1.z + finishInterp * q2.z
-    local w = startInterp * q1.w + finishInterp * q2.w
-
-    return {x = x, y = y, z = z, w = w}
 end
 
 --credit to lance for this--
@@ -8852,7 +8196,7 @@ util.create_thread(function()
 				end
 			end
 		end
-		util.yield()
+		util.yield(200)
 	end
 end)
 
@@ -8875,7 +8219,7 @@ util.create_thread(function()
 				end
 			end
 		end
-		util.yield()
+		util.yield(200)
 	end
 end)
 
@@ -8898,7 +8242,7 @@ util.create_thread(function()
 				end
 			end
 		end
-		util.yield()
+		util.yield(200)
 	end
 end)
 
@@ -8921,7 +8265,7 @@ util.create_thread(function()
 				end
 			end
 		end
-		util.yield()
+		util.yield(200)
 	end
 end)
 
@@ -8944,7 +8288,7 @@ util.create_thread(function()
 				end
 			end
 		end
-		util.yield()
+		util.yield(200)
 	end
 end)
 
@@ -8967,7 +8311,7 @@ util.create_thread(function()
 				end
 			end
 		end
-		util.yield()
+		util.yield(200)
 	end
 end)
 
@@ -9042,9 +8386,7 @@ menu.toggle_loop(anticage, "Anti Cage", {"anticage"}, "", function()
     end
 end)
 
-local anti_mugger = menu.list(protects, "Anti-Mugger")
-
-menu.toggle_loop(anti_mugger, "To Me", {}, "Block Muggers targeting you.", function() -- thx nowiry for improving my method :D
+menu.toggle_loop(protects, "Anti-Mugger", {}, "Block Muggers Targeting You.", function() -- thx nowiry for improving my method :D
     if NETWORK.NETWORK_IS_SCRIPT_ACTIVE("am_gang_call", 0, true, 0) then
         local ped_netId = memory.script_local("am_gang_call", 63 + 10 + (0 * 7 + 1))
         local sender = memory.script_local("am_gang_call", 287)
@@ -9057,26 +8399,7 @@ menu.toggle_loop(anti_mugger, "To Me", {}, "Block Muggers targeting you.", funct
             and NETWORK.NETWORK_REQUEST_CONTROL_OF_NETWORK_ID(memory.read_int(ped_netId))) then
                 local mugger = NETWORK.NET_TO_PED(memory.read_int(ped_netId))
                 entities.delete_by_handle(mugger)
-                util.toast("Blocked mugger from " .. players.get_name(memory.read_int(sender)))
-            end
-        end)
-    end
-end)
-
-menu.toggle_loop(anti_mugger, "Someone Else", {}, "Block Muggers targeted to someone else.", function()
-    if NETWORK.NETWORK_IS_SCRIPT_ACTIVE("am_gang_call", 0, true, 0) then
-        local ped_netId = memory.script_local("am_gang_call", 63 + 10 + (0 * 7 + 1))
-        local sender = memory.script_local("am_gang_call", 287)
-        local target = memory.script_local("am_gang_call", 288)
-        local player = players.user()
-
-        util.spoof_script("am_gang_call", function()
-            if memory.read_int(target) ~= player and memory.read_int(sender) ~= player
-            and NETWORK.NETWORK_DOES_NETWORK_ID_EXIST(memory.read_int(ped_netId)) 
-            and NETWORK.NETWORK_REQUEST_CONTROL_OF_NETWORK_ID(memory.read_int(ped_netId)) then
-                local mugger = NETWORK.NET_TO_PED(memory.read_int(ped_netId))
-                entities.delete_by_handle(mugger)
-                util.toast("Block mugger sent by " .. players.get_name(memory.read_int(sender)) .. " to " .. players.get_name(memory.read_int(target)))
+                util.toast("Blocked Mugger From " .. players.get_name(memory.read_int(sender)))
             end
         end)
     end
@@ -9095,7 +8418,7 @@ menu.slider(pool_limiter, "Vehicle Limit", {"vehlimi"}, "", 0, 300, 130, 1, func
     veh_limit = amount
 end)
 
-local obj_limit = 635
+local obj_limit = 465
 menu.slider(pool_limiter, "Object Limit", {"objlimi"}, "", 0, 2500, 600, 1, function(amount)
     obj_limit = amount
 end)
@@ -9309,11 +8632,6 @@ menu.click_slider(vehicles, "Dirt level", {"dirt"}, "Makes your vehicle dirty.",
 end)
 
 local licenseplate = menu.list(vehicles, "License Plate Options", {}, "")
-
-local Utils = {}
-
-function Utils.emptyFunction()
-end
 
 local text = 'FewMod'
 local animatedtext = ''
@@ -9575,14 +8893,10 @@ menu.toggle_loop(vehicles, "Aim Passangers", {}, "You can aim passangers in vehi
 	end
 end)
 
-menu.toggle_loop(vehicles, "Silent GodMode", {}, "It will not be detected by most menus", function()
-    ENTITY.SET_ENTITY_PROOFS(entities.get_user_vehicle_as_handle(), true, true, true, true, true, 0, 0, true)
-    end, function() ENTITY.SET_ENTITY_PROOFS(PED.GET_VEHICLE_PED_IS_IN(players.user(), false), false, false, false, false, false, 0, 0, false)
-end)
-
 menu.toggle_loop(vehicles, "Remove Stickys From Car", {"removestickys"}, "", function(toggle)
     local car = PED.GET_VEHICLE_PED_IS_IN(players.user_ped(PLAYER.PLAYER_PED_ID(player_id), true))
     NETWORK.REMOVE_ALL_STICKY_BOMBS_FROM_ENTITY(car)
+    util.yield()
 end)
 
 local indicatorsLeftOn = false
@@ -9684,9 +8998,6 @@ if player_cur_car ~= 0 then
     if everythingproof then
         ENTITY.SET_ENTITY_PROOFS(player_cur_car, true, true, true, true, true, true, true, true)
     end
-    --if racemode then
-    --    VEHICLE.SET_VEHICLE_IS_RACING(player_cur_car, true)
-    --end
 
     if infcms then
         if VEHICLE.GET_VEHICLE_COUNTERMEASURE_AMMO(player_cur_car) < 100 then
@@ -9694,64 +9005,8 @@ if player_cur_car ~= 0 then
         end
     end
 
-    --if shift_drift then
-    --    if PAD.IS_CONTROL_PRESSED(21, 21) then
-    --        VEHICLE.SET_VEHICLE_REDUCE_GRIP(player_cur_car, true)
-    --        VEHICLE._SET_VEHICLE_REDUCE_TRACTION(player_cur_car, 0.0)
-    --    else
-    --        VEHICLE.SET_VEHICLE_REDUCE_GRIP(player_cur_car, false)
-    --    end
-    --end
 end
 
---force_cm = false
---menu.toggle(vehicles, "Force countermeasures", {"forcecms"}, "Force countermeasures on any vehicle to the horn key.", function(on)
---    force_cm = on
---    menu.trigger_commands("getgunsflaregun")
---end)
-
---if player_cur_car ~= 0 and force_cm then
---    if PAD.IS_CONTROL_PRESSED(46, 46) then
---        local target = ENTITY.GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(PLAYER.PLAYER_PED_ID(player_id), math.random(-5, 5), -30.0, math.random(-5, 5))
---        --MISC.SHOOT_SINGLE_BULLET_BETWEEN_COORDS(target.x, target.y, target.z, target.x, target.y, target.z, 300.0, true, -1355376991, PLAYER.PLAYER_PED_ID(player_id), true, false, 100.0)
---        MISC.SHOOT_SINGLE_BULLET_BETWEEN_COORDS(target.x, target.y, target.z, target.x, target.y, target.z, 100.0, true, 1198879012, PLAYER.PLAYER_PED_ID(player_id), true, false, 100.0)
---    end
---end
-
---------------------------------------------------------------------------------------------------------------------------------------------------------
--- Real Helicopter Mode Start
-
-get_vtable_entry_pointer = function(address, index)
-    return memory.read_long(memory.read_long(address) + (8 * index))
-end
-get_sub_handling_types = function(vehicle, type)
-    local veh_handling_address = memory.read_long(entities.handle_to_pointer(vehicle) + 0x938)
-    local sub_handling_array = memory.read_long(veh_handling_address + 0x0158)
-    local sub_handling_count = memory.read_ushort(veh_handling_address + 0x0160)
-    local types = {registerd = sub_handling_count, found = 0}
-    for i = 0, sub_handling_count - 1, 1 do
-        local sub_handling_data = memory.read_long(sub_handling_array + 8 * i)
-        if sub_handling_data ~= 0 then
-            local GetSubHandlingType_address = get_vtable_entry_pointer(sub_handling_data, 2)
-            local result = util.call_foreign_function(GetSubHandlingType_address, sub_handling_data)
-            if type and type == result then return sub_handling_data end
-            types[#types+1] = {type = result, address = sub_handling_data}
-            types.found = types.found + 1
-        end
-    end
-    if type then return nil else return types end
-end
-local thrust_offset = 0x8
-local better_heli_handling_offsets = {
-    ["fYawMul"] = 0x18, -- dont remember
-    ["fYawStabilise"] = 0x20, --minor stabalization
-    ["fSideSlipMul"] = 0x24, --minor stabalizaztion
-    ["fRollStabilise"] = 0x30, --minor stabalization
-    ["fAttackLiftMul"] = 0x48, --disables most of it
-    ["fAttackDiveMul"] = 0x4C, --disables most of the other axis
-    ["fWindMul"] = 0x58, --helps with removing some jitter
-    ["fPitchStabilise"] = 0x3C --idk what it does but it seems to help
-}
 --------------------------------------------------------------------------------------------------------------------------------------------------------
 --Impulse SportMode start
 
@@ -9910,70 +9165,6 @@ util.create_tick_handler(function()
 
     return true
 end)
-
---------------------------------------------------------------------------------------------------------------------------------
--- Drift Mode Start
-
-local function getCurrentVehicle() 
-	local player_id = PLAYER.PLAYER_ID()
-	local player_ped = PLAYER.GET_PLAYER_PED(player_id)
-    local player_vehicle = 0
-    if (PED.IS_PED_IN_ANY_VEHICLE(player_ped)) then
-        veh = PED.GET_VEHICLE_PED_IS_USING(player_ped)
-        if (NETWORK.NETWORK_HAS_CONTROL_OF_ENTITY(veh)) then
-            player_vehicle = veh
-        end 
-    end
-    return player_vehicle
-end
-
-local function getHeadingOfTravel(veh) 
-    local velocity = ENTITY.GET_ENTITY_VELOCITY(veh)
-    local x = velocity.x
-    local y = velocity.y
-    local at2 = math.atan(y, x)
-    return math.fmod(270.0 + math.deg(at2), 360.0)
-end
-
-local function slamDatBitch(veh, height) 
-    if (VEHICLE.IS_VEHICLE_ON_ALL_WHEELS(veh) and not ENTITY.IS_ENTITY_IN_AIR(veh)) then
-     
-        ENTITY.APPLY_FORCE_TO_ENTITY(veh, 1,    0, 0, height,    0, 0, 0,   true, true)
-    end
-end
-
-local function getCurGear()
-    return memory.read_byte(entities.get_user_vehicle_as_pointer() +memory.read_int(CurrentGearOffset))
-end
-
-local function getNextGear()
-    return memory.read_byte(entities.get_user_vehicle_as_pointer() +memory.read_int(NextGearOffset))
-end
-
-local function setCurGear(gear)
-    memory.write_byte(entities.get_user_vehicle_as_pointer() +memory.read_int(CurrentGearOffset), gear)
-end
-
-local function setNextGear(gear)
-    memory.write_byte(entities.get_user_vehicle_as_pointer() +memory.read_int(NextGearOffset), gear)
-end
-
-local function asDegrees(angle)
-    return angle * (180.0 / 3.14159265357); 
-end
-
-local function wrap360(val) 
-    --    this may be the same as:
-    --      return math.fmod(val + 360, 360)
-    --    but wierd things happen
-    while (val < 0.0) do
-        val = val + 360.0
-    end
-    while (val > 360.0) do
-        val = val - 360.0
-    end
-    return val
-end
 
 --------------------------------------------------------------------------------------------------------------------------------
 -- Fun Stuff
@@ -11553,36 +10744,16 @@ end)
 
 menu.hyperlink(misc, "Github Link", "https://github.com/Fewdys/GTA5-FewMod-Lua")
 
-menu.action(misc, "Alternative - Update FewMod", {}, "Grabs The Newest Version Of Script From \nLink: https://github.com/Fewdys/GTA5-FewMod-Lua", function()
-    async_http.init('raw.githubusercontent.com','/Fewdys/GTA5-FewMod/main/Few.lua',function(a)
-        local err = select(2,load(a))
-        if err then
-            util.toast("There was a issue updating FewMod, please update it manually from github.")
-            util.log("There was a issue updating FewMod, please update it manually from github.")
-            util.toast("Link: https://github.com/Fewdys/GTA5-FewMod-Lua")
-            util.log("Link: https://github.com/Fewdys/GTA5-FewMod-Lua")
-        return end
-        local f = io.open(filesystem.scripts_dir()..SCRIPT_RELPATH, "wb")
-        f:write(a)
-        f:close()
-        util.toast("FewMod Updated Successfully. Restarting Script")
-        util.log("FewMod Updated Successfully. Restarting Script")
-        util.restart_script()
-    end)
-    async_http.dispatch()
-end)
-
 menu.action(misc, "Clear All Notifications", {}, "", function()
     menu.trigger_commands("clearnotifications")
+    menu.trigger_commands("removenotifications")
 end)
 
 menu.toggle_loop(misc, "Clear All Notifications Loop", {"clearnotifs"}, "I recommend you use Console so you can see the log on screen when people try to crash you with this enabled.", function()
-    Clear_Stand_Notifs = menu.ref_by_path("Stand>Clear Notifications")
-    Clear_Minimap_Notifs = menu.ref_by_path("Game>Remove Notifications Above Minimap")
-        menu.trigger_command(Clear_Stand_Notifs)
-        menu.trigger_command(Clear_Minimap_Notifs)
-        util.yield(6500)
-    end)
+    menu.trigger_commands("clearnotifications")
+    menu.trigger_commands("removenotifications")
+    util.yield(6500)
+end)
 
 menu.toggle(misc, "Screenshot Mode", {}, "So you can take pictures <3", function(on)
 	if on then
@@ -11590,15 +10761,6 @@ menu.toggle(misc, "Screenshot Mode", {}, "So you can take pictures <3", function
 	else
 		menu.trigger_commands("screenshot off")
 	end
-end)
-
-menu.toggle(misc, "Stand ID", {}, "It makes you invisible to other stand users, but you won't detect them either.", function(on_toggle)
-    local standid = menu.ref_by_path("Online>Protections>Detections>Stand User Identification")
-    if on_toggle then
-        menu.trigger_command(standid, "on")
-    else
-        menu.trigger_command(standid, "off")
-    end
 end)
 
 menu.toggle(misc, "Rejoin Failed Joins", {"rejoinfail"}, "Joins previously failed transitions, Joins previously failed sessions but if failed will join new public.", function(state)
@@ -11723,15 +10885,12 @@ menu.action(misc, "Delete Skybase/Island", {"delskybase"}, "", function()
     end
 end)
 
-util.on_pre_stop(function()
+util.on_stop(function()
     util.toast("Cleaning...")
     menu.trigger_commands("clearropes")
     menu.trigger_commands("clearpeds")
     menu.trigger_commands("clearveh")
     menu.trigger_commands("clearobj")
-end)
-
-util.on_stop(function()
     VEHICLE.SET_VEHICLE_GRAVITY(veh, true)
     VEHICLE.SET_VEHICLE_REDUCE_GRIP(veh, false)
     ENTITY.SET_ENTITY_COLLISION(veh, true, true);
