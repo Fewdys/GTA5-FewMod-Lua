@@ -17998,7 +17998,7 @@ menu.toggle_loop(path, "Randomize Position", {"randwarp"}, "spoofs your position
         random_pos();
         menu.trigger_commands("spoofedposition " .. tostring(changed_pos.x) .. ", " .. tostring(changed_pos.y) .. ", " .. tostring(changed_pos.z))
         util.yield(interval)
-    elseif aim_rand
+    elseif aim_rand then
         random_pos();
         menu.trigger_commands("spoofedposition " .. tostring(changed_pos.x) .. ", " .. tostring(changed_pos.y) .. ", " .. tostring(changed_pos.z))
         util.yield(interval)
