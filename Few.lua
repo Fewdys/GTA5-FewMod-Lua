@@ -880,7 +880,7 @@ end)
         end
     end
 
-    menu.action(malicious, "Clean Up", {"cleanup"}, "Cleans Everything Up \nHere For Redundancy" function()
+    menu.action(malicious, "Clean Up", {"cleanup"}, "Cleans Everything Up \nHere For Redundancy", function()
         menu.trigger_commands("clearworld")
     end)
 
