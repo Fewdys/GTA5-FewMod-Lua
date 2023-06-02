@@ -5331,9 +5331,9 @@ menu.action(uwuworld, "Delete Objects", {"clearobj"}, "Deletes All Objects", fun
         entities.delete_by_handle(ent)
         ct += 1
     end
-    for i, entity in pairs(entities.get_all_objects_as_handles()) do
-        request_control(entity)
+    for k,ent in pairs(entities.get_all_objects_as_handles()) do
         entities.delete_by_handle(entity) 
+        ct += 1
     end
 end)
 
@@ -5401,10 +5401,6 @@ menu.action(uwuworld, "Clean World/Super Cleanse", {"clearworld"}, "Literally cl
         for k,ent in pairs(entities.get_all_objects_as_handles()) do
             entities.delete_by_handle(ent)
             ct += 1
-        end
-        for i, entity in pairs(entities.get_all_objects_as_handles()) do
-            request_control2(entity)
-            entities.delete_by_handle(entity) 
         end
         local rope_alloc = memory.alloc(4)
         for i=0, 100 do 
@@ -11731,10 +11727,8 @@ menu.toggle(misc, "Rejoin Failed Joins", {"rejoinfail"}, "Joins previously faile
 
             wait_session_transition()
             util.toast("Trying To Rejoin")
+            util.log("Trying To Rejoin")
             menu.trigger_commands("rejoin ")
-        else
-            util.toast("Failed To Join")
-            menu.trigger_commands("go newpublic")
         end
     end
 end)
@@ -11857,10 +11851,6 @@ util.on_pre_stop(function()
         for k,ent in pairs(entities.get_all_objects_as_handles()) do
             entities.delete_by_handle(ent)
             ct += 1
-        end
-        for i, entity in pairs(entities.get_all_objects_as_handles()) do
-            request_control2(entity)
-            entities.delete_by_handle(entity) 
         end
         local rope_alloc = memory.alloc(4)
         for i=0, 100 do 
