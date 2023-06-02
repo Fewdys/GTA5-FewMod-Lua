@@ -3202,14 +3202,14 @@ menu.divider(crashes, "Component Crashes")
 
     local scrshs = menu.list(crashes, "Script Crashes", {}, "")
 
-    menu.action(crashes, "Script Crash", {}, "", function(on_toggle)
+    menu.action(scrshs, "Script Crash", {}, "", function(on_toggle)
         menu.trigger_commands("scripthost")
         util.yield(25)
         menu.trigger_commands("givesh" .. players.get_name(player_id))
         Fewd.power_crash(player_id)
     end)
 
-    menu.toggle_loop(scrash, "SE Crash (S0)", {"crashs0"}, "A very strong SE/SH crash.", function(on_toggle)
+    menu.toggle_loop(scrshs, "SE Crash (S0)", {"crashs0"}, "A very strong SE/SH crash.", function(on_toggle)
         local int_min = -2147483647
         local int_max = 2147483647
         for i = 1, 15 do
@@ -3227,7 +3227,7 @@ menu.divider(crashes, "Component Crashes")
         end
     end)
 
-    menu.toggle_loop(scrash, "SE Crash (S1)", {"crashs1"}, "A very strong SE/SH crash.", function(on_toggle)
+    menu.toggle_loop(scrshs, "SE Crash (S1)", {"crashs1"}, "A very strong SE/SH crash.", function(on_toggle)
         local int_min = -2147483647
         local int_max = 2147483647
             for i = 1, 15 do
@@ -3247,7 +3247,7 @@ menu.divider(crashes, "Component Crashes")
 
         
 
-        menu.toggle_loop(scrash, "SE Crash (S3)", {"crashs3"}, "A very strong SE/SH crash.", function(on_toggle)
+        menu.toggle_loop(scrshs, "SE Crash (S3)", {"crashs3"}, "A very strong SE/SH crash.", function(on_toggle)
             local int_min = -2147483647
             local int_max = 2147483647
             for i = 1, 15 do
@@ -3265,7 +3265,7 @@ menu.divider(crashes, "Component Crashes")
                 end
             end)  
 
-        menu.toggle_loop(scrash, "SE Crash (S4)", {"crashs4"}, "A very strong SE/SH crash.", function(on_toggle)
+        menu.toggle_loop(scrshs, "SE Crash (S4)", {"crashs4"}, "A very strong SE/SH crash.", function(on_toggle)
             local int_min = -2147483647
             local int_max = 2147483647
             for i = 1, 15 do
@@ -3283,7 +3283,7 @@ menu.divider(crashes, "Component Crashes")
                 end
             end)      
 
-   menu.toggle_loop(scrash, "SE Crash (S7)", {"crashs7"}, "A very strong SE/SH crash.", function(on_toggle)
+   menu.toggle_loop(scrshs, "SE Crash (S7)", {"crashs7"}, "A very strong SE/SH crash.", function(on_toggle)
         local int_min = -2147483647
         local int_max = 2147483647
         for i = 1, 15 do
@@ -3301,7 +3301,7 @@ menu.divider(crashes, "Component Crashes")
             end
         end)
 
-        menu.toggle_loop(scrash, "SUS Crash", {"togglesus"}, "This one is bound to hurt.", function(on_toggle)
+        menu.toggle_loop(scrshs, "SUS Crash", {"togglesus"}, "This one is bound to hurt.", function(on_toggle)
 
                 local int_min = -2147483647
                 local int_max = 2147483647
