@@ -5332,7 +5332,7 @@ menu.action(uwuworld, "Delete Objects", {"clearobj"}, "Deletes All Objects", fun
         ct += 1
     end
     for i, entity in pairs(entities.get_all_objects_as_handles()) do
-        request_control2(entity)
+        request_control(entity)
         entities.delete_by_handle(entity) 
     end
 end)
