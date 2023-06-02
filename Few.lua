@@ -96,7 +96,7 @@ util.toast("Welcome " .. SOCIALCLUB.SC_ACCOUNT_INFO_GET_NICKNAME())
 util.toast("Loading FewMod...")
 util.log("Loading FewMod...")
 menu.trigger_commands("allguns")
-util.yield(2000)
+util.yield(2100)
 
 -- Memory Functions
 
@@ -1161,7 +1161,7 @@ end)
 		end
 		local cage_object = OBJECT.CREATE_OBJECT(hash, pos.x, pos.y, pos.z - 1, true, true, false)
         spawned_objects[#spawned_objects + 1] = cage_object
-		util.yield(0015)
+		util.yield(15)
 		STREAMING.SET_MODEL_AS_NO_LONGER_NEEDED(cage_object)
         menu.trigger_commands("disarm" .. PLAYER.GET_PLAYER_NAME(player_id))
     end)
@@ -1175,7 +1175,7 @@ end)
 	    end
 	    local cage_object = OBJECT.CREATE_OBJECT(hash, pos.x, pos.y, pos.z, true, true, false)
         spawned_objects[#spawned_objects + 1] = cage_object
-	    util.yield(0015)
+	    util.yield(15)
 	    STREAMING.SET_MODEL_AS_NO_LONGER_NEEDED(cage_object)
         menu.trigger_commands("disarm" .. PLAYER.GET_PLAYER_NAME(player_id))
     end)
@@ -1211,7 +1211,7 @@ end)
       spawned_objects[#spawned_objects + 1] = cage_object3
       spawned_objects[#spawned_objects + 1] = cage_object4
       spawned_objects[#spawned_objects + 1] = cage_object5
-	    util.yield(0015)
+	    util.yield(15)
 	    STREAMING.SET_MODEL_AS_NO_LONGER_NEEDED(cage_object)
      menu.trigger_commands("disarm" .. PLAYER.GET_PLAYER_NAME(player_id))
     end)
@@ -1260,7 +1260,7 @@ end)
     	ENTITY.FREEZE_ENTITY_POSITION(cage_object3, true)
     	ENTITY.FREEZE_ENTITY_POSITION(cage_object4, true)
 	    ENTITY.FREEZE_ENTITY_POSITION(cage_object5, true)
-	    util.yield(0015)
+	    util.yield(15)
 	    STREAMING.SET_MODEL_AS_NO_LONGER_NEEDED(cage_object)
        menu.trigger_commands("disarm" .. PLAYER.GET_PLAYER_NAME(player_id))
     end)
@@ -1278,7 +1278,7 @@ end)
         spawned_objects[#spawned_objects + 1] = cage_object
         spawned_objects[#spawned_objects + 1] = cage_object2
         spawned_objects[#spawned_objects + 1] = cage_object3
-	    util.yield(0015)
+	    util.yield(15)
 	    STREAMING.SET_MODEL_AS_NO_LONGER_NEEDED(cage_object)
         menu.trigger_commands("disarm" .. PLAYER.GET_PLAYER_NAME(player_id))
     end)
@@ -1311,7 +1311,7 @@ end)
         spawned_objects[#spawned_objects + 1] = cage_object7
         spawned_objects[#spawned_objects + 1] = cage_object8
         spawned_objects[#spawned_objects + 1] = cage_object9
-	    util.yield(0015)
+	    util.yield(15)
 	    local rot  = ENTITY.GET_ENTITY_ROTATION(cage_object)
 	    rot.y = 90
 	    STREAMING.SET_MODEL_AS_NO_LONGER_NEEDED(cage_object)
@@ -1327,7 +1327,7 @@ end)
 		end
 		local cage_object = OBJECT.CREATE_OBJECT(2081936690, pos.x, pos.y, pos.z, true, true, false)
         spawned_objects[#spawned_objects + 1] = cage_object
-		util.yield(0015)
+		util.yield(15)
 		local rot  = ENTITY.GET_ENTITY_ROTATION(cage_object)
 		rot.y = 90
 		ENTITY.SET_ENTITY_ROTATION(cage_object, rot.x,rot.y,rot.z,1,true)
@@ -3989,86 +3989,6 @@ local spawnDistance = 0
 local to_ply = 1
 local selected = 1
 local spawnedPlanes = {}
------------------------------------------------------------------------------------------------------------
-local Cheraxcrash = menu.list(crashes, "Cherax Crashes", {}, "")
-
-menu.action(Cheraxcrash,"Cherax Crash", {"dacheraxcrash"}, "Working.", function()
-    menu.trigger_commands("choke" .. PLAYER.GET_PLAYER_NAME(player_id))
-    menu.trigger_commands("flashcrash" .. PLAYER.GET_PLAYER_NAME(player_id))
-    menu.trigger_commands("choke" .. PLAYER.GET_PLAYER_NAME(player_id))
-    menu.trigger_commands("flashcrash" .. PLAYER.GET_PLAYER_NAME(player_id))
-    util.yield()
-    util.toast("Cherax Crash Sent to " .. PLAYER.GET_PLAYER_NAME(player_id))
-    util.log("Cherax Crash Sent to " .. PLAYER.GET_PLAYER_NAME(player_id))
-end, nil, nil, COMMANDPERM_AGGRESSIVE)
-
-menu.toggle_loop(Cheraxcrash,"Cherax Crash", {"cheraxcrash"}, "Working.", function()
-    if player_id ~= players.user() then
-    menu.trigger_commands("choke" .. PLAYER.GET_PLAYER_NAME(player_id))
-    menu.trigger_commands("flashcrash" .. PLAYER.GET_PLAYER_NAME(player_id))
-    menu.trigger_commands("choke" .. PLAYER.GET_PLAYER_NAME(player_id))
-    menu.trigger_commands("flashcrash" .. PLAYER.GET_PLAYER_NAME(player_id))
-    util.yield()
-    util.toast("Cherax Crash Sent to " .. PLAYER.GET_PLAYER_NAME(player_id))
-    util.log("Cherax Crash Sent to " .. PLAYER.GET_PLAYER_NAME(player_id))
-    end
-end)
------------------------------------------------------------------------------------------------------------
-local Northcrash = menu.list(crashes, "North Crashes", {}, "")
-
-menu.action(Northcrash,"North Crash", {"danorthcrash"}, "Working.", function()
-    local pos = ENTITY.GET_ENTITY_COORDS(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id))
-    local michael = util.joaat("player_zero")
-    while not STREAMING.HAS_MODEL_LOADED(michael) do
-        STREAMING.REQUEST_MODEL(michael)
-        util.yield()
-    end
-    local ped = entities.create_ped(0, michael, pos, 0)
-    PED.SET_PED_COMPONENT_VARIATION(ped, 0, 0, 6, 0)
-    PED.SET_PED_COMPONENT_VARIATION(ped, 0, 0, 7, 0)
-    util.yield()
-    util.yield(500)
-    entities.delete_by_handle(ped)
-    util.toast("North Crash Sent to " .. PLAYER.GET_PLAYER_NAME(player_id))
-    util.log("North Crash Sent to " .. PLAYER.GET_PLAYER_NAME(player_id))
-end, nil, nil, COMMANDPERM_AGGRESSIVE)
-
-menu.toggle_loop(Northcrash,"North Crash", {"northcrash"}, "Working. Can't crash yourself with toggled.", function()
-    if player_id ~= players.user() then
-    local pos = ENTITY.GET_ENTITY_COORDS(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id))
-    local michael = util.joaat("player_zero")
-    while not STREAMING.HAS_MODEL_LOADED(michael) do
-        STREAMING.REQUEST_MODEL(michael)
-        util.yield()
-    end
-    local ped = entities.create_ped(0, michael, pos, 0)
-    PED.SET_PED_COMPONENT_VARIATION(ped, 0, 0, 6, 0)
-    PED.SET_PED_COMPONENT_VARIATION(ped, 0, 0, 7, 0)
-    util.yield()
-    util.yield(500)
-    entities.delete_by_handle(ped)
-    util.toast("North Crash Sent to " .. PLAYER.GET_PLAYER_NAME(player_id))
-    util.log("North Crash Sent to " .. PLAYER.GET_PLAYER_NAME(player_id))
-    end
-end)
------------------------------------------------------------------------------------------------------------
-local KiddionsCrash = menu.list(crashes, "Kiddions Crashes", {}, "")
-
-menu.action(KiddionsCrash,"Kiddions Crash", {"dakiddionscrash"}, "Working. LMFAO", function()
-    menu.trigger_commands("flashcrash" .. PLAYER.GET_PLAYER_NAME(player_id))
-    util.yield()
-    util.toast("Kiddions Crash Sent to " .. PLAYER.GET_PLAYER_NAME(player_id))
-    util.log("Kiddions Crash Sent to " .. PLAYER.GET_PLAYER_NAME(player_id))
-end, nil, nil, COMMANDPERM_AGGRESSIVE)
-
-menu.toggle_loop(KiddionsCrash,"Kiddions Crash", {"kiddionscrash"}, "Working. LMFAO", function()
-    if player_id ~= players.user() then
-    menu.trigger_commands("flashcrash" .. PLAYER.GET_PLAYER_NAME(player_id))
-    util.yield()
-    util.toast("Kiddions Crash Sent to " .. PLAYER.GET_PLAYER_NAME(player_id))
-    util.log("Kiddions Crash Sent to " .. PLAYER.GET_PLAYER_NAME(player_id))
-    end
-end)
 
 --------------------------------------------------------------------------------------------------------------------------------
 
@@ -5113,7 +5033,6 @@ players.dispatch_on_join()
 -------------------------------------------------------------------------------------------------------------------------------------------------
 
 --==Menu's==--
-util.yield(5000)
 local selfc = menu.list(uwuself, "Main", {}, "Main Options.")
 local weapons = menu.list(uwuself, "Weapons", {}, "")
 local online = menu.list(uwuonline, "FewMod", {}, "Online mode options")
@@ -5220,7 +5139,6 @@ local function request_control2(entity, timeout)
     NETWORK.NETWORK_REQUEST_CONTROL_OF_ENTITY(entity)
     while not NETWORK.NETWORK_HAS_CONTROL_OF_ENTITY(entity) and end_time >= os.time() do
         NETWORK.NETWORK_REQUEST_CONTROL_OF_ENTITY(entity)
-        util.yield()
     end
     return NETWORK.NETWORK_HAS_CONTROL_OF_ENTITY(entity)
 end
@@ -6456,7 +6374,6 @@ menu.toggle_loop(selfc, "Refill Health in Cover", {"healincover"}, "", function(
 	if PED.IS_PED_IN_COVER(players.user_ped(), false) then
 		PLAYER.SET_PLAYER_HEALTH_RECHARGE_MAX_PERCENT(players.user_ped(), 1.0)
 		PLAYER.SET_PLAYER_HEALTH_RECHARGE_MULTIPLIER(players.user_ped(), 15.0)
-        util.yield_once()
         menu.trigger_commands("maxhealth")
 	else
 		PLAYER.SET_PLAYER_HEALTH_RECHARGE_MAX_PERCENT(players.user_ped(), 0.5)
@@ -6652,17 +6569,17 @@ local interiors = {
     end)
     
     menu.toggle_loop(online, "Script Host Addiction", {}, "You become addicted to being the Script Host (Could Help Prevent Some Shitty Kicks) \nNote: Don't Use With Never Script Host, It Will Break The Session and Also Become Pointless", function()
-        util.yield(0500)
+        util.yield(500)
         if players.get_script_host() ~= players.user() and Fewd.get_spawn_state(players.user()) ~= 0 then
             menu.trigger_command(menu.ref_by_path("Players>"..players.get_name_with_tags(players.user())..">Friendly>Give Script Host"))
         else
-            util.yield(0275)
+            util.yield(275)
             menu.trigger_commands("scripthost")
         end
     end)
 
     menu.toggle_loop(online, "Never Script Host", {"neversh"}, "You never become the Script Host (Could Sometimes Help Prevent Kicks Related To Having Script Host) \nNote: Don't Use With Script Host Addiction, It Will Break The Session and Also Become Pointless", function()
-        util.yield(0500)
+        util.yield(500)
         if players.get_script_host() == players.user() then
             menu.trigger_command(menu.ref_by_path("Players>"..players.get_name_with_tags(players.get_host())..">Friendly>Give Script Host"))
         end
@@ -8178,13 +8095,13 @@ end
 
 function ent_func.request_model(hash)
     STREAMING.REQUEST_MODEL(hash)
-    while not STREAMING.HAS_MODEL_LOADED(hash) do util.yield(0) end
+    while not STREAMING.HAS_MODEL_LOADED(hash) do util.yield() end
 end
 
 function ent_func.use_fx_asset(asset)
     while not STREAMING.HAS_NAMED_PTFX_ASSET_LOADED(asset) do
 		STREAMING.REQUEST_NAMED_PTFX_ASSET(asset)
-		util.yield(0)
+		util.yield()
 	end
     GRAPHICS.USE_PARTICLE_FX_ASSET(asset)
 end
@@ -8192,7 +8109,7 @@ end
 function ent_func.has_anim_dict_loaded(dict)
     while not STREAMING.HAS_ANIM_DICT_LOADED(dict) do
         STREAMING.REQUEST_ANIM_DICT(dict)
-        util.yield(0)
+        util.yield()
     end
 end
 
@@ -10089,13 +10006,13 @@ end
 
 menu.action(fun, "Random Female Outfit", {}, "Gives You A Random Outfit \n(Can Be Used To Leave Any Bird You Switch Into)", function()
     menu.trigger_commands("mpfemale")
-    util.yield(0800)
+    util.yield(800)
     menu.trigger_commands("randomoutfit")
 end)
 
 menu.action(fun, "Random Male Outfit", {}, "Gives You A Random Outfit \n(Can Be Used To Leave Any Bird You Switch Into)", function()
     menu.trigger_commands("mpmale")
-    util.yield(0800)
+    util.yield(800)
     menu.trigger_commands("randomoutfit")
 end)
 
@@ -10642,7 +10559,7 @@ menu.toggle(pmenu, "Become A KillerWhale", {}, "Change Into A KillerWhale", func
     else
         menu.trigger_commands("allguns")
         menu.trigger_commands("mpfemale")
-        util.yield(0500)
+        util.yield(500)
         menu.trigger_commands("tpmazehelipad")
     end
 end)
@@ -18313,5 +18230,5 @@ while true do
         util.draw_ar_beacon(changed_pos) 
     end
 
-    util.yield()
+    util.yield_once()
 end
