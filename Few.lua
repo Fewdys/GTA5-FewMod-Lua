@@ -1010,59 +1010,6 @@ end)
         send_player_vehicle_flying(player_id)
     end)
 
-    menu.toggle_loop(trolling, "Windmills V2", {"togglemillsv1"}, "", function(on_toggle)
-        Fewd.BlockSyncs(player_id, function()
-                local object = entities.create_object(util.joaat("prop_windmill_01"), ENTITY.GET_ENTITY_COORDS(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)))
-                OBJECT.BREAK_OBJECT_FRAGMENT_CHILD(object, 1, true)
-                entities.delete_by_handle(object)
-                local object = entities.create_object(util.joaat("prop_windmill_01"), ENTITY.GET_ENTITY_COORDS(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)))
-                OBJECT.BREAK_OBJECT_FRAGMENT_CHILD(object, 1, true)
-                entities.delete_by_handle(object)
-                local object = entities.create_object(util.joaat("prop_windmill_01"), ENTITY.GET_ENTITY_COORDS(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)))
-                OBJECT.BREAK_OBJECT_FRAGMENT_CHILD(object, 1, true)
-                entities.delete_by_handle(object)
-                local object = entities.create_object(util.joaat("prop_windmill_01"), ENTITY.GET_ENTITY_COORDS(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)))
-                OBJECT.BREAK_OBJECT_FRAGMENT_CHILD(object, 1, true)
-                entities.delete_by_handle(object)
-                local object = entities.create_object(util.joaat("prop_windmill_01"), ENTITY.GET_ENTITY_COORDS(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)))
-                OBJECT.BREAK_OBJECT_FRAGMENT_CHILD(object, 1, true)
-                entities.delete_by_handle(object)
-                util.yield(1000)
-            end)
-        end)
-
-    menu.toggle_loop(trolling, "Attach Windmills", {"attachmills"}, "", function()
-        local id = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)
-        local playerpos = ENTITY.GET_ENTITY_COORDS(id)
-        playerpos.z = playerpos.z + 3
-        local khanjali = util.joaat("prop_windmill_01")
-        STREAMING.REQUEST_MODEL(khanjali)
-        while not STREAMING.HAS_MODEL_LOADED(khanjali) do
-            util.yield()
-        end
-        local vehicle1 = entities.create_object(khanjali, ENTITY.GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(PLAYER.GET_PLAYER_PED(player_id), 0, 2, 3), ENTITY.GET_ENTITY_HEADING(id))
-            ENTITY.ATTACH_ENTITY_TO_ENTITY(vehicle1, id, playerpos, 0, 0, 0, 0, 0, 0, 0, 0, true, true, false, 0, true)
-            ENTITY.SET_ENTITY_VISIBLE(vehicle1, true, 0)
-        local vehicle2 = entities.create_object(khanjali, playerpos, 0)
-            ENTITY.ATTACH_ENTITY_TO_ENTITY(vehicle1, id, playerpos, 0, 0, 0, 0, 0, 0, 0, 0, true, true, false, 0, true)
-            ENTITY.SET_ENTITY_VISIBLE(vehicle1, true, 0)
-        NETWORK.NETWORK_REQUEST_CONTROL_OF_ENTITY(vehicle1)
-        NETWORK.NETWORK_REQUEST_CONTROL_OF_ENTITY(vehicle2)
-        ENTITY.ATTACH_ENTITY_TO_ENTITY(vehicle2, vehicle1, 0, 0, 3, 0, 0, 0, -180, 0, false, true, false, 0, true)
-        ENTITY.SET_ENTITY_VISIBLE(vehicle1, true)
-        util.yield(100)
-    end)
-
-    menu.action(trolling, "Clear Windmill's", {"clearwindmills"}, "", function()
-        local count = 0
-        for k,ent in pairs(entities.get_all_objects_as_handles()) do
-            ENTITY.SET_ENTITY_AS_MISSION_ENTITY(ent, false, false)
-            entities.delete_by_handle(ent)
-            count = count + 1
-            util.yield()
-        end
-    end)
-
     function is_ped_player(ped)
         if PED.GET_PED_TYPE(ped) >= 4 then
             return false
@@ -1071,7 +1018,7 @@ end)
         end
     end
 
-    menu.toggle_loop(trolling, "Attach All Nearby Entities", {"attachallnearby"}, "", function(on_toggle)
+    menu.toggle_loop(trolling, "Attach All Nearby Entities", {"attachallnearby"}, "Will Likely Get An Access Violation lol", function(on_toggle)
         local tar = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)
         objects = entities.get_all_objects_as_handles()
         vehicles = entities.get_all_vehicles_as_handles()
@@ -1100,6 +1047,63 @@ end)
         spawned_objects[#spawned_objects + 1] = container
         ENTITY.SET_ENTITY_VISIBLE(container, false)
         ENTITY.FREEZE_ENTITY_POSITION(container, true)
+    end)
+
+    local windmilli = menu.list(trolling, "Windmills", {}, "")
+
+    menu.toggle_loop(windmilli, "Attach Windmills", {"attachmills"}, "", function()
+        local id = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)
+        local playerpos = ENTITY.GET_ENTITY_COORDS(id)
+        playerpos.z = playerpos.z + 3
+        local khanjali = util.joaat("prop_windmill_01")
+        STREAMING.REQUEST_MODEL(khanjali)
+        windmills[#windmills + 1] = khanjali
+        while not STREAMING.HAS_MODEL_LOADED(khanjali) do
+            util.yield()
+        end
+        local vehicle1 = entities.create_object(khanjali, ENTITY.GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(PLAYER.GET_PLAYER_PED(player_id), 0, 2, 3), ENTITY.GET_ENTITY_HEADING(id))
+            ENTITY.ATTACH_ENTITY_TO_ENTITY(vehicle1, id, playerpos, 0, 0, 0, 0, 0, 0, 0, 0, true, true, false, 0, true)
+            ENTITY.SET_ENTITY_VISIBLE(vehicle1, true, 0)
+        local vehicle2 = entities.create_object(khanjali, playerpos, 0)
+            ENTITY.ATTACH_ENTITY_TO_ENTITY(vehicle1, id, playerpos, 0, 0, 0, 0, 0, 0, 0, 0, true, true, false, 0, true)
+            ENTITY.SET_ENTITY_VISIBLE(vehicle1, true, 0)
+        NETWORK.NETWORK_REQUEST_CONTROL_OF_ENTITY(vehicle1)
+        NETWORK.NETWORK_REQUEST_CONTROL_OF_ENTITY(vehicle2)
+        ENTITY.ATTACH_ENTITY_TO_ENTITY(vehicle2, vehicle1, 0, 0, 3, 0, 0, 0, -180, 0, false, true, false, 0, true)
+        ENTITY.SET_ENTITY_VISIBLE(vehicle1, true)
+        util.yield(100)
+    end)
+
+    menu.toggle_loop(windmilli, "Windmills V2", {"togglemillsv1"}, "", function(on_toggle)
+        Fewd.BlockSyncs(player_id, function()
+                local object = entities.create_object(util.joaat("prop_windmill_01"), ENTITY.GET_ENTITY_COORDS(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)))
+                OBJECT.BREAK_OBJECT_FRAGMENT_CHILD(object, 1, true)
+                entities.delete_by_handle(object)
+                local object = entities.create_object(util.joaat("prop_windmill_01"), ENTITY.GET_ENTITY_COORDS(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)))
+                OBJECT.BREAK_OBJECT_FRAGMENT_CHILD(object, 1, true)
+                entities.delete_by_handle(object)
+                local object = entities.create_object(util.joaat("prop_windmill_01"), ENTITY.GET_ENTITY_COORDS(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)))
+                OBJECT.BREAK_OBJECT_FRAGMENT_CHILD(object, 1, true)
+                entities.delete_by_handle(object)
+                local object = entities.create_object(util.joaat("prop_windmill_01"), ENTITY.GET_ENTITY_COORDS(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)))
+                OBJECT.BREAK_OBJECT_FRAGMENT_CHILD(object, 1, true)
+                entities.delete_by_handle(object)
+                local object = entities.create_object(util.joaat("prop_windmill_01"), ENTITY.GET_ENTITY_COORDS(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)))
+                OBJECT.BREAK_OBJECT_FRAGMENT_CHILD(object, 1, true)
+                entities.delete_by_handle(object)
+                util.yield(1000)
+            end)
+        end)
+
+    menu.action(windmilli, "Delete Windmills", {"clearwindmills"}, "", function()
+        local entitycount = 0
+        for i, object in ipairs(windmills) do
+            ENTITY.SET_ENTITY_AS_MISSION_ENTITY(object, false, false)
+            NETWORK.NETWORK_REQUEST_CONTROL_OF_ENTITY(object)
+            entities.delete_by_handle(object)
+            windmills[i] = nil
+            entitycount += 1
+        end
     end)
 
     local cage = menu.list(trolling, "Cage Player", {}, "")
