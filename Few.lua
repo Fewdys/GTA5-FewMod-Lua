@@ -4783,6 +4783,7 @@ end)
 menu.action(uwuworld, "Delete Objects", {"clearobj"}, "Deletes All Objects", function(on_click)
     local objects = delete_entities_by_range(entities.get_all_objects_as_handles(), 1000000, "OBJECT")
     local player_pos = ENTITY.GET_ENTITY_COORDS(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(players.user()), 1)
+    local ct = 0
     for k,ent in pairs(entities.get_all_objects_as_handles()) do
         entities.delete_by_handle(ent)
         ct += 1
