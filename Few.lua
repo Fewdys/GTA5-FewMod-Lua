@@ -5249,10 +5249,6 @@ menu.action(uwuworld, "Delete Objects", {"clearobj"}, "Deletes All Objects", fun
         entities.delete_by_handle(ent)
         ct += 1
     end
-    for k,ent in pairs(entities.get_all_objects_as_handles()) do
-        entities.delete_by_handle(entity) 
-        ct += 1
-    end
 end)
 
 
@@ -5302,32 +5298,10 @@ menu.action(uwuworld, "Clean World/Super Cleanse", {"clearworld"}, "Literally cl
     local peds = delete_entities_by_range(entities.get_all_peds_as_handles(), 1000000, "PED")
     local player_pos = ENTITY.GET_ENTITY_COORDS(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(players.user()), 1)
     GRAPHICS.REMOVE_PARTICLE_FX_IN_RANGE(player_pos.x, player_pos.y, player_pos.z, 1000000)
-        local ct = 0
-        for k,ent in pairs(entities.get_all_vehicles_as_handles()) do
-            local driver = VEHICLE.GET_PED_IN_VEHICLE_SEAT(ent, -1)
-            if not PED.IS_PED_A_PLAYER(driver) then
-                entities.delete_by_handle(ent)
-                ct += 1
-            end
-        end
-        for k,ent in pairs(entities.get_all_peds_as_handles()) do
-            if not PED.IS_PED_A_PLAYER(ent) then
-                entities.delete_by_handle(ent)
-            end
-            ct += 1
-        end
-        for k,ent in pairs(entities.get_all_objects_as_handles()) do
-            entities.delete_by_handle(ent)
-            ct += 1
-        end
-        local rope_alloc = memory.alloc(4)
-        for i=0, 100 do 
-            memory.write_int(rope_alloc, i)
-            if PHYSICS.DOES_ROPE_EXIST(rope_alloc) then   
-                PHYSICS.DELETE_ROPE(rope_alloc)
-                ct += 1
-            end
-        end
+    menu.trigger_commands("clearropes")
+    menu.trigger_commands("clearpeds")
+    menu.trigger_commands("clearveh")
+    menu.trigger_commands("clearobj")
 end)
 
 --------------------------------------------------------------------------------------------------------------------------------
@@ -11751,32 +11725,10 @@ end)
 
 util.on_pre_stop(function()
     util.toast("Cleaning...")
-    local ct = 0
-        for k,ent in pairs(entities.get_all_vehicles_as_handles()) do
-            local driver = VEHICLE.GET_PED_IN_VEHICLE_SEAT(ent, -1)
-            if not PED.IS_PED_A_PLAYER(driver) then
-                entities.delete_by_handle(ent)
-                ct += 1
-            end
-        end
-        for k,ent in pairs(entities.get_all_peds_as_handles()) do
-            if not PED.IS_PED_A_PLAYER(ent) then
-                entities.delete_by_handle(ent)
-            end
-            ct += 1
-        end
-        for k,ent in pairs(entities.get_all_objects_as_handles()) do
-            entities.delete_by_handle(ent)
-            ct += 1
-        end
-        local rope_alloc = memory.alloc(4)
-        for i=0, 100 do 
-            memory.write_int(rope_alloc, i)
-            if PHYSICS.DOES_ROPE_EXIST(rope_alloc) then   
-                PHYSICS.DELETE_ROPE(rope_alloc)
-                ct += 1
-            end
-        end
+    menu.trigger_commands("clearropes")
+    menu.trigger_commands("clearpeds")
+    menu.trigger_commands("clearveh")
+    menu.trigger_commands("clearobj")
 end)
 
 util.on_stop(function()
