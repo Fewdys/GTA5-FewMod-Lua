@@ -4885,7 +4885,7 @@ menu.divider(kicks, "Base Kicks")
         end
     end)
 
-    menu.action(tpthem, "Fix loading screen", {"fixme"}, "Try to fix player's infinite loading screen by giving him script host and teleporting to nearest apartment.", function()
+    menu.action(friendly, "Fix loading screen", {"fixme"}, "Try to fix player's infinite loading screen by giving him script host and teleporting to nearest apartment.", function()
         menu.trigger_commands("givesh" .. players.get_name(player_id))
         menu.trigger_commands("aptme" .. players.get_name(player_id))
         end, nil, nil, COMMANDPERM_FRIENDLY)
