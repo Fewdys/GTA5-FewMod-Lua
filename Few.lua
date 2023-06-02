@@ -7,7 +7,7 @@ util.require_natives(1676318796)
 util.require_natives(1663599433)
 
 local response = false
-local localversion = 1.55
+local localversion = 1.56
 local localKs = false
 async_http.init("raw.githubusercontent.com", "/Fewdys/GTA5-FewMod-Lua/main/FewModVersion.lua", function(output)
     currentVer = tonumber(output)
@@ -1027,22 +1027,7 @@ end)
                 local object = entities.create_object(util.joaat("prop_windmill_01"), ENTITY.GET_ENTITY_COORDS(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)))
                 OBJECT.BREAK_OBJECT_FRAGMENT_CHILD(object, 1, true)
                 entities.delete_by_handle(object)
-                local object = entities.create_object(util.joaat("prop_windmill_01"), ENTITY.GET_ENTITY_COORDS(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)))
-                OBJECT.BREAK_OBJECT_FRAGMENT_CHILD(object, 1, true)
-                entities.delete_by_handle(object)
-                local object = entities.create_object(util.joaat("prop_windmill_01"), ENTITY.GET_ENTITY_COORDS(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)))
-                OBJECT.BREAK_OBJECT_FRAGMENT_CHILD(object, 1, true)
-                entities.delete_by_handle(object)
-                local object = entities.create_object(util.joaat("prop_windmill_01"), ENTITY.GET_ENTITY_COORDS(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)))
-                OBJECT.BREAK_OBJECT_FRAGMENT_CHILD(object, 1, true)
-                entities.delete_by_handle(object)
-                local object = entities.create_object(util.joaat("prop_windmill_01"), ENTITY.GET_ENTITY_COORDS(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)))
-                OBJECT.BREAK_OBJECT_FRAGMENT_CHILD(object, 1, true)
-                entities.delete_by_handle(object)
-                local object = entities.create_object(util.joaat("prop_windmill_01"), ENTITY.GET_ENTITY_COORDS(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)))
-                OBJECT.BREAK_OBJECT_FRAGMENT_CHILD(object, 1, true)
                 util.yield(1000)
-                entities.delete_by_handle(object)
             end)
         end)
 
@@ -1061,21 +1046,11 @@ end)
         local vehicle2 = entities.create_object(khanjali, playerpos, 0)
             ENTITY.ATTACH_ENTITY_TO_ENTITY(vehicle1, id, playerpos, 0, 0, 0, 0, 0, 0, 0, 0, true, true, false, 0, true)
             ENTITY.SET_ENTITY_VISIBLE(vehicle1, true, 0)
-        local vehicle3 = entities.create_object(khanjali, playerpos, 0)
-            ENTITY.ATTACH_ENTITY_TO_ENTITY(vehicle1, id, playerpos, 0, 0, 0, 0, 0, 0, 0, 0, true, true, false, 0, true)
-            ENTITY.SET_ENTITY_VISIBLE(vehicle1, true, 0)
-        local vehicle4 = entities.create_object(khanjali, playerpos, 0)
-            ENTITY.ATTACH_ENTITY_TO_ENTITY(vehicle1, id, playerpos, 0, 0, 0, 0, 0, 0, 0, 0, true, true, false, 0, true)
-            ENTITY.SET_ENTITY_VISIBLE(vehicle1, true, 0)
         NETWORK.NETWORK_REQUEST_CONTROL_OF_ENTITY(vehicle1)
         NETWORK.NETWORK_REQUEST_CONTROL_OF_ENTITY(vehicle2)
-        NETWORK.NETWORK_REQUEST_CONTROL_OF_ENTITY(vehicle3)
-        NETWORK.NETWORK_REQUEST_CONTROL_OF_ENTITY(vehicle4)
         ENTITY.ATTACH_ENTITY_TO_ENTITY(vehicle2, vehicle1, 0, 0, 3, 0, 0, 0, -180, 0, false, true, false, 0, true)
-        ENTITY.ATTACH_ENTITY_TO_ENTITY(vehicle3, vehicle1, 0, 3, 3, 0, 0, 0, -180, 0, false, true, false, 0, true)
-        ENTITY.ATTACH_ENTITY_TO_ENTITY(vehicle4, vehicle1, 0, 3, 0, 0, 0, 0, 0, 0, false, true, false, 0, true)
         ENTITY.SET_ENTITY_VISIBLE(vehicle1, true)
-        util.yield(10)
+        util.yield(100)
     end)
 
     menu.action(trolling, "Clear Windmill's", {"clearwindmills"}, "", function()
@@ -1087,6 +1062,14 @@ end)
             util.yield()
         end
     end)
+
+    function is_ped_player(ped)
+        if PED.GET_PED_TYPE(ped) >= 4 then
+            return false
+        else
+            return true
+        end
+    end
 
     menu.toggle_loop(trolling, "Attach All Nearby Entities", {"attachallnearby"}, "", function(on_toggle)
         local tar = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)
@@ -4690,7 +4673,7 @@ menu.divider(kicks, "Base Kicks")
         0x991F8C36
     }
 
-    menu.toggle_loop(drops, "Drop All Figures Fast", {"figures"}, "", function()
+    menu.toggle_loop(friendly, "Drop All Figures Fast", {"figures"}, "", function()
         local coords = players.get_position(player_id)
         coords.z = coords.z + 1.5
         local random_hash
