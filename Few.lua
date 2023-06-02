@@ -42,7 +42,7 @@ until response
 
 local pos = players.get_position(players.user())
 local changed_pos = pos;
-local aim_only, aim_only_fake_lag = false, false;
+local aim_only, aim_only_fake_lag, aim_rand = false, false, false;
 local x_off, y_off = 0, 0;
 local fakelag_ms = 0;
 local radius = 5
@@ -17998,9 +17998,17 @@ menu.toggle_loop(path, "Randomize Position", {"randwarp"}, "spoofs your position
         random_pos();
         menu.trigger_commands("spoofedposition " .. tostring(changed_pos.x) .. ", " .. tostring(changed_pos.y) .. ", " .. tostring(changed_pos.z))
         util.yield(interval)
+    elseif aim_rand
+        random_pos();
+        menu.trigger_commands("spoofedposition " .. tostring(changed_pos.x) .. ", " .. tostring(changed_pos.y) .. ", " .. tostring(changed_pos.z))
+        util.yield(interval)
     else
         util.toast("Failed Lmao")
     end
+end)
+
+menu.toggle(path, "Random Position When Aiming", {},"spoofs your position to a random place within a radius around your current position at the given interval but only when aiming", function()
+    aim_rand = not aim_rand
 end)
 
 --------------------------------------------------------------------------------------------------------------------------------------------------------
