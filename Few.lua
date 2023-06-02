@@ -884,7 +884,7 @@ end)
         menu.trigger_commands("clearworld")
     end)
 
-    menu.toggle_loop(malicious, "Attach All Nearby Entities", {"attachallnearby"}, "Will Likely Get An Access Violation lol", function(on_toggle)
+    menu.toggle_loop(malicious, "Attach All Nearby Entities", {"attachallnearby"}, "Will Likely Get An Access Violation lol \nUse With Caution As You Could Possibly Crash Yourself With This \nCan Cause (X8, XY, A0:38)", function(on_toggle)
         local tar = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)
         objects = entities.get_all_objects_as_handles()
         vehicles = entities.get_all_vehicles_as_handles()
