@@ -17995,13 +17995,15 @@ end
 menu.toggle_loop(path, "Randomize Position", {"randwarp"}, "spoofs your position to a random place within a radius around your current position at the given interval", function ()
 
     if pos then
+        if not aim_rand then
         random_pos();
         menu.trigger_commands("spoofedposition " .. tostring(changed_pos.x) .. ", " .. tostring(changed_pos.y) .. ", " .. tostring(changed_pos.z))
         util.yield(interval)
-    elseif not aim_rand then
+        elseif aim_rand and PED.GET_PED_CONFIG_FLAG(players.user_ped(), 78, false) then
         random_pos();
         menu.trigger_commands("spoofedposition " .. tostring(changed_pos.x) .. ", " .. tostring(changed_pos.y) .. ", " .. tostring(changed_pos.z))
         util.yield(interval)
+        end
     else
         util.toast("Failed Lmao")
     end
