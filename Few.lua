@@ -1057,7 +1057,6 @@ end)
         playerpos.z = playerpos.z + 3
         local khanjali = util.joaat("prop_windmill_01")
         STREAMING.REQUEST_MODEL(khanjali)
-        windmills[#windmills + 1] = khanjali
         while not STREAMING.HAS_MODEL_LOADED(khanjali) do
             util.yield()
         end
@@ -1104,6 +1103,7 @@ end)
             windmills[i] = nil
             entitycount += 1
         end
+        menu.trigger_commands("clearobj")
     end)
 
     local cage = menu.list(trolling, "Cage Player", {}, "")
