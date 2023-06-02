@@ -872,6 +872,34 @@ end)
 
     -------------------------------------------------------------------------------------------------------
 
+    function is_ped_player(ped)
+        if PED.GET_PED_TYPE(ped) >= 4 then
+            return false
+        else
+            return true
+        end
+    end
+
+    menu.toggle_loop(malicious, "Attach All Nearby Entities", {"attachallnearby"}, "Will Likely Get An Access Violation lol", function(on_toggle)
+        local tar = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)
+        objects = entities.get_all_objects_as_handles()
+        vehicles = entities.get_all_vehicles_as_handles()
+        peds = entities.get_all_peds_as_handles()
+        for i, ent in pairs(peds) do
+            if not is_ped_player(ped) then
+                ENTITY.ATTACH_ENTITY_TO_ENTITY(ent, tar, 0, 0.0, -0.20, 2.00, 1.0, 1.0,1, true, true, true, false, 0, true)
+            end
+        end
+        for i, ent in pairs(vehicles) do
+            if not is_ped_player(VEHICLE.GET_PED_IN_VEHICLE_SEAT(ent, -1)) then
+                ENTITY.ATTACH_ENTITY_TO_ENTITY(ent, tar, 0, 0.0, -0.20, 2.00, 1.0, 1.0,1, true, true, true, false, 0, true)
+            end
+        end
+        for i, ent in pairs(objects) do
+            ENTITY.ATTACH_ENTITY_TO_ENTITY(ent, tar, 0, 0.0, -0.20, 2.00, 1.0, 1.0,1, true, true, true, false, 0, true)
+        end
+    end)
+
     local flushes = menu.list(malicious, "Loops", {}, "")
 
     menu.toggle_loop(flushes, "Loop Explode", {"customexplodeloop"}, "", function()
@@ -1010,34 +1038,6 @@ end)
         send_player_vehicle_flying(player_id)
     end)
 
-    function is_ped_player(ped)
-        if PED.GET_PED_TYPE(ped) >= 4 then
-            return false
-        else
-            return true
-        end
-    end
-
-    menu.toggle_loop(trolling, "Attach All Nearby Entities", {"attachallnearby"}, "Will Likely Get An Access Violation lol", function(on_toggle)
-        local tar = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)
-        objects = entities.get_all_objects_as_handles()
-        vehicles = entities.get_all_vehicles_as_handles()
-        peds = entities.get_all_peds_as_handles()
-        for i, ent in pairs(peds) do
-            if not is_ped_player(ped) then
-                ENTITY.ATTACH_ENTITY_TO_ENTITY(ent, tar, 0, 0.0, -0.20, 2.00, 1.0, 1.0,1, true, true, true, false, 0, true)
-            end
-        end
-        for i, ent in pairs(vehicles) do
-            if not is_ped_player(VEHICLE.GET_PED_IN_VEHICLE_SEAT(ent, -1)) then
-                ENTITY.ATTACH_ENTITY_TO_ENTITY(ent, tar, 0, 0.0, -0.20, 2.00, 1.0, 1.0,1, true, true, true, false, 0, true)
-            end
-        end
-        for i, ent in pairs(objects) do
-            ENTITY.ATTACH_ENTITY_TO_ENTITY(ent, tar, 0, 0.0, -0.20, 2.00, 1.0, 1.0,1, true, true, true, false, 0, true)
-        end
-    end)
-
     menu.action(trolling, "Cage Vehicle", {"cage"}, "", function()
         local container_hash = util.joaat("benson")
         local ped = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)
@@ -1094,15 +1094,7 @@ end)
             end)
         end)
 
-    menu.action(windmilli, "Delete Windmills", {"clearwindmills"}, "", function()
-        local entitycount = 0
-        for i, object in ipairs(windmills) do
-            ENTITY.SET_ENTITY_AS_MISSION_ENTITY(object, false, false)
-            NETWORK.NETWORK_REQUEST_CONTROL_OF_ENTITY(object)
-            entities.delete_by_handle(object)
-            windmills[i] = nil
-            entitycount += 1
-        end
+    menu.action(windmilli, "Delete Objects", {"clearwindmills"}, "", function()
         menu.trigger_commands("clearobj")
     end)
 
