@@ -8596,12 +8596,10 @@ end)
  --==Full Credit To Frug & Nova_Plays==-- 
 getVehicleThread = util.create_thread(function(thr)
 	while true do 
-		vehicle = entities.get_user_vehicle_as_handle(true)
+		uwucurveh = entities.get_user_vehicle_as_handle(true)
 		util.yield(2000)
 	end
 end)
-
-local uwucurveh = entities.get_user_vehicle_as_handle(true)
 
 menu.toggle_loop(uwuvehicle, "Loud Radio", {"loudradio"}, "Enables loud radio (like lowriders have) on your current vehicle.", function()
 	AUDIO.SET_VEHICLE_RADIO_LOUD(uwucurveh, true)
