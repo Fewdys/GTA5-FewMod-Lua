@@ -7,7 +7,7 @@ util.require_natives(1676318796)
 util.require_natives(1663599433)
 
 local response = false
-local localversion = 1.58
+local localversion = 1.59
 local localKs = false
 async_http.init("raw.githubusercontent.com", "/Fewdys/GTA5-FewMod-Lua/main/FewModVersion.lua", function(output)
     currentVer = tonumber(output)
@@ -8594,17 +8594,19 @@ menu.toggle_loop(uwuvehicle, "Auto-flip Vehicle", {}, "Automatically flips your 
 end)
 
  --==Full Credit To Frug & Nova_Plays==-- 
- getVehicleThread = util.create_thread(function(thr)
+getVehicleThread = util.create_thread(function(thr)
 	while true do 
 		vehicle = entities.get_user_vehicle_as_handle(true)
 		util.yield(2000)
 	end
 end)
 
-menu.toggle_loop(uwuvehicle, "Loud radio", {"loudradio"}, "Enables loud radio (like lowriders have) on your current vehicle.", function()
-	AUDIO.SET_VEHICLE_RADIO_LOUD(vehicle, true)
+local uwucurveh = entities.get_user_vehicle_as_handle(true)
+
+menu.toggle_loop(uwuvehicle, "Loud Radio", {"loudradio"}, "Enables loud radio (like lowriders have) on your current vehicle.", function()
+	AUDIO.SET_VEHICLE_RADIO_LOUD(uwucurveh, true)
 end, function()
-	AUDIO.SET_VEHICLE_RADIO_LOUD(vehicle, false)
+	AUDIO.SET_VEHICLE_RADIO_LOUD(uwucurveh, false)
 end)
 
 util.create_thread(function()
@@ -8629,7 +8631,7 @@ menu.toggle(uwuvehicle, "Shift/A to Drift", {"driftmode"}, "Might Need To Respaw
 end)
 
 menu.click_slider(vehicles, "Dirt level", {"dirt"}, "Makes your vehicle dirty.", 0, 15, 0, 1, function(dirtAmount)
-	VEHICLE.SET_VEHICLE_DIRT_LEVEL(vehicle, dirtAmount)
+	VEHICLE.SET_VEHICLE_DIRT_LEVEL(uwucurveh, dirtAmount)
 end)
 
 local licenseplate = menu.list(vehicles, "License Plate Options", {}, "")
@@ -8826,53 +8828,53 @@ local windows_root = menu.list(uwuvehicle, "Windows", {vcwindows}, "Roll down/di
 
 menu.toggle(windows_root, "All Windows", {"rollwinall"}, "", function(wa)
 	if wa then
-		VEHICLE.ROLL_DOWN_WINDOWS(vehicle)
+		VEHICLE.ROLL_DOWN_WINDOWS(uwucurveh)
 	else
 		for i=0,7 do
-            VEHICLE.ROLL_UP_WINDOW(vehicle, i)
+            VEHICLE.ROLL_UP_WINDOW(uwucurveh, i)
         end
 	end
 end)
 menu.toggle(windows_root, "Front Left", {"rollwinfl"}, "", function(wfl)
 	if wfl then
-		VEHICLE.ROLL_DOWN_WINDOW(vehicle, 0)
+		VEHICLE.ROLL_DOWN_WINDOW(uwucurveh, 0)
 	else
-		VEHICLE.ROLL_UP_WINDOW(vehicle, 0)
+		VEHICLE.ROLL_UP_WINDOW(uwucurveh, 0)
 	end
 end)
 menu.toggle(windows_root, "Front Right", {"rollwinfr"}, "", function(wfr)
 	if wfr then
-		VEHICLE.ROLL_DOWN_WINDOW(vehicle, 1)
+		VEHICLE.ROLL_DOWN_WINDOW(uwucurveh, 1)
 	else
-		VEHICLE.ROLL_UP_WINDOW(vehicle, 1)
+		VEHICLE.ROLL_UP_WINDOW(uwucurveh, 1)
 	end
 end)
 menu.toggle(windows_root, "Rear Left", {"rollwinrl"}, "", function(wrl)
 	if wrl then
-		VEHICLE.ROLL_DOWN_WINDOW(vehicle, 2)
+		VEHICLE.ROLL_DOWN_WINDOW(uwucurveh, 2)
 	else
-		VEHICLE.ROLL_UP_WINDOW(vehicle, 2)
+		VEHICLE.ROLL_UP_WINDOW(uwucurveh, 2)
 	end
 end)
 menu.toggle(windows_root, "Rear Right", {"rollwinrr"}, "", function(wrr)
 	if wrr then
-		VEHICLE.ROLL_DOWN_WINDOW(vehicle, 3)
+		VEHICLE.ROLL_DOWN_WINDOW(uwucurveh, 3)
 	else
-		VEHICLE.ROLL_UP_WINDOW(vehicle, 3)
+		VEHICLE.ROLL_UP_WINDOW(uwucurveh, 3)
 	end
 end)
 menu.toggle(windows_root, "Mid Left", {"rollwinml"}, "", function(wml)
 	if wml then
-		VEHICLE.ROLL_DOWN_WINDOW(vehicle, 6)
+		VEHICLE.ROLL_DOWN_WINDOW(uwucurveh, 6)
 	else
-		VEHICLE.ROLL_UP_WINDOW(vehicle, 6)
+		VEHICLE.ROLL_UP_WINDOW(uwucurveh, 6)
 	end
 end)
 menu.toggle(windows_root, "Mid Right", {"rollwinmr"}, "", function(wmr)
 	if wmr then
-		VEHICLE.ROLL_DOWN_WINDOW(vehicle, 7)
+		VEHICLE.ROLL_DOWN_WINDOW(uwucurveh, 7)
 	else
-		VEHICLE.ROLL_UP_WINDOW(vehicle, 7)
+		VEHICLE.ROLL_UP_WINDOW(uwucurveh, 7)
 	end
 end)
 
