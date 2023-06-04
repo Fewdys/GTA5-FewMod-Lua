@@ -16777,7 +16777,6 @@ util.on_pre_stop(function()
     menu.trigger_commands("clearobj")
     local delped = delete_entities_by_range(entities.get_all_peds_as_handles(), 1000000, "PED")
     local delveh = delete_entities_by_range(entities.get_all_vehicles_as_handles(), 1000000, "VEHICLE")
-    local delobj = delete_entities_by_range(entities.get_all_objects_as_handles(), 1000000, "OBJECT")
     clear_area(10000)
     ----------------------------------------------------------------------------------------
 end)
