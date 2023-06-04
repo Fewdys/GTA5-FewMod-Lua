@@ -16687,7 +16687,7 @@ end
 
 local crosshairmisc = menu.list(misc, "Crosshair", {}, "")
 
-local crosshair_file = "cr1.png" -- default file name
+local crosshair_file = 'cr1.png' -- default file name
 
 local crosshair_tex = directx.create_texture(filesystem.scripts_dir().. '\\FewMod\\' .. '\\textures\\' .. '\\'..crosshair_file)
 
@@ -16725,12 +16725,10 @@ GenerateFeatures = function()
     )
     end)
 
-    menu.action(crosshairmisc, "Change Crosshair File Name", {"crfilename"}, "The new file must be in FewMod/textures (put .png / .jpeg in the name)", function(click_type)  --input text 
-        menu.show_command_box_click_based(click_type, "crfilename ")
-    end, function(arg)
+    menu.text_input(crosshairmisc, "Change Crosshair File Name", {"crfilename"}, "The new file must be in FewMod/textures (put .png / .jpeg in the name)", function(arg)
         crosshair_file = arg
         crosshair_tex = directx.create_texture(filesystem.scripts_dir().. '\\FewMod\\' .. '\\textures\\' .. '\\'..crosshair_file)
-    end, "crfilename [text]")
+    end, 'cr1.png')
 
     menu.slider(crosshairmisc, "Resize Crosshair", {"crsize"}, "", 1, 10000, 200, 1, function(size)
 	    cr_size=size/10000
@@ -16748,16 +16746,16 @@ GenerateFeatures = function()
 	    rotation = 0.0
     end)
 
-    menu.toggle(crosshairmisc, "Default Crosshair", {}, "", function() --Default rotoation 
-	    crosshair_file = 'cr1.png'
+    menu.action(crosshairmisc, "Default Crosshair", {}, "", function() --Default rotoation 
+	    menu.trigger_commands("crfilename ".."cr1.png")
     end)
 
-    menu.toggle(crosshairmisc, "Crosshair 2", {}, "", function() --Default rotoation 
-	    crosshair_file = 'cr2.png'
+    menu.action(crosshairmisc, "Crosshair 2", {}, "", function() --Default rotoation 
+        menu.trigger_commands("crfilename ".."cr2.png")
     end)
 
-    menu.toggle(crosshairmisc, "Custom Crosshair", {}, "", function() --Default rotoation 
-	    crosshair_file = 'customcr.png'
+    menu.action(crosshairmisc, "Custom Crosshair", {}, "", function() --Default rotoation 
+	    menu.trigger_commands("crfilename ".."customcr.png")
     end)
 
 end
