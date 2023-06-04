@@ -16740,12 +16740,27 @@ GenerateFeatures()
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 util.on_pre_stop(function()
-    util.toast("Cleaning...")
     menu.trigger_commands("clearworld")
+    util.toast("Cleaning...")
 end)
 
 util.on_stop(function()
-    menu.trigger_commands("clearworld") --x2 just to make sure everything cleans up properly
+    --Incase "clearworld" above doesn't work
+    ---------------------------------------------------------------------------------------
+    GRAPHICS.REMOVE_PARTICLE_FX_IN_RANGE(player_pos.x, player_pos.y, player_pos.z, 1000000)
+    menu.trigger_commands("clearropes")
+    util.yield(150)
+    menu.trigger_commands("clearpeds")
+    util.yield(150)
+    menu.trigger_commands("clearveh")
+    util.yield(150)
+    menu.trigger_commands("clearobj")
+    util.yield(150)
+    local delped = delete_entities_by_range(entities.get_all_peds_as_handles(), 1000000, "PED")
+    local delveh = delete_entities_by_range(entities.get_all_vehicles_as_handles(), 1000000, "VEHICLE")
+    local delobj = delete_entities_by_range(entities.get_all_objects_as_handles(), 1000000, "OBJECT")
+    clear_area(10000)
+    ----------------------------------------------------------------------------------------
     VEHICLE.SET_VEHICLE_GRAVITY(veh, true)
     VEHICLE.SET_VEHICLE_REDUCE_GRIP(veh, false)
     ENTITY.SET_ENTITY_COLLISION(veh, true, true);
