@@ -608,7 +608,7 @@ end
 clear_radius = 100000
 function clear_area(clear_radius)
     target_pos = ENTITY.GET_ENTITY_COORDS(PLAYER.PLAYER_PED_ID())
-    MISC.CLEAR_AREA(target_pos['x'], target_pos['y'], target_pos['z'], clear_radius, true, false, false, false)
+    MISC.CLEAR_AREA(target_pos['x'], target_pos['y'], target_pos['z'], clear_radius, true, true, true, true)
 end
 
 local function request_ptfx_asset(asset)
@@ -4782,18 +4782,17 @@ menu.toggle(yoinkSettings, "Pickups", {}, "", function (pick)
 end)
 
 menu.action(uwuworld, "Delete Objects", {"clearobj"}, "Deletes All Objects", function(on_click)
-    local objects = delete_entities_by_range(entities.get_all_objects_as_handles(), 1000000, "OBJECT")
     local player_pos = ENTITY.GET_ENTITY_COORDS(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(players.user()), 1)
     local ct = 0
     for k,ent in pairs(entities.get_all_objects_as_handles()) do
         entities.delete_by_handle(ent)
         ct += 1
     end
+    local objects = delete_entities_by_range(entities.get_all_objects_as_handles(), 10000, "OBJECT")
 end)
 
 
 menu.action(uwuworld, "Delete Vehicles", {"clearveh"}, "Deletes All Cars", function(on_click)
-    local vehicles = delete_entities_by_range(entities.get_all_vehicles_as_handles(), 1000000, "VEHICLE")
     local player_pos = ENTITY.GET_ENTITY_COORDS(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(players.user()), 1)
     local ct = 0
     for k,ent in pairs(entities.get_all_vehicles_as_handles()) do
@@ -4803,10 +4802,10 @@ menu.action(uwuworld, "Delete Vehicles", {"clearveh"}, "Deletes All Cars", funct
             ct += 1
         end
     end
+    local vehicles = delete_entities_by_range(entities.get_all_vehicles_as_handles(), 1000000, "VEHICLE")
 end)
 
 menu.action(uwuworld, "Delete Peds", {"clearpeds"}, "Deletes All Pedestrians", function(on_click)
-    local peds = delete_entities_by_range(entities.get_all_peds_as_handles(), 1000000, "PED")
     local player_pos = ENTITY.GET_ENTITY_COORDS(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(players.user()), 1)
     local ct = 0
     for k,ent in pairs(entities.get_all_peds_as_handles()) do
@@ -4815,6 +4814,7 @@ menu.action(uwuworld, "Delete Peds", {"clearpeds"}, "Deletes All Pedestrians", f
         end
         ct += 1
     end
+    local peds = delete_entities_by_range(entities.get_all_peds_as_handles(), 1000000, "PED")
 end)
 
 menu.action(uwuworld, "Delete Ropes", {"clearropes"}, "Deletes All Ropes", function(on_click)
@@ -4832,12 +4832,9 @@ end)
 
 
 menu.action(uwuworld, "Clean World/Super Cleanse", {"clearworld"}, "Literally cleans everything in the area including peds, cars, objects, bools etc.", function(on_click)
-    clear_area(2000000)
-    local vehicles = delete_entities_by_range(entities.get_all_vehicles_as_handles(), 1000000, "VEHICLE")
-    local objects = delete_entities_by_range(entities.get_all_objects_as_handles(), 1000000, "OBJECT")
-    local peds = delete_entities_by_range(entities.get_all_peds_as_handles(), 1000000, "PED")
     local player_pos = ENTITY.GET_ENTITY_COORDS(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(players.user()), 1)
     GRAPHICS.REMOVE_PARTICLE_FX_IN_RANGE(player_pos.x, player_pos.y, player_pos.z, 1000000)
+    util.yield(100)
     menu.trigger_commands("clearropes")
     util.yield(100)
     menu.trigger_commands("clearpeds")
@@ -4846,6 +4843,16 @@ menu.action(uwuworld, "Clean World/Super Cleanse", {"clearworld"}, "Literally cl
     util.yield(100)
     menu.trigger_commands("clearobj")
     util.yield(100)
+    local delped = delete_entities_by_range(entities.get_all_peds_as_handles(), 1000000, "PED")
+    local delveh = delete_entities_by_range(entities.get_all_vehicles_as_handles(), 1000000, "VEHICLE")
+    local delobj = delete_entities_by_range(entities.get_all_objects_as_handles(), 1000000, "OBJECT")
+    clear_area(10000)
+    util.yield(100)
+    menu.trigger_command(delped)
+    util.yield(100)
+    menu.trigger_command(delveh)
+    util.yield(100)
+    menu.trigger_command(delobj)
 end)
 
 --------------------------------------------------------------------------------------------------------------------------------
@@ -16639,6 +16646,69 @@ elseif filesystem.exists(resources_dir) then
 end
 
 ::skipspeedometer::
+
+local crosshairmisc = menu.list(misc, "Crosshair", {}, "")
+
+local crosshair_file = "cr1.png" -- default file name
+
+local crosshair_tex = directx.create_texture(filesystem.scripts_dir() .. crosshair_file) -- Crosshair file
+
+local cr_posX = 0.5 --default position X
+local cr_posY = 0.5 --default position Y
+
+local cr_size = 0.03 --default size
+
+--Default rotation
+local rotation = rotation
+local intensity = 0.01
+
+GenerateFeatures = function()
+
+    menu.divider(crosshairmisc, "Crosshair options")
+    menu.toggle_loop(crosshairmisc, "Show Crosshair", {"crhide"}, "Hide the Crosshair.",function(pog)	
+        directx.draw_texture(		----Crosshair (on)
+        crosshair_tex,	-- id
+        cr_size,			-- sizeX
+        cr_size,			-- sizeY
+        0.5,				-- centerX
+        0.5,				-- centerY
+        cr_posX,			-- posX
+        cr_posY,			-- posY
+        rotation,				-- rotation
+        {					-- colour
+            ["r"] = 1.0,
+            ["g"] = 1.0,
+            ["b"] = 1.0,
+            ["a"] = 1.0
+        }
+    )
+	    cr = pog --like an on / off
+    end)
+    menu.action(crosshairmisc, "Change Crosshair File Name", {"crfilename"}, "The new file file must be in Lua Scripts of stand (put .png / .jpeg in the name)", function(click_type)  --input text 
+        menu.show_command_box_click_based(click_type, "crfilename ")
+    end, function(arg)
+        crosshair_file = arg
+	    crosshair_tex = directx.create_texture(filesystem.scripts_dir() .. crosshair_file) 
+    end, "crfilename [text]")
+    menu.slider(crosshairmisc, "Resize Crosshair", {"crsize"}, "", 1, 10000, 300, 1, function(size)
+	    cr_size=size/10000
+    end)
+    menu.slider(crosshairmisc, "Crosshair X Position", {"crx"}, "", -100000, 100000, 5000, 1, function(x)
+	    cr_posX=x/10000
+    end)
+    menu.slider(crosshairmisc, "Crosshair Y Position", {"cry"}, "", -100000, 100000, 5000, 1, function(y)
+	    cr_posY=y/10000
+    end)
+    menu.slider(crosshairmisc, "Rotation", {"crotint"}, "", -360, 360, 0, 1, function(int)
+	    rotation=int/1000
+    end)
+    menu.action(crosshairmisc, "Default Rotation", {}, "", function() --Default rotoation 
+	    rotation = 0.0
+    end)
+
+end
+
+GenerateFeatures()
 
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
