@@ -16748,8 +16748,16 @@ GenerateFeatures = function()
 	    rotation = 0.0
     end)
 
-    menu.action(crosshairmisc, "Default Crosshair", {}, "", function() --Default rotoation 
+    menu.toggle(crosshairmisc, "Default Crosshair", {}, "", function() --Default rotoation 
 	    crosshair_file = 'cr1.png'
+    end)
+
+    menu.toggle(crosshairmisc, "Crosshair 2", {}, "", function() --Default rotoation 
+	    crosshair_file = 'cr2.png'
+    end)
+
+    menu.toggle(crosshairmisc, "Custom Crosshair", {}, "", function() --Default rotoation 
+	    crosshair_file = 'customcr.png'
     end)
 
 end
