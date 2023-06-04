@@ -6,7 +6,7 @@ util.keep_running()
 util.require_natives(1676318796)
 
 local response = false
-local localversion = 1.61
+local localversion = 1.62
 local localKs = false
 async_http.init("raw.githubusercontent.com", "/Fewdys/GTA5-FewMod-Lua/main/FewModVersion.lua", function(output)
     currentVer = tonumber(output)
@@ -5972,9 +5972,12 @@ function playerListToNames(input)
     return output
 end
 
+local modderlistinclude
+
 menu.divider(online, "Normal Stuff")
 
-menu.toggle(online, "Include ModderList On Toast Join", {"modderlist"}, "Sends the sessions list of modders to you as a notification", function(modderlistinclude)
+menu.toggle(online, "Include ModderList On Toast Join", {"modderlist"}, "Sends the sessions list of modders to you as a notification", function(mli)
+    modderlistinclude = mli
     --local modders = getModderList()
     --util.toast("Modders in this session ("..table.getn(modders).."): "..table.concat(playerListToNames(getModderList()), ", "))
 end)
@@ -6067,7 +6070,7 @@ local interiors = {
     {"Strip Club DJ Booth", {x=121.398254, y=-1281.0024, z=29.480522}, ""},
 }
 
-    menu.action(online, "Modder List to Chat", {"bcmodderlist"}, "Sends the sessions list of modders in chat", function()
+    menu.action(online, "Modder List To Chat", {"bcmodderlist"}, "Sends the sessions list of modders in chat", function()
         local modders = getModderList()
         chat.send_message("# Modders In This Session ("..table.getn(modders).."): "..table.concat(playerListToNames(modders), ", "), false, true, true)
     end)
