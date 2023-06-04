@@ -4839,9 +4839,13 @@ menu.action(uwuworld, "Clean World/Super Cleanse", {"clearworld"}, "Literally cl
     local player_pos = ENTITY.GET_ENTITY_COORDS(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(players.user()), 1)
     GRAPHICS.REMOVE_PARTICLE_FX_IN_RANGE(player_pos.x, player_pos.y, player_pos.z, 1000000)
     menu.trigger_commands("clearropes")
+    util.yield(100)
     menu.trigger_commands("clearpeds")
+    util.yield(100)
     menu.trigger_commands("clearveh")
+    util.yield(100)
     menu.trigger_commands("clearobj")
+    util.yield(100)
 end)
 
 --------------------------------------------------------------------------------------------------------------------------------
