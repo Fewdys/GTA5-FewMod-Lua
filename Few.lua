@@ -6,7 +6,7 @@ util.keep_running()
 util.require_natives(1676318796)
 
 local response = false
-local localversion = 1.60
+local localversion = 1.61
 local localKs = false
 async_http.init("raw.githubusercontent.com", "/Fewdys/GTA5-FewMod-Lua/main/FewModVersion.lua", function(output)
     currentVer = tonumber(output)
@@ -5959,6 +5959,33 @@ function CheckLobbyForGodmode()
     util.toast(godcount .. " players in GodMode")
 end
 
+function getModderList()
+    local list = {}
+    for i=0, 31 do
+        if players.exists(i) and (players.is_godmode(i) or players.is_marked_as_modder(i) or players.is_marked_as_attacker(i)) then
+            table.insert(list, i)
+        end
+    end
+    return list
+end
+
+function playerListToNames(input)
+    local output = {}
+    for i,v in pairs(input) do
+        if players.exists(v) then
+            table.insert(output, players.get_name(v))
+        end
+    end
+    return output
+end
+
+menu.divider(online, "Normal Stuff")
+
+menu.toggle(menu.my_root(), "Include ModderList On Toast Join", {"modderlist"}, "Sends the sessions list of modders to you as a notification", function(modderlistinclude)
+    --local modders = getModderList()
+    --util.toast("Modders in this session ("..table.getn(modders).."): "..table.concat(playerListToNames(getModderList()), ", "))
+end)
+
 local join_ing = false
 function CheckLobbyForPlayers()
     local buffer = join_ing
@@ -5970,9 +5997,17 @@ function CheckLobbyForPlayers()
             util.yield(1750)
             util.toast("Players in session: " .. #playersTable)
             util.yield(10)
+            if modderlistinclude then
+            local modders = getModderList()
+            util.toast("Modders In This Session ("..table.getn(modders).."): "..table.concat(playerListToNames(getModderList()), ", "))
+            end
         end
     end
 end
+
+menu.toggle_loop(online, "Toast Players When Joining", {}, "Toasts number of players when you join a new session.", function ()
+    CheckLobbyForPlayers()
+end)
 
 local interiors = {
     {"Safe Space [AFK Room]", {x=-158.71494, y=-982.75885, z=149.13135}, ""},
@@ -6039,14 +6074,13 @@ local interiors = {
     {"Strip Club DJ Booth", {x=121.398254, y=-1281.0024, z=29.480522}, ""},
 }
 
-    menu.divider(online, "Normal Stuff")
+    menu.action(menu.my_root(), "Modder List to Chat", {"bcmodderlist"}, "Sends the sessions list of modders in chat", function()
+        local modders = getModderList()
+        chat.send_message("# Modders In This Session ("..table.getn(modders).."): "..table.concat(playerListToNames(modders), ", "), false, true, true)
+    end)
 
     menu.action(online, "Check Lobby for GodMode", {}, "Checks the entire lobby for godmode, and notifies you of their names.", function()
         CheckLobbyForGodmode()
-    end)
-
-    menu.toggle_loop(online, "Toast Players When Joining", {}, "Toasts number of players when you join a new session.", function ()
-        CheckLobbyForPlayers()
     end)
 
     block_blaming = menu.ref_by_path("Online>Protections>Block Blaming")
