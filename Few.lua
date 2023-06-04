@@ -16744,6 +16744,7 @@ util.on_pre_stop(function()
     util.toast("Cleaning...")
     --Incase "clearworld" above doesn't work
     ---------------------------------------------------------------------------------------
+    local player_pos = ENTITY.GET_ENTITY_COORDS(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(players.user()), 1)
     GRAPHICS.REMOVE_PARTICLE_FX_IN_RANGE(player_pos.x, player_pos.y, player_pos.z, 1000000)
     menu.trigger_commands("clearropes")
     menu.trigger_commands("clearpeds")
