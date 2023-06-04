@@ -16679,25 +16679,35 @@ end
 
 ::skipspeedometer::
 
+--I Tried To Make This Make As Much Sense As Possible As I Wanted The Crosshair To Instantly Change On Path Change But I Lost About 40 Braincells Bothering With Trying To Do That
+
+--PS: I Managed To Do So, I Was Overthinking TF Out Of It LMAO (ADHD Things)
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+--Custom Crosshair
+
 local crosshairmisc = menu.list(misc, "Crosshair", {}, "")
 
-local crosshair_file = "cr1.png" -- default file name
+local crosshair_file = 'cr1.png' -- default file name
+local defaultcrosshairpath = filesystem.scripts_dir().. '\\FewMod\\' .. '\\textures\\' .. '\\'..crosshair_file
 
-local crosshair_tex = directx.create_texture(filesystem.scripts_dir() .. crosshair_file) -- Crosshair file
+local crosshair_tex = directx.create_texture(defaultcrosshairpath)
 
-local cr_posX = 0.5 --default position X
-local cr_posY = 0.5 --default position Y
+--default X position
+local cr_posX = 0.5
+--default Y position
+local cr_posY = 0.5
 
-local cr_size = 0.03 --default size
+--default size
+local cr_size = 0.02
 
 --Default rotation
 local rotation = 0.0
-local intensity = 0.01
 
 GenerateFeatures = function()
 
-    menu.divider(crosshairmisc, "Crosshair options")
-    menu.toggle_loop(crosshairmisc, "Show Crosshair", {"crhide"}, "Hide the Crosshair.",function(pog)	
+    menu.divider(crosshairmisc, "Crosshair Options")
+    menu.toggle_loop(crosshairmisc, "Show Crosshair", {"crshow"}, "Show Custom Crosshair",function(pog)
+        cr = pog --like an on / off
         directx.draw_texture(		----Crosshair (on)
         crosshair_tex,	-- id
         cr_size,			-- sizeX
@@ -16714,15 +16724,16 @@ GenerateFeatures = function()
             ["a"] = 1.0
         }
     )
-	    cr = pog --like an on / off
     end)
-    menu.action(crosshairmisc, "Change Crosshair File Name", {"crfilename"}, "The new file file must be in Lua Scripts of stand (put .png / .jpeg in the name)", function(click_type)  --input text 
+
+    menu.action(crosshairmisc, "Change Crosshair File Name", {"crfilename"}, "The new file must be in FewMod/textures (put .png / .jpeg in the name)", function(click_type)  --input text 
         menu.show_command_box_click_based(click_type, "crfilename ")
     end, function(arg)
         crosshair_file = arg
-	    crosshair_tex = directx.create_texture(filesystem.scripts_dir() .. crosshair_file) 
+        crosshair_tex = directx.create_texture(defaultcrosshairpath)
     end, "crfilename [text]")
-    menu.slider(crosshairmisc, "Resize Crosshair", {"crsize"}, "", 1, 10000, 300, 1, function(size)
+
+    menu.slider(crosshairmisc, "Resize Crosshair", {"crsize"}, "", 1, 10000, 200, 1, function(size)
 	    cr_size=size/10000
     end)
     menu.slider(crosshairmisc, "Crosshair X Position", {"crx"}, "", -100000, 100000, 5000, 1, function(x)
@@ -16736,6 +16747,10 @@ GenerateFeatures = function()
     end)
     menu.action(crosshairmisc, "Default Rotation", {}, "", function() --Default rotoation 
 	    rotation = 0.0
+    end)
+
+    menu.action(crosshairmisc, "Default Crosshair", {}, "", function() --Default rotoation 
+	    crosshair_file = 'cr1.png'
     end)
 
 end
