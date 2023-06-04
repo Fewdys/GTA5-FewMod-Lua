@@ -16648,6 +16648,7 @@ util.on_pre_stop(function()
 end)
 
 util.on_stop(function()
+    menu.trigger_commands("clearworld") --x2 just to make sure everything cleans up properly
     VEHICLE.SET_VEHICLE_GRAVITY(veh, true)
     VEHICLE.SET_VEHICLE_REDUCE_GRIP(veh, false)
     ENTITY.SET_ENTITY_COLLISION(veh, true, true);
