@@ -6,7 +6,7 @@ util.keep_running()
 util.require_natives(1676318796)
 
 local response = false
-local localversion = 1.62
+local localversion = 1.63
 local localKs = false
 async_http.init("raw.githubusercontent.com", "/Fewdys/GTA5-FewMod-Lua/main/FewModVersion.lua", function(output)
     currentVer = tonumber(output)
@@ -4783,42 +4783,43 @@ end)
 
 menu.action(uwuworld, "Delete Objects", {"clearobj"}, "Deletes All Objects", function(on_click)
     local player_pos = ENTITY.GET_ENTITY_COORDS(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(players.user()), 1)
-    local ct = 0
+    local ot = 0
     for k,ent in pairs(entities.get_all_objects_as_handles()) do
         entities.delete_by_handle(ent)
-        ct += 1
+        ot += 1
     end
-    local objects = delete_entities_by_range(entities.get_all_objects_as_handles(), 10000, "OBJECT")
+    util.yield_once()
 end)
 
 
 menu.action(uwuworld, "Delete Vehicles", {"clearveh"}, "Deletes All Cars", function(on_click)
     local player_pos = ENTITY.GET_ENTITY_COORDS(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(players.user()), 1)
-    local ct = 0
+    local vt = 0
     for k,ent in pairs(entities.get_all_vehicles_as_handles()) do
         local driver = VEHICLE.GET_PED_IN_VEHICLE_SEAT(ent, -1)
         if not PED.IS_PED_A_PLAYER(driver) then
             entities.delete_by_handle(ent)
-            ct += 1
+            vt += 1
         end
     end
-    local vehicles = delete_entities_by_range(entities.get_all_vehicles_as_handles(), 1000000, "VEHICLE")
+    local vehicles = delete_entities_by_range(entities.get_all_vehicles_as_handles(), 10000, "VEHICLE")
+    util.yield_once()
 end)
 
 menu.action(uwuworld, "Delete Peds", {"clearpeds"}, "Deletes All Pedestrians", function(on_click)
     local player_pos = ENTITY.GET_ENTITY_COORDS(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(players.user()), 1)
-    local ct = 0
+    local pt = 0
     for k,ent in pairs(entities.get_all_peds_as_handles()) do
         if not PED.IS_PED_A_PLAYER(ent) then
             entities.delete_by_handle(ent)
         end
-        ct += 1
+        pt += 1
     end
-    local peds = delete_entities_by_range(entities.get_all_peds_as_handles(), 1000000, "PED")
+    local peds = delete_entities_by_range(entities.get_all_peds_as_handles(), 10000, "PED")
+    util.yield_once()
 end)
 
 menu.action(uwuworld, "Delete Ropes", {"clearropes"}, "Deletes All Ropes", function(on_click)
-    local player_pos = ENTITY.GET_ENTITY_COORDS(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(players.user()), 1)
     local ct = 0
     local rope_alloc = memory.alloc(4)
     for i=0, 100 do 
@@ -4828,6 +4829,7 @@ menu.action(uwuworld, "Delete Ropes", {"clearropes"}, "Deletes All Ropes", funct
             ct += 1
         end
     end
+    util.yield_once()
 end)
 
 
