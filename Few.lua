@@ -5981,7 +5981,7 @@ end
 
 menu.divider(online, "Normal Stuff")
 
-menu.toggle(menu.my_root(), "Include ModderList On Toast Join", {"modderlist"}, "Sends the sessions list of modders to you as a notification", function(modderlistinclude)
+menu.toggle(online, "Include ModderList On Toast Join", {"modderlist"}, "Sends the sessions list of modders to you as a notification", function(modderlistinclude)
     --local modders = getModderList()
     --util.toast("Modders in this session ("..table.getn(modders).."): "..table.concat(playerListToNames(getModderList()), ", "))
 end)
@@ -6074,7 +6074,7 @@ local interiors = {
     {"Strip Club DJ Booth", {x=121.398254, y=-1281.0024, z=29.480522}, ""},
 }
 
-    menu.action(menu.my_root(), "Modder List to Chat", {"bcmodderlist"}, "Sends the sessions list of modders in chat", function()
+    menu.action(online, "Modder List to Chat", {"bcmodderlist"}, "Sends the sessions list of modders in chat", function()
         local modders = getModderList()
         chat.send_message("# Modders In This Session ("..table.getn(modders).."): "..table.concat(playerListToNames(modders), ", "), false, true, true)
     end)
