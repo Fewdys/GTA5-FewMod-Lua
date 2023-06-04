@@ -16691,7 +16691,7 @@ local cr_posY = 0.5 --default position Y
 local cr_size = 0.03 --default size
 
 --Default rotation
-local rotation = rotation
+local rotation = 0.0
 local intensity = 0.01
 
 GenerateFeatures = function()
