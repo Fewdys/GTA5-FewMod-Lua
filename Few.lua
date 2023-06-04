@@ -16687,10 +16687,9 @@ end
 
 local crosshairmisc = menu.list(misc, "Crosshair", {}, "")
 
-local crosshair_file = 'cr1.png' -- default file name
-local defaultcrosshairpath = filesystem.scripts_dir().. '\\FewMod\\' .. '\\textures\\' .. '\\'..crosshair_file
+local crosshair_file = "cr1.png" -- default file name
 
-local crosshair_tex = directx.create_texture(defaultcrosshairpath)
+local crosshair_tex = directx.create_texture(filesystem.scripts_dir().. '\\FewMod\\' .. '\\textures\\' .. '\\'..crosshair_file)
 
 --default X position
 local cr_posX = 0.5
@@ -16730,7 +16729,7 @@ GenerateFeatures = function()
         menu.show_command_box_click_based(click_type, "crfilename ")
     end, function(arg)
         crosshair_file = arg
-        crosshair_tex = directx.create_texture(defaultcrosshairpath)
+        crosshair_tex = directx.create_texture(filesystem.scripts_dir().. '\\FewMod\\' .. '\\textures\\' .. '\\'..crosshair_file)
     end, "crfilename [text]")
 
     menu.slider(crosshairmisc, "Resize Crosshair", {"crsize"}, "", 1, 10000, 200, 1, function(size)
