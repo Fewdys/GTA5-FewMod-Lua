@@ -5998,7 +5998,6 @@ function CheckLobbyForPlayers()
             if modderlistinclude then
             local modders = getModderList()
             util.toast("Modders In This Session ("..table.getn(modders).."): "..table.concat(playerListToNames(getModderList()), ", "))
-            util.log("Modders In This Session ("..table.getn(modders).."): "..table.concat(playerListToNames(getModderList()), ", "))
             end
         end
     end
