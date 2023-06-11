@@ -8191,6 +8191,7 @@ menu.toggle_loop(protects, "Anti Beast", {}, "Prevent them from turning you the 
         util.toast(players.get_name(host).." started Hunt The Beast. Killing script...")
         menu.trigger_commands(menu.ref_by_path("Online>Session>Session Scripts>Hunt the Beast>Stop Scrip"))
         menu.trigger_commands("stopsounds")
+        soun
     end
 end)
 
@@ -16322,7 +16323,7 @@ menu.action(dances_erotic_vroot, "Pole Dance 3", {""}, "", function(on_click)
 end)
 
 menu.action(uwuself, "Stop all sounds", {"stopsounds"}, "", function()
-    for i=-1,100 do
+    for i=-1,255 do
         AUDIO.STOP_SOUND(i)
         AUDIO.RELEASE_SOUND_ID(i)
     end
