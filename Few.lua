@@ -6383,6 +6383,7 @@ local sfchat = require("lib.ScaleformLib")("multiplayer_chat")
 sfchat:draw_fullscreen()
 
 local Languages = {
+    { Name = "English", Key = "en" },
 	{ Name = "Afrikaans", Key = "af" },
 	{ Name = "Albanian", Key = "sq" },
 	{ Name = "Arabic", Key = "ar" },
@@ -6398,7 +6399,6 @@ local Languages = {
 	{ Name = "Czech", Key = "cs" },
 	{ Name = "Danish", Key = "da" },
 	{ Name = "Dutch", Key = "nl" },
-	{ Name = "English", Key = "en" },
 	{ Name = "Esperanto", Key = "eo" },
 	{ Name = "Estonian", Key = "et" },
 	{ Name = "Filipino", Key = "tl" },
