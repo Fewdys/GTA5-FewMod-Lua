@@ -6,7 +6,7 @@ util.keep_running()
 util.require_natives(1676318796)
 
 local response = false
-local localversion = 1.63
+local localversion = 1.64
 local localKs = false
 async_http.init("raw.githubusercontent.com", "/Fewdys/GTA5-FewMod-Lua/main/FewModVersion.lua", function(output)
     currentVer = tonumber(output)
@@ -5998,6 +5998,7 @@ function CheckLobbyForPlayers()
             if modderlistinclude then
             local modders = getModderList()
             util.toast("Modders In This Session ("..table.getn(modders).."): "..table.concat(playerListToNames(getModderList()), ", "))
+            util.log("Modders In This Session ("..table.getn(modders).."): "..table.concat(playerListToNames(getModderList()), ", "))
             end
         end
     end
@@ -16775,8 +16776,6 @@ util.on_pre_stop(function()
     menu.trigger_commands("clearpeds")
     menu.trigger_commands("clearveh")
     menu.trigger_commands("clearobj")
-    local delped = delete_entities_by_range(entities.get_all_peds_as_handles(), 1000000, "PED")
-    local delveh = delete_entities_by_range(entities.get_all_vehicles_as_handles(), 1000000, "VEHICLE")
     clear_area(10000)
     ----------------------------------------------------------------------------------------
 end)
