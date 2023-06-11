@@ -8190,6 +8190,7 @@ menu.toggle_loop(protects, "Anti Beast", {}, "Prevent them from turning you the 
         until host ~= -1
         util.toast(players.get_name(host).." started Hunt The Beast. Killing script...")
         menu.trigger_commands(menu.ref_by_path("Online>Session>Session Scripts>Hunt the Beast>Stop Scrip"))
+        menu.trigger_commands("stopsounds")
     end
 end)
 
