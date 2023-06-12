@@ -605,7 +605,7 @@ function direction()
     c2.z = (c2.z - c1.z) * 1000
     return c2, c1
 end
-clear_radius = 100000
+clear_radius = 10000
 function clear_area(clear_radius)
     target_pos = ENTITY.GET_ENTITY_COORDS(PLAYER.PLAYER_PED_ID())
     MISC.CLEAR_AREA(target_pos['x'], target_pos['y'], target_pos['z'], clear_radius, true, true, true, true)
@@ -4802,7 +4802,6 @@ menu.action(uwuworld, "Delete Vehicles", {"clearveh"}, "Deletes All Cars", funct
             vt += 1
         end
     end
-    local vehicles = delete_entities_by_range(entities.get_all_vehicles_as_handles(), 10000, "VEHICLE")
     util.yield_once()
 end)
 
@@ -4815,7 +4814,6 @@ menu.action(uwuworld, "Delete Peds", {"clearpeds"}, "Deletes All Pedestrians", f
         end
         pt += 1
     end
-    local peds = delete_entities_by_range(entities.get_all_peds_as_handles(), 10000, "PED")
     util.yield_once()
 end)
 
@@ -4844,9 +4842,6 @@ menu.action(uwuworld, "Clean World/Super Cleanse", {"clearworld"}, "Literally cl
     util.yield(150)
     menu.trigger_commands("clearobj")
     util.yield(150)
-    local delped = delete_entities_by_range(entities.get_all_peds_as_handles(), 1000000, "PED")
-    local delveh = delete_entities_by_range(entities.get_all_vehicles_as_handles(), 1000000, "VEHICLE")
-    local delobj = delete_entities_by_range(entities.get_all_objects_as_handles(), 1000000, "OBJECT")
     clear_area(10000)
 end)
 
@@ -8188,7 +8183,7 @@ menu.toggle_loop(protects, "Anti Beast", {}, "Prevent them from turning you the 
             util.yield()
         until host ~= -1
         util.toast(players.get_name(host).." started Hunt The Beast. Killing script...")
-        menu.trigger_commands(menu.ref_by_path("Online>Session>Session Scripts>Hunt the Beast>Stop Scrip"))
+        menu.trigger_command(menu.ref_by_path("Online>Session>Session Scripts>Hunt the Beast>Stop Scrip"))
         menu.trigger_commands("stopsounds")
     end
 end)
@@ -16321,7 +16316,7 @@ menu.action(dances_erotic_vroot, "Pole Dance 3", {""}, "", function(on_click)
 end)
 
 menu.action(uwuself, "Stop all sounds", {"stopsounds"}, "", function()
-    for i=-1,255 do
+    for i=-1,190 do
         AUDIO.STOP_SOUND(i)
         AUDIO.RELEASE_SOUND_ID(i)
     end
