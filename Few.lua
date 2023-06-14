@@ -3,10 +3,10 @@
 --[[Script Is Still A WIP So There May Be Minor Issues]]--
 
 util.keep_running()
-util.require_natives(1676318796)
+util.require_natives(1681379138)
 
 local response = false
-local localversion = 1.64
+local localversion = 1.65
 local localKs = false
 async_http.init("raw.githubusercontent.com", "/Fewdys/GTA5-FewMod-Lua/main/FewModVersion.lua", function(output)
     currentVer = tonumber(output)
