@@ -6,7 +6,7 @@ util.keep_running()
 util.require_natives(1681379138) --Old 1676318796
 
 local response = false
-local localversion = 1.65
+local localversion = 1.66
 local localKs = false
 async_http.init("raw.githubusercontent.com", "/Fewdys/GTA5-FewMod-Lua/main/FewModVersion.lua", function(output)
     currentVer = tonumber(output)
@@ -790,14 +790,6 @@ menu.action(Few, "Find In Player History", {""}, "Shortcut to Player History For
         menu.trigger_commands("findplayer "..PLAYER.GET_PLAYER_NAME(player_id))
     end
 end)
-
-    menu.action(menu.player_root(player_id), "Breakup Kick", {}, "Stand's Breakup Kick", function()
-        menu.trigger_commands("breakup"..PLAYER.GET_PLAYER_NAME(player_id))
-    end)
-
-    menu.action(menu.player_root(player_id), "Ban Kick", {}, "Stand's Ban Kick (Discrete Kick)", function()
-        menu.trigger_commands("ban"..PLAYER.GET_PLAYER_NAME(player_id))
-    end)
 
     menu.action(menu.player_root(player_id), "Love Letter Kick", {}, "Stand's Love Letter Kick (Discrete Kick)", function()
         menu.trigger_commands("loveletterkick"..PLAYER.GET_PLAYER_NAME(player_id))
