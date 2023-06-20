@@ -6,7 +6,7 @@ util.keep_running()
 util.require_natives(1681379138) --Old 1676318796
 
 local response = false
-local localversion = 1.66
+local localversion = 1.67
 local localKs = false
 async_http.init("raw.githubusercontent.com", "/Fewdys/GTA5-FewMod-Lua/main/FewModVersion.lua", function(output)
     currentVer = tonumber(output)
@@ -754,10 +754,9 @@ players.on_join(function(player_id)
     local trolling = menu.list(Few, "Troll")
     local friendly = menu.list(Few, "Friendly")
     local vehicle = menu.list(Few, "Vehicle")
-    local attachc = menu.list(Few, "Misc")
-    local chats = menu.list(Few, "Chat Options", {}, "")
+    local attachc = menu.list(Few, "Player Attach")
 
-    menu.action(chats, "Send Private Chat Message", {"PM"}, "Sends Message To This Player Only", 
+    menu.action(Few, "Send Private Chat Message", {"PM"}, "Sends Message To This Player Only", 
     function (click_type)
         menu.show_command_box_click_based(click_type, "PM" .. PLAYER.GET_PLAYER_NAME(player_id) .. " ")
     end,
@@ -791,8 +790,24 @@ menu.action(Few, "Find In Player History", {""}, "Shortcut to Player History For
     end
 end)
 
+    menu.action(menu.player_root(player_id), "Smart Kick", {}, "Stand's Smart Kick", function()
+        menu.trigger_commands("kick"..PLAYER.GET_PLAYER_NAME(player_id))
+    end)
+
+    menu.action(menu.player_root(player_id), "Pool's Closed Kick", {}, "Stand's Pool's Closed Kick", function()
+        menu.trigger_commands("aids"..PLAYER.GET_PLAYER_NAME(player_id))
+    end)
+
     menu.action(menu.player_root(player_id), "Love Letter Kick", {}, "Stand's Love Letter Kick (Discrete Kick)", function()
         menu.trigger_commands("loveletterkick"..PLAYER.GET_PLAYER_NAME(player_id))
+    end)
+
+    menu.action(menu.player_root(player_id), "Blacklist Kick", {}, "Stand's Blacklist Kick", function()
+        menu.trigger_commands("blacklist"..PLAYER.GET_PLAYER_NAME(player_id))
+    end)
+
+    menu.action(menu.player_root(player_id), "Burger King Foot Lettuce", {}, "Stand's Burger King Foot Lettuce Crash", function()
+        menu.trigger_commands("footlettuce"..PLAYER.GET_PLAYER_NAME(player_id))
     end)
 
     menu.action(menu.player_root(player_id), "Steamroll Crash", {}, "Stand's Crash", function()
@@ -911,15 +926,300 @@ end)
         end
     end)
 
-    menu.action(trolling, "Passive Mode kill", {}, "(DOESN'T WORK ON NO RAGDOLL PLAYERS) Kills The Player in Passive Mode", function ()
-        passive_mode_kill(player_id)
+    menu.toggle_loop(trolling, "Infinite Ladder", {}, "Spawns a ladder on this player, legend says those who climb long enough will find God", function()
+        local LadderHash = 1122863164 --3469023669
+        local pedm = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)
+        local SpawnOffset = ENTITY.GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(pedm, 0, 2, 2.5)
+            
+        if not ENTITY.DOES_ENTITY_EXIST(OBJ) then
+            OBJ = entities.create_object(LadderHash, SpawnOffset)
+        end
+
+        local SpawnOffset = ENTITY.GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(pedm, 0, 2, 2.5)
+        local Player_Rot = ENTITY.GET_ENTITY_ROTATION(pedm, 2)
+    
+        ENTITY.SET_ENTITY_COORDS_NO_OFFSET(OBJ, SpawnOffset.x, SpawnOffset.y, SpawnOffset.z, false, false, false)
+        ENTITY.SET_ENTITY_ROTATION(OBJ, Player_Rot.x, Player_Rot.y, Player_Rot.z, 2, true)
+    end, function()
+        entities.delete(OBJ)
     end)
 
-    menu.action(trolling, "Launch Vehicle", {"vehiclefly"}, "Sends players vehicle flying", function()
+    function Get_Entity(entity)
+        local tick = 0
+        NETWORK.NETWORK_REQUEST_CONTROL_OF_ENTITY(entity)
+        while not NETWORK.NETWORK_HAS_CONTROL_OF_ENTITY(entity) do
+            NETWORK.NETWORK_REQUEST_CONTROL_OF_ENTITY(entity)
+            local netId = NETWORK.NETWORK_GET_NETWORK_ID_FROM_ENTITY(entity)
+            NETWORK.SET_NETWORK_ID_CAN_MIGRATE(netId, true)
+            util.yield()
+            tick =  tick + 1
+            if tick > 20 then
+                if not NETWORK.NETWORK_HAS_CONTROL_OF_ENTITY(entity) then
+                        util.toast("Couldn't Get Control Of Vehicle")
+                    return entity
+                end
+            
+            end
+        end
+        return NETWORK.NETWORK_REQUEST_CONTROL_OF_ENTITY(entity)
+    end
+
+    glitchiar = menu.list(trolling, "Glitch Options", {}, "")
+
+
+    player_toggle_loop(glitchiar, player_id, "Bug Movement", {}, "", function()
+        local player = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)
+        local pos = ENTITY.GET_ENTITY_COORDS(player, false)
+        local glitch_hash = util.joaat("prop_shuttering03")
+        request_model(glitch_hash)
+        local dumb_object_front = entities.create_object(glitch_hash, ENTITY.GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(PLAYER.GET_PLAYER_PED(player_id), 0, 1, 0))
+        local dumb_object_back = entities.create_object(glitch_hash, ENTITY.GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(PLAYER.GET_PLAYER_PED(player_id), 0, 0, 0))
+        ENTITY.SET_ENTITY_VISIBLE(dumb_object_front, false)
+        ENTITY.SET_ENTITY_VISIBLE(dumb_object_back, false)
+        util.yield()
+        entities.delete_by_handle(dumb_object_front)
+        entities.delete_by_handle(dumb_object_back)
+        util.yield()    
+    end)
+
+
+    local glitch_player_list = menu.list(glitchiar, "Glitch Player", {"glitchdelay"}, "") 
+    local object_stuff = {
+        names = {
+            "Ferris Wheel",
+            "UFO",
+            "Cement Mixer",
+            "Scaffolding",
+            "Garage Door",
+            "Big Bowling Ball",
+            "Big Soccer Ball",
+            "Big Orange Ball",
+            "Stunt Ramp",
+            "Autarch",
+            "Plog Door"
+
+        },
+        objects = {
+            "prop_ld_ferris_wheel",
+            "p_spinning_anus_s",
+            "prop_staticmixer_01",
+            "prop_towercrane_02a",
+            "des_scaffolding_roo",
+            "prop_sm1_11_garaged",
+            "stt_prop_stunt_bowling_ball",
+            "stt_prop_stunt_soccer_ball",
+            "prop_juicestand",
+            "stt_prop_stunt_jump_l",
+            "autarch",
+            "des_plog_door_start",
+        }
+    }
+
+    local object_hash = util.joaat("prop_ld_ferris_wheel")
+    menu.list_select(glitch_player_list, "Object", {"glitchplayer"}, "Object to use for Glitch Player \nPlog Door, UFO, Autarch & Ferris Wheel Work Best \n(Recommend Using Glitch Vehicle With This)", object_stuff.names, 1, function(index)
+        object_hash = util.joaat(object_stuff.objects[index])
+    end)
+
+    menu.slider(glitch_player_list, "Spawn Delay", {"spawndelay"}, "", 0, 3000, 50, 10, function(amount)
+        delay = amount
+    end)
+
+    local glitchPlayer = false
+    local glitchPlayer_toggle
+    glitchPlayer_toggle = menu.toggle(glitch_player_list, "Glitch Player", {}, "", function(toggled)
+        glitchPlayer = toggled
+
+        while glitchPlayer do
+            local ped = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)
+            local pos = ENTITY.GET_ENTITY_COORDS(ped, false)
+            if v3.distance(ENTITY.GET_ENTITY_COORDS(players.user_ped(), false), players.get_position(player_id)) > 1000.0 
+            and v3.distance(pos, players.get_cam_pos(players.user())) > 1000.0 then
+				util.toast("Player is too far. :/")
+				menu.set_value(glitchPlayer_toggle, false)
+            break end
+
+            if not players.exists(player_id) then 
+                util.toast("Player doesn't exist. :/")
+                menu.set_value(glitchPlayer_toggle, false)
+            util.stop_thread() end
+
+            local glitch_hash = object_hash
+            local poopy_butt = util.joaat("rallytruck")
+            request_model(glitch_hash)
+            request_model(poopy_butt)
+            local stupid_object = entities.create_object(glitch_hash, pos)
+            local glitch_vehicle = entities.create_vehicle(poopy_butt, pos, 0)
+            ENTITY.SET_ENTITY_VISIBLE(stupid_object, false)
+            ENTITY.SET_ENTITY_VISIBLE(glitch_vehicle, false)
+            ENTITY.SET_ENTITY_INVINCIBLE(stupid_object, true)
+            ENTITY.SET_ENTITY_COLLISION(stupid_object, true, true)
+            ENTITY.APPLY_FORCE_TO_ENTITY(glitch_vehicle, 1, 0.0, 10, 10, 0.0, 0.0, 0.0, 0, 1, 1, 1, 0, 1)
+            util.yield(delay)
+            entities.delete_by_handle(stupid_object)
+            entities.delete_by_handle(glitch_vehicle)
+            util.yield(delay)    
+        end
+    end)
+
+    --==Credit To Jinx==--
+    local glitchVeh = false
+    local glitchVehCmd
+    glitchVehCmd = menu.toggle(glitchiar, "Glitch Vehicle", {"glitchvehicle"}, "Might Still Cause A Timeout or Throw An Error \n(Use With Glitch Player For Good Results)", function(toggle)
+        glitchVeh = toggle
+        local ped = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)
+        local pos = ENTITY.GET_ENTITY_COORDS(ped, false)
+        local player_veh = PED.GET_VEHICLE_PED_IS_USING(ped)
+        local veh_model = players.get_vehicle_model(player_id)
+        local ped_hash = util.joaat("a_c_chop")
+        local object_hash = util.joaat("des_plog_door_start")
+        request_model(ped_hash)
+        request_model(object_hash)
+        
+        while glitchVeh do
+            if v3.distance(ENTITY.GET_ENTITY_COORDS(players.user_ped(), false), players.get_position(player_id)) > 1000.0 
+            and v3.distance(pos, players.get_cam_pos(players.user())) > 1000.0 then
+                util.toast("Player muh away. :c")
+                menu.set_value(glitchVehCmd, false);
+            break end
+
+            if not players.exists(player_id) then 
+                util.toast("The player does not exist")
+                menu.set_value(glitchVehCmd, false);
+            break end
+
+            if not PED.IS_PED_IN_VEHICLE(ped, player_veh, false) then 
+                util.toast("The player is not in a car")
+                menu.set_value(glitchVehCmd, false);
+            break end
+
+            if not VEHICLE.ARE_ANY_VEHICLE_SEATS_FREE(player_veh) then
+                util.toast("There are no seats available")
+                menu.set_value(glitchVehCmd, false);
+            break end
+
+            local seat_count = VEHICLE.GET_VEHICLE_MODEL_NUMBER_OF_SEATS(veh_model)
+            local glitch_obj = entities.create_object(object_hash, pos)
+            local glitched_ped = entities.create_ped(26, ped_hash, pos, 0)
+            local things = {glitched_ped, glitch_obj}
+
+            NETWORK.NETWORK_REQUEST_CONTROL_OF_ENTITY(glitch_obj)
+            NETWORK.NETWORK_REQUEST_CONTROL_OF_ENTITY(glitched_ped)
+
+            ENTITY.ATTACH_ENTITY_TO_ENTITY(glitch_obj, glitched_ped, 0, 0, 0, -0.2--[[y]], 0, 0, 0, true, false, true, 0, true)
+
+            for i, spawned_objects in ipairs(things) do
+                NETWORK.NETWORK_REQUEST_CONTROL_OF_ENTITY(spawned_objects)
+                ENTITY.SET_ENTITY_VISIBLE(spawned_objects, false)
+                ENTITY.SET_ENTITY_INVINCIBLE(spawned_objects, true)
+            end
+
+            for i = 0, seat_count -1 do
+                if VEHICLE.ARE_ANY_VEHICLE_SEATS_FREE(player_veh) then
+                    local emptyseat = i
+                    for l = 1, 25 do
+                        PED.SET_PED_INTO_VEHICLE(glitched_ped, player_veh, emptyseat)
+                        ENTITY.SET_ENTITY_COLLISION(glitch_obj, true, true)
+                        util.yield()
+                    end
+                end
+            end
+            if not menu.get_value(glitchVehCmd) then
+                entities.delete_by_handle(glitched_ped)
+                entities.delete_by_handle(glitch_obj)
+            end
+            if glitched_ped ~= nil then
+                entities.delete_by_handle(glitched_ped) 
+            end
+            if glitch_obj ~= nil then 
+                entities.delete_by_handle(glitch_obj)
+            end
+        end
+    end)
+
+    local vehtrolling = menu.list(trolling, "Vehicle Trolling", {}, "")
+
+    menu.action(vehtrolling, "Detach Wheels", {}, "Detaches the wheels from the player's vehicle", function()
+        local  pname = PLAYER.GET_PLAYER_NAME(player_id)
+        local pedm = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id) -- get the players model
+        if PED.IS_PED_IN_ANY_VEHICLE(pedm, true) then --checking if they are in a vehicle
+            local vmod = PED.GET_VEHICLE_PED_IS_IN(pedm, true) --get the vehicle they are in
+            Get_Entity(vmod) --get control
+            entities.detach_wheel(vmod, 0)
+            entities.detach_wheel(vmod, 1)
+            entities.detach_wheel(vmod, 2)
+            entities.detach_wheel(vmod, 3)
+            entities.detach_wheel(vmod, 4)
+            entities.detach_wheel(vmod, 5)
+        end   
+    end)
+
+    menu.action(vehtrolling, "Burst Tires", {""}, "Button That Burst The Wheels Tires", function ()
+        local pname = PLAYER.GET_PLAYER_NAME(player_id)
+        local pedm = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id) -- get the players model
+        if PED.IS_PED_IN_ANY_VEHICLE(pedm, true) then --checking if they are in a vehicle
+            local vmod = PED.GET_VEHICLE_PED_IS_IN(pedm, true) --get the vehicle they are in
+        local current_vehicle_handle_or_ptr = entities.get_user_vehicle_as_handle(true)
+            if ENTITY.DOES_ENTITY_EXIST(vmod) and Get_Entity(vmod) then --get control
+                VEHICLE.SET_VEHICLE_TYRES_CAN_BURST(vmod, true)
+                for wheelId = 0, 7 do VEHICLE.SET_VEHICLE_TYRE_BURST(vmod, wheelId, true, 1000.0) end
+            end
+        end
+    end)
+
+    menu.action(vehtrolling, "Invert Vehicle Controls", {}, "Inverts players vehicle controls (Permanent)", function ()
+        local pname = PLAYER.GET_PLAYER_NAME(player_id)
+        local pedm = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id) -- get the players model
+        if PED.IS_PED_IN_ANY_VEHICLE(pedm, true) then --checking if they are in a vehicle
+            local vmod = PED.GET_VEHICLE_PED_IS_IN(pedm, true) --get the vehicle they are in
+            Get_Entity(vmod) --get control
+        end  
+        local vmod = PED.GET_VEHICLE_PED_IS_IN(pedm, true)
+        SET_INVERT_VEHICLE_CONTROLS(vmod, true)
+    end)
+
+    menu.action(vehtrolling, "Delete Vehicle", {}, "Deletes the players current vehicle", function ()
+        local pname = PLAYER.GET_PLAYER_NAME(player_id)
+        local pedm = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id) -- get the players model
+        if PED.IS_PED_IN_ANY_VEHICLE(pedm, true) then --checking if they are in a vehicle
+            local vmod = PED.GET_VEHICLE_PED_IS_IN(pedm, true) --get the vehicle they are in
+            Get_Entity(vmod) --get control
+            entities.delete_by_handle(vmod)
+        end  
+    end)
+    
+    menu.toggle_loop(vehtrolling, "Delete vehicle Loop", {}, "Deletes the players current vehicle over and over", function ()
+        local pname = PLAYER.GET_PLAYER_NAME(player_id)
+        local pedm = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id) -- get the players model
+        if PED.IS_PED_IN_ANY_VEHICLE(pedm, true) then --checking if they are in a vehicle
+            local vmod = PED.GET_VEHICLE_PED_IS_IN(pedm, true) --get the vehicle they are in
+            Get_Entity(vmod) --get control
+            entities.delete_by_handle(vmod)
+        end  
+    end)
+
+    menu.action(vehtrolling, "Spawn Ramp In Front Of them", {}, "", function() 
+        local ramp_hash = util.joaat("stt_prop_ramp_jump_s")
+        local ped = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)
+        local pos = ENTITY.GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(ped, 0, 10, -2)
+        local rot = ENTITY.GET_ENTITY_ROTATION(ped, 2)
+        STREAMING.REQUEST_MODEL(ramp_hash)
+    	while not STREAMING.HAS_MODEL_LOADED(ramp_hash) do
+    		util.yield()
+    	end
+
+        local ramp = OBJECT.CREATE_OBJECT(ramp_hash, pos.x, pos.y, pos.z, true, false, true)
+
+        ENTITY.SET_ENTITY_VISIBLE(ramp, true)
+        ENTITY.SET_ENTITY_ROTATION(ramp, rot.x, rot.y, rot.z + 90, 0, true)
+        util.yield(2500)
+        entities.delete_by_handle(ramp)
+    end)
+
+    menu.action(vehtrolling, "Launch Vehicle", {"vehiclefly"}, "Sends players vehicle flying", function()
         send_player_vehicle_flying(player_id)
     end)
 
-    menu.action(trolling, "Cage Vehicle", {"cage"}, "", function()
+    menu.action(vehtrolling, "Cage Vehicle", {"cage"}, "", function()
         local container_hash = util.joaat("benson")
         local ped = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)
         local pos = ENTITY.GET_ENTITY_COORDS(ped)
@@ -928,6 +1228,234 @@ end)
         spawned_objects[#spawned_objects + 1] = container
         ENTITY.SET_ENTITY_VISIBLE(container, false)
         ENTITY.FREEZE_ENTITY_POSITION(container, true)
+    end)
+
+    local teletrolling = menu.list(trolling, "Teleport Trolling", {}, "")
+
+    menu.action(teletrolling, "Send To Jail", {}, "", function()
+        local my_pos = ENTITY.GET_ENTITY_COORDS(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id))
+        local my_ped = PLAYER.GET_PLAYER_PED(players.user())
+        ENTITY.SET_ENTITY_COORDS_NO_OFFSET(my_ped, 1628.5234, 2570.5613, 45.56485, true, false, false, false)
+        menu.trigger_commands("givesh " .. PLAYER.GET_PLAYER_NAME(player_id))
+        menu.trigger_commands("summon " .. PLAYER.GET_PLAYER_NAME(player_id))
+        menu.trigger_commands("invisibility on")
+        menu.trigger_commands("otr")
+        util.yield(5000)
+        menu.trigger_commands("invisibility off")
+        menu.trigger_commands("otr")
+        ENTITY.SET_ENTITY_COORDS_NO_OFFSET(my_ped, my_pos.x, my_pos.y, my_pos.z)
+    end)
+
+    menu.action(teletrolling, "Teleport To The Backrooms", {}, "", function()
+        local p = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)
+        local c = ENTITY.GET_ENTITY_COORDS(p, true)
+        local defx = c.x
+        local defy = c.y 
+        local defz = c.z
+        local veh = PED.GET_VEHICLE_PED_IS_IN(p, true)
+        if PED.IS_PED_IN_ANY_VEHICLE(p, false) then
+            STREAMING.REQUEST_MODEL(floorbr)
+            while not STREAMING.HAS_MODEL_LOADED(floorbr) do
+                STREAMING.REQUEST_MODEL(floorbr)
+                util.yield()
+            end
+            STREAMING.REQUEST_MODEL(wallbr)
+            while not STREAMING.HAS_MODEL_LOADED(wallbr) do
+                STREAMING.REQUEST_MODEL(wallbr)
+                util.yield()
+            end
+            RequestControl(veh)
+            local success, floorcoords
+            repeat
+                success, floorcoords = util.get_ground_z(c.x, c.y)
+                util.yield()
+            until success
+            c.z = floorcoords - 100
+            ENTITY.SET_ENTITY_COORDS(veh, c.x, c.y, c.z, false, false, false, false)
+
+            local c = ENTITY.GET_ENTITY_COORDS(p)
+            local defz = c.z
+            c.z = defz - 2
+            local spawnedfloorbr = entities.create_object(floorbr, c)
+            c.z = c.z + 10
+            local spawnedroofbr = entities.create_object(floorbr, c)
+            ENTITY.SET_ENTITY_ROTATION(spawnedroofbr, 180.0, 0.0, 0.0, 1, true)
+
+            defz = c.z - 5
+            c.x = c.x + 4
+            c.z = defz
+            local spawnedwall = entities.create_object(wallbr, c)
+            ENTITY.SET_ENTITY_ROTATION(spawnedwall, 0.0, 90.0, 0.0, 1, true)
+            OBJECT.SET_OBJECT_TINT_INDEX(spawnedwall, 7)
+
+            c.x = c.x - 8
+            local spawnedwall = entities.create_object(wallbr, c)
+            ENTITY.SET_ENTITY_ROTATION(spawnedwall, 0.0, 90.0, 0.0, 1, true)
+            OBJECT.SET_OBJECT_TINT_INDEX(spawnedwall, 7)
+
+            c.y = c.y - 8
+            c.x = defx + 10.5
+            local spawnedwall = entities.create_object(wallbr, c)
+            ENTITY.SET_ENTITY_ROTATION(spawnedwall, 90.0, 90.0, 0.0, 1, true)
+            OBJECT.SET_OBJECT_TINT_INDEX(spawnedwall, 7)
+
+            local spawnedwall = entities.create_object(wallbr, c)
+            ENTITY.SET_ENTITY_ROTATION(spawnedwall, 0.0, 90.0, 0.0, 1, true)
+            OBJECT.SET_OBJECT_TINT_INDEX(spawnedwall, 7)
+
+            c.y = c.y - 14.5
+            local spawnedwall = entities.create_object(wallbr, c)
+            ENTITY.SET_ENTITY_ROTATION(spawnedwall, 0.0, 90.0, 0.0, 1, true)
+            OBJECT.SET_OBJECT_TINT_INDEX(spawnedwall, 7)
+
+            c.y = c.y - 7.2
+            c.x = defx + 3.5
+            local spawnedwall = entities.create_object(wallbr, c)
+            ENTITY.SET_ENTITY_ROTATION(spawnedwall, 90.0, 90.0, 0.0, 1, true)
+            OBJECT.SET_OBJECT_TINT_INDEX(spawnedwall, 7)
+
+            c.y = defy + 6.5
+            c.x = defx + 11
+            local spawnedwall = entities.create_object(wallbr, c)
+            ENTITY.SET_ENTITY_ROTATION(spawnedwall, 90.0, 90.0, 0.0, 1, true)
+            OBJECT.SET_OBJECT_TINT_INDEX(spawnedwall, 7)
+
+            c.x = defx - 12
+            c.y = defy + 4
+            local spawnedwall = entities.create_object(wallbr, c)
+            ENTITY.SET_ENTITY_ROTATION(spawnedwall, 90.0, 90.0, 0.0, 1, true)
+            OBJECT.SET_OBJECT_TINT_INDEX(spawnedwall, 7)
+
+            c.y = defy - 7
+            local spawnedwall = entities.create_object(wallbr, c)
+            ENTITY.SET_ENTITY_ROTATION(spawnedwall, 90.0, 90.0, 0.0, 1, true)
+            OBJECT.SET_OBJECT_TINT_INDEX(spawnedwall, 7)
+
+            c.y = c.y - 10
+            local spawnedwall = entities.create_object(wallbr, c)
+            ENTITY.SET_ENTITY_ROTATION(spawnedwall, 90.0, 90.0, 0.0, 1, true)
+            OBJECT.SET_OBJECT_TINT_INDEX(spawnedwall, 7)
+
+            c.y = c.y - 7
+            local spawnedwall = entities.create_object(wallbr, c)
+            ENTITY.SET_ENTITY_ROTATION(spawnedwall, 0.0, 90.0, 0.0, 1, true)
+            OBJECT.SET_OBJECT_TINT_INDEX(spawnedwall, 7)
+
+            c.y = defy - 10
+            c.x = defx - 19
+            local spawnedwall = entities.create_object(wallbr, c)
+            ENTITY.SET_ENTITY_ROTATION(spawnedwall, 0.0, 90.0, 0.0, 1, true)
+            OBJECT.SET_OBJECT_TINT_INDEX(spawnedwall, 7)
+
+            c.x = defx - 3
+            c.y = defy + 6.5
+            local spawnedwall = entities.create_object(wallbr, c)
+            ENTITY.SET_ENTITY_ROTATION(spawnedwall, 90.0, 90.0, 0.0, 1, true)
+            OBJECT.SET_OBJECT_TINT_INDEX(spawnedwall, 7)
+
+            c.x = defx + 25
+            local spawnedwall = entities.create_object(wallbr, c)
+            ENTITY.SET_ENTITY_ROTATION(spawnedwall, 90.0, 90.0, 0.0, 1, true)
+            OBJECT.SET_OBJECT_TINT_INDEX(spawnedwall, 7)
+
+            c.x = c.x + 7
+            c.y = defy
+            local spawnedwall = entities.create_object(wallbr, c)
+            ENTITY.SET_ENTITY_ROTATION(spawnedwall, 0.0, 90.0, 0.0, 1, true)
+            OBJECT.SET_OBJECT_TINT_INDEX(spawnedwall, 7)
+
+            c.y = defy - 14.5
+            local spawnedwall = entities.create_object(wallbr, c)
+            ENTITY.SET_ENTITY_ROTATION(spawnedwall, 0.0, 90.0, 0.0, 1, true)
+            OBJECT.SET_OBJECT_TINT_INDEX(spawnedwall, 7)
+
+            c.y = c.y - 7
+            c.x = c.x - 7
+            local spawnedwall = entities.create_object(wallbr, c)
+            ENTITY.SET_ENTITY_ROTATION(spawnedwall, 90.0, 90.0, 0.0, 1, true)
+            OBJECT.SET_OBJECT_TINT_INDEX(spawnedwall, 7)
+
+            c.y = c.y - 7
+            local spawnedwall = entities.create_object(wallbr, c)
+            ENTITY.SET_ENTITY_ROTATION(spawnedwall, 0.0, 90.0, 0.0, 1, true)
+            OBJECT.SET_OBJECT_TINT_INDEX(spawnedwall, 7)
+
+            c.y = c.y - 7
+            c.x = c.x - 7.5
+            local spawnedwall = entities.create_object(wallbr, c)
+            ENTITY.SET_ENTITY_ROTATION(spawnedwall, 90.0, 90.0, 0.0, 1, true)
+            OBJECT.SET_OBJECT_TINT_INDEX(spawnedwall, 7)
+
+            c.x = c.x - 6.5
+            c.y = c.y - 6.5
+            local spawnedwall = entities.create_object(wallbr, c)
+            ENTITY.SET_ENTITY_ROTATION(spawnedwall, 0.0, 90.0, 0.0, 1, true)
+            OBJECT.SET_OBJECT_TINT_INDEX(spawnedwall, 7)
+
+            c.x = c.x - 7.5
+            c.y = c.y - 7
+            local spawnedwall = entities.create_object(wallbr, c)
+            ENTITY.SET_ENTITY_ROTATION(spawnedwall, 90.0, 90.0, 0.0, 1, true)
+            OBJECT.SET_OBJECT_TINT_INDEX(spawnedwall, 7)
+
+            c.x = c.x - 14
+            local spawnedwall = entities.create_object(wallbr, c)
+            ENTITY.SET_ENTITY_ROTATION(spawnedwall, 90.0, 90.0, 0.0, 1, true)
+            OBJECT.SET_OBJECT_TINT_INDEX(spawnedwall, 7)
+
+            local spawnedwall = entities.create_object(wallbr, c)
+            ENTITY.SET_ENTITY_ROTATION(spawnedwall, 0.0, 90.0, 0.0, 1, true)
+            OBJECT.SET_OBJECT_TINT_INDEX(spawnedwall, 7)
+
+            c.x = c.x - 6.5
+            c.y = c.y + 7
+            local spawnedwall = entities.create_object(wallbr, c)
+            ENTITY.SET_ENTITY_ROTATION(spawnedwall, 0.0, 90.0, 0.0, 1, true)
+            OBJECT.SET_OBJECT_TINT_INDEX(spawnedwall, 7)
+
+            c.x = c.x - 7.5
+            local spawnedwall = entities.create_object(wallbr, c)
+            ENTITY.SET_ENTITY_ROTATION(spawnedwall, 90.0, 90.0, 0.0, 1, true)
+            OBJECT.SET_OBJECT_TINT_INDEX(spawnedwall, 7)
+
+            c.x = c.x - 6.5
+            c.y = c.y + 7
+            local spawnedwall = entities.create_object(wallbr, c)
+            ENTITY.SET_ENTITY_ROTATION(spawnedwall, 0.0, 90.0, 0.0, 1, true)
+            OBJECT.SET_OBJECT_TINT_INDEX(spawnedwall, 7)
+
+            c.y = c.y + 14
+            local spawnedwall = entities.create_object(wallbr, c)
+            ENTITY.SET_ENTITY_ROTATION(spawnedwall, 0.0, 90.0, 0.0, 1, true)
+            OBJECT.SET_OBJECT_TINT_INDEX(spawnedwall, 7)
+
+            local spawnedwall = entities.create_object(wallbr, c)
+            ENTITY.SET_ENTITY_ROTATION(spawnedwall, 90.0, 90.0, 0.0, 1, true)
+            OBJECT.SET_OBJECT_TINT_INDEX(spawnedwall, 7)
+
+            c.y = c.y + 14
+            local spawnedwall = entities.create_object(wallbr, c)
+            ENTITY.SET_ENTITY_ROTATION(spawnedwall, 0.0, 90.0, 0.0, 1, true)
+            OBJECT.SET_OBJECT_TINT_INDEX(spawnedwall, 7)
+
+            c.y = c.y + 14
+            local spawnedwall = entities.create_object(wallbr, c)
+            ENTITY.SET_ENTITY_ROTATION(spawnedwall, 0.0, 90.0, 0.0, 1, true)
+            OBJECT.SET_OBJECT_TINT_INDEX(spawnedwall, 7)
+
+            c.y = c.y - 3.1
+            c.x = c.x + 5
+            local spawnedwall = entities.create_object(wallbr, c)
+            ENTITY.SET_ENTITY_ROTATION(spawnedwall, 90.0, 90.0, 0.0, 1, true)
+            OBJECT.SET_OBJECT_TINT_INDEX(spawnedwall, 7)
+
+            util.yield(600)
+            TASK.CLEAR_PED_TASKS_IMMEDIATELY(p)
+            util.yield(500)
+            entities.delete_by_handle(veh)
+        else
+            util.toast(players.get_name(player_id).. " Not in a vehicle")
+        end
     end)
 
     local windmilli = menu.list(trolling, "Windmills", {}, "")
@@ -1259,22 +1787,8 @@ end)
 
     menu.divider(trolling, "Others")
 
-    menu.action(trolling, "Spawn Ramp In Front Of them", {}, "", function() 
-        local ramp_hash = util.joaat("stt_prop_ramp_jump_s")
-        local ped = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)
-        local pos = ENTITY.GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(ped, 0, 10, -2)
-        local rot = ENTITY.GET_ENTITY_ROTATION(ped, 2)
-        STREAMING.REQUEST_MODEL(ramp_hash)
-    	while not STREAMING.HAS_MODEL_LOADED(ramp_hash) do
-    		util.yield()
-    	end
-
-        local ramp = OBJECT.CREATE_OBJECT(ramp_hash, pos.x, pos.y, pos.z, true, false, true)
-
-        ENTITY.SET_ENTITY_VISIBLE(ramp, true)
-        ENTITY.SET_ENTITY_ROTATION(ramp, rot.x, rot.y, rot.z + 90, 0, true)
-        util.yield(1000)
-        entities.delete_by_handle(ramp)
+    menu.action(trolling, "Passive Mode Kill", {}, "(DOESN'T WORK ON NO RAGDOLL PLAYERS) Tries To Kill The Player in Passive Mode", function ()
+        passive_mode_kill(player_id)
     end)
 
     menu.action(trolling,"Kidnap Player", {}, "", function()
@@ -1337,58 +1851,6 @@ end)
         end
 	end)
 
-    local inf_loading = menu.list(trolling, "Infinite Loading Screen", {}, "")
-    menu.action(inf_loading, "Teleport To MC", {}, "", function()
-        util.trigger_script_event(1 << player_id, {891653640, player_id, 0, 32, NETWORK.NETWORK_HASH_FROM_PLAYER_HANDLE(player_id), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0})    
-    end)
-
-    menu.action(inf_loading, "Apartament", {}, "", function()
-        util.trigger_script_event(1 << player_id , {-1796714618, player_id, 0, 1, player_id})
-    end)
-        
-    --[[menu.action_slider(inf_loading, "Currupt", {}, "Click to select a style", invites, function(index, name)
-        switch name do
-            case 1:
-                util.trigger_script_event(1 << player_id, {36077543, player_id, 1})
-            break
-            case 2:
-                util.trigger_script_event(1 << player_id, {36077543, player_id, 2})
-            break
-            case 3:
-                util.trigger_script_event(1 << player_id, {36077543, player_id, 3})
-            break
-            case 4:
-                util.trigger_script_event(1 << player_id, {36077543, player_id, 4})
-            break
-            case 5:
-                util.trigger_script_event(1 << player_id, {36077543, player_id, 5})
-            break
-            case 6:
-                util.trigger_script_event(1 << player_id, {36077543, player_id, 6})
-            break
-        end
-    end)]]
-
-
-    local freeze = menu.list(malicious, "Freeze Methods", {}, "")
-
-    player_toggle_loop(freeze, player_id, "Scene Freeze", {}, "Works Better Than Most Of Them.", function()
-        util.trigger_script_event(1 << player_id , {330622597, player_id, 0, 0, 0, 0, 0})
-    end)
-
-    player_toggle_loop(freeze, player_id, "Scene Freeze V2", {}, "Works less than upper one.", function()
-        util.trigger_script_event(1 << player_id, {-1796714618, player_id, 0, 1, 0, 0})
-        util.yield(500)
-    end)
-
-    player_toggle_loop(freeze, player_id, "Event Freeze", {}, "Triggers all events.", function()
-        local ped = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)
-        util.trigger_script_event(1 << player_id, {-93722397, player_id, 0, 0, 0, 0, 0})
-        util.trigger_script_event(1 << player_id, {330622597, player_id, 0, 0, 0, 0, 0})
-        TASK.CLEAR_PED_TASKS_IMMEDIATELY(player_id)
-        util.yield(500)
-    end)
-
     menu.action(trolling, "Killing Indoors", {}, "Does not work in apartments (Love u jinx x2)", function()
         local ped = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)
         local pos = ENTITY.GET_ENTITY_COORDS(ped)
@@ -1399,178 +1861,6 @@ end)
             return end
             if Fewd.is_player_in_interior(player_id) ~= interior then
                 MISC.SHOOT_SINGLE_BULLET_BETWEEN_COORDS(pos.x, pos.y, pos.z + 1, pos.x, pos.y, pos.z, 1000, true, util.joaat("weapon_stungun"), players.user_ped(), false, true, 1.0)
-            end
-        end
-    end)
-
-    glitchiar = menu.list(trolling, "Glitch Options", {}, "")
-
-
-    player_toggle_loop(glitchiar, player_id, "Bug Movement", {}, "", function()
-        local player = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)
-        local pos = ENTITY.GET_ENTITY_COORDS(player, false)
-        local glitch_hash = util.joaat("prop_shuttering03")
-        request_model(glitch_hash)
-        local dumb_object_front = entities.create_object(glitch_hash, ENTITY.GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(PLAYER.GET_PLAYER_PED(player_id), 0, 1, 0))
-        local dumb_object_back = entities.create_object(glitch_hash, ENTITY.GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(PLAYER.GET_PLAYER_PED(player_id), 0, 0, 0))
-        ENTITY.SET_ENTITY_VISIBLE(dumb_object_front, false)
-        ENTITY.SET_ENTITY_VISIBLE(dumb_object_back, false)
-        util.yield()
-        entities.delete_by_handle(dumb_object_front)
-        entities.delete_by_handle(dumb_object_back)
-        util.yield()    
-    end)
-
-
-    local glitch_player_list = menu.list(glitchiar, "Glitch Player", {"glitchdelay"}, "") 
-    local object_stuff = {
-        names = {
-            "Ferris Wheel",
-            "UFO",
-            "Cement Mixer",
-            "Scaffolding",
-            "Garage Door",
-            "Big Bowling Ball",
-            "Big Soccer Ball",
-            "Big Orange Ball",
-            "Stunt Ramp",
-            "Autarch",
-            "Plog Door"
-
-        },
-        objects = {
-            "prop_ld_ferris_wheel",
-            "p_spinning_anus_s",
-            "prop_staticmixer_01",
-            "prop_towercrane_02a",
-            "des_scaffolding_roo",
-            "prop_sm1_11_garaged",
-            "stt_prop_stunt_bowling_ball",
-            "stt_prop_stunt_soccer_ball",
-            "prop_juicestand",
-            "stt_prop_stunt_jump_l",
-            "autarch",
-            "des_plog_door_start",
-        }
-    }
-
-    local object_hash = util.joaat("prop_ld_ferris_wheel")
-    menu.list_select(glitch_player_list, "Object", {"glitchplayer"}, "Object to use for Glitch Player \nPlog Door, UFO, Autarch & Ferris Wheel Work Best \n(Recommend Using Glitch Vehicle With This)", object_stuff.names, 1, function(index)
-        object_hash = util.joaat(object_stuff.objects[index])
-    end)
-
-    menu.slider(glitch_player_list, "Spawn Delay", {"spawndelay"}, "", 0, 3000, 50, 10, function(amount)
-        delay = amount
-    end)
-
-    local glitchPlayer = false
-    local glitchPlayer_toggle
-    glitchPlayer_toggle = menu.toggle(glitch_player_list, "Glitch Player", {}, "", function(toggled)
-        glitchPlayer = toggled
-
-        while glitchPlayer do
-            local ped = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)
-            local pos = ENTITY.GET_ENTITY_COORDS(ped, false)
-            if v3.distance(ENTITY.GET_ENTITY_COORDS(players.user_ped(), false), players.get_position(player_id)) > 1000.0 
-            and v3.distance(pos, players.get_cam_pos(players.user())) > 1000.0 then
-				util.toast("Player is too far. :/")
-				menu.set_value(glitchPlayer_toggle, false)
-            break end
-
-            if not players.exists(player_id) then 
-                util.toast("Player doesn't exist. :/")
-                menu.set_value(glitchPlayer_toggle, false)
-            util.stop_thread() end
-
-            local glitch_hash = object_hash
-            local poopy_butt = util.joaat("rallytruck")
-            request_model(glitch_hash)
-            request_model(poopy_butt)
-            local stupid_object = entities.create_object(glitch_hash, pos)
-            local glitch_vehicle = entities.create_vehicle(poopy_butt, pos, 0)
-            ENTITY.SET_ENTITY_VISIBLE(stupid_object, false)
-            ENTITY.SET_ENTITY_VISIBLE(glitch_vehicle, false)
-            ENTITY.SET_ENTITY_INVINCIBLE(stupid_object, true)
-            ENTITY.SET_ENTITY_COLLISION(stupid_object, true, true)
-            ENTITY.APPLY_FORCE_TO_ENTITY(glitch_vehicle, 1, 0.0, 10, 10, 0.0, 0.0, 0.0, 0, 1, 1, 1, 0, 1)
-            util.yield(delay)
-            entities.delete_by_handle(stupid_object)
-            entities.delete_by_handle(glitch_vehicle)
-            util.yield(delay)    
-        end
-    end)
-
-    --==Credit To Jinx==--
-    local glitchVeh = false
-    local glitchVehCmd
-    glitchVehCmd = menu.toggle(glitchiar, "Glitch Vehicle", {"glitchvehicle"}, "Might Still Cause A Timeout or Throw An Error \n(Use With Glitch Player For Good Results)", function(toggle)
-        glitchVeh = toggle
-        local ped = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)
-        local pos = ENTITY.GET_ENTITY_COORDS(ped, false)
-        local player_veh = PED.GET_VEHICLE_PED_IS_USING(ped)
-        local veh_model = players.get_vehicle_model(player_id)
-        local ped_hash = util.joaat("a_c_chop")
-        local object_hash = util.joaat("des_plog_door_start")
-        request_model(ped_hash)
-        request_model(object_hash)
-        
-        while glitchVeh do
-            if v3.distance(ENTITY.GET_ENTITY_COORDS(players.user_ped(), false), players.get_position(player_id)) > 1000.0 
-            and v3.distance(pos, players.get_cam_pos(players.user())) > 1000.0 then
-                util.toast("Player muh away. :c")
-                menu.set_value(glitchVehCmd, false);
-            break end
-
-            if not players.exists(player_id) then 
-                util.toast("The player does not exist")
-                menu.set_value(glitchVehCmd, false);
-            break end
-
-            if not PED.IS_PED_IN_VEHICLE(ped, player_veh, false) then 
-                util.toast("The player is not in a car")
-                menu.set_value(glitchVehCmd, false);
-            break end
-
-            if not VEHICLE.ARE_ANY_VEHICLE_SEATS_FREE(player_veh) then
-                util.toast("There are no seats available")
-                menu.set_value(glitchVehCmd, false);
-            break end
-
-            local seat_count = VEHICLE.GET_VEHICLE_MODEL_NUMBER_OF_SEATS(veh_model)
-            local glitch_obj = entities.create_object(object_hash, pos)
-            local glitched_ped = entities.create_ped(26, ped_hash, pos, 0)
-            local things = {glitched_ped, glitch_obj}
-
-            NETWORK.NETWORK_REQUEST_CONTROL_OF_ENTITY(glitch_obj)
-            NETWORK.NETWORK_REQUEST_CONTROL_OF_ENTITY(glitched_ped)
-
-            ENTITY.ATTACH_ENTITY_TO_ENTITY(glitch_obj, glitched_ped, 0, 0, 0, -0.2--[[y]], 0, 0, 0, true, false, true, 0, true)
-
-            for i, spawned_objects in ipairs(things) do
-                NETWORK.NETWORK_REQUEST_CONTROL_OF_ENTITY(spawned_objects)
-                ENTITY.SET_ENTITY_VISIBLE(spawned_objects, false)
-                ENTITY.SET_ENTITY_INVINCIBLE(spawned_objects, true)
-            end
-
-            for i = 0, seat_count -1 do
-                if VEHICLE.ARE_ANY_VEHICLE_SEATS_FREE(player_veh) then
-                    local emptyseat = i
-                    for l = 1, 25 do
-                        PED.SET_PED_INTO_VEHICLE(glitched_ped, player_veh, emptyseat)
-                        ENTITY.SET_ENTITY_COLLISION(glitch_obj, true, true)
-                        util.yield()
-                    end
-                end
-            end
-            if not menu.get_value(glitchVehCmd) then
-                entities.delete_by_handle(glitched_ped)
-                entities.delete_by_handle(glitch_obj)
-            end
-            if glitched_ped ~= nil then
-                entities.delete_by_handle(glitched_ped) 
-            end
-            if glitch_obj ~= nil then 
-                entities.delete_by_handle(glitch_obj)
             end
         end
     end)
@@ -1665,6 +1955,7 @@ menu.action(crashes, "FewMod All In One", {"FewModLobbyCrash"}, "Uses Multiple C
     util.yield(10000)
     util.toast("Done Muscle Crash")
     util.log("Done Muscle Crash")
+    menu.trigger_commands("musclecrash" .. PLAYER.GET_PLAYER_NAME(player_id))
     menu.trigger_commands("componentcrash" .. PLAYER.GET_PLAYER_NAME(player_id))
     util.toast("Started Component Crash (This Crash Takes A Bit)")
     util.log("Started Component Crash (This Crash Takes A Bit)")
@@ -1679,14 +1970,17 @@ menu.action(crashes, "FewMod All In One", {"FewModLobbyCrash"}, "Uses Multiple C
     util.yield(15000)
     util.toast("Done Sync Crash v1")
     util.log("Done Sync Crash v1")
+    menu.trigger_commands("crashv77" .. PLAYER.GET_PLAYER_NAME(player_id))
     menu.trigger_commands("crashv78" .. PLAYER.GET_PLAYER_NAME(player_id))
     util.yield(15000)
     util.toast("Done Sync Crash v2")
     util.log("Done Sync Crash v2")
+    menu.trigger_commands("crashv78" .. PLAYER.GET_PLAYER_NAME(player_id))
     menu.trigger_commands("crashv79" .. PLAYER.GET_PLAYER_NAME(player_id))
     util.yield(10000)
     util.toast("Done Sync Crash v3")
     util.log("Done Sync Crash v3")
+    menu.trigger_commands("crashv79" .. PLAYER.GET_PLAYER_NAME(player_id))
     menu.trigger_commands("anticrashcamera".. " on")
     menu.trigger_commands("5GCrashForSession")
     util.yield(10000)
@@ -3792,15 +4086,13 @@ end)
 -------------------------------------------------------------------------------------------------------------------------------------------------------
 
 local kicks = menu.list(malicious, "Kicks", {}, "")
-	
-menu.divider(kicks, "Base Kicks")
 
     menu.action(kicks, "Adaptive Kick", {}, "", function()
-        menu.trigger_commands("scripthos")
+        menu.trigger_commands("scripthost")
         util.trigger_script_event(1 << player_id, {1104117595, player_id, 1, 0, 2, 14, 3, 1})
         util.trigger_script_event(1 << player_id, {1104117595, player_id, 1, 0, 2, 167, 3, 1})
         util.trigger_script_event(1 << player_id, {1104117595, player_id, 1, 0, 2, 257, 3, 1})
-        menu.trigger_commands("breakup" .. players.get_name(player_id))
+        menu.trigger_commands("loveletter" .. players.get_name(player_id))
     end)
 
     menu.action(kicks, "Script Kick", {}, "", function()
@@ -3816,20 +4108,6 @@ menu.divider(kicks, "Base Kicks")
 
     menu.action(kicks, "Power Kick", {}, "", function()
         Fewd.power_kick(player_id)
-    end)
-
-    menu.action(trolling, "Send To Jail", {}, "", function()
-        local my_pos = ENTITY.GET_ENTITY_COORDS(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id))
-        local my_ped = PLAYER.GET_PLAYER_PED(players.user())
-        ENTITY.SET_ENTITY_COORDS_NO_OFFSET(my_ped, 1628.5234, 2570.5613, 45.56485, true, false, false, false)
-        menu.trigger_commands("givesh " .. PLAYER.GET_PLAYER_NAME(player_id))
-        menu.trigger_commands("summon " .. PLAYER.GET_PLAYER_NAME(player_id))
-        menu.trigger_commands("invisibility on")
-        menu.trigger_commands("otr")
-        util.yield(5000)
-        menu.trigger_commands("invisibility off")
-        menu.trigger_commands("otr")
-        ENTITY.SET_ENTITY_COORDS_NO_OFFSET(my_ped, my_pos.x, my_pos.y, my_pos.z)
     end)
 
     local pclpid = {}
@@ -3852,218 +4130,6 @@ menu.divider(kicks, "Base Kicks")
             entitycount += 1
         end
         util.toast("Deleted " .. entitycount .. " Clones")
-    end)
-
-    menu.action(trolling, "Teleport To The Backrooms", {}, "", function()
-        local p = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)
-        local c = ENTITY.GET_ENTITY_COORDS(p, true)
-        local defx = c.x
-        local defy = c.y 
-        local defz = c.z
-        local veh = PED.GET_VEHICLE_PED_IS_IN(p, true)
-        if PED.IS_PED_IN_ANY_VEHICLE(p, false) then
-            STREAMING.REQUEST_MODEL(floorbr)
-            while not STREAMING.HAS_MODEL_LOADED(floorbr) do
-                STREAMING.REQUEST_MODEL(floorbr)
-                util.yield()
-            end
-            STREAMING.REQUEST_MODEL(wallbr)
-            while not STREAMING.HAS_MODEL_LOADED(wallbr) do
-                STREAMING.REQUEST_MODEL(wallbr)
-                util.yield()
-            end
-            RequestControl(veh)
-            local success, floorcoords
-            repeat
-                success, floorcoords = util.get_ground_z(c.x, c.y)
-                util.yield()
-            until success
-            c.z = floorcoords - 100
-            ENTITY.SET_ENTITY_COORDS(veh, c.x, c.y, c.z, false, false, false, false)
-
-            local c = ENTITY.GET_ENTITY_COORDS(p)
-            local defz = c.z
-            c.z = defz - 2
-            local spawnedfloorbr = entities.create_object(floorbr, c)
-            c.z = c.z + 10
-            local spawnedroofbr = entities.create_object(floorbr, c)
-            ENTITY.SET_ENTITY_ROTATION(spawnedroofbr, 180.0, 0.0, 0.0, 1, true)
-
-            defz = c.z - 5
-            c.x = c.x + 4
-            c.z = defz
-            local spawnedwall = entities.create_object(wallbr, c)
-            ENTITY.SET_ENTITY_ROTATION(spawnedwall, 0.0, 90.0, 0.0, 1, true)
-            OBJECT.SET_OBJECT_TINT_INDEX(spawnedwall, 7)
-
-            c.x = c.x - 8
-            local spawnedwall = entities.create_object(wallbr, c)
-            ENTITY.SET_ENTITY_ROTATION(spawnedwall, 0.0, 90.0, 0.0, 1, true)
-            OBJECT.SET_OBJECT_TINT_INDEX(spawnedwall, 7)
-
-            c.y = c.y - 8
-            c.x = defx + 10.5
-            local spawnedwall = entities.create_object(wallbr, c)
-            ENTITY.SET_ENTITY_ROTATION(spawnedwall, 90.0, 90.0, 0.0, 1, true)
-            OBJECT.SET_OBJECT_TINT_INDEX(spawnedwall, 7)
-
-            local spawnedwall = entities.create_object(wallbr, c)
-            ENTITY.SET_ENTITY_ROTATION(spawnedwall, 0.0, 90.0, 0.0, 1, true)
-            OBJECT.SET_OBJECT_TINT_INDEX(spawnedwall, 7)
-
-            c.y = c.y - 14.5
-            local spawnedwall = entities.create_object(wallbr, c)
-            ENTITY.SET_ENTITY_ROTATION(spawnedwall, 0.0, 90.0, 0.0, 1, true)
-            OBJECT.SET_OBJECT_TINT_INDEX(spawnedwall, 7)
-
-            c.y = c.y - 7.2
-            c.x = defx + 3.5
-            local spawnedwall = entities.create_object(wallbr, c)
-            ENTITY.SET_ENTITY_ROTATION(spawnedwall, 90.0, 90.0, 0.0, 1, true)
-            OBJECT.SET_OBJECT_TINT_INDEX(spawnedwall, 7)
-
-            c.y = defy + 6.5
-            c.x = defx + 11
-            local spawnedwall = entities.create_object(wallbr, c)
-            ENTITY.SET_ENTITY_ROTATION(spawnedwall, 90.0, 90.0, 0.0, 1, true)
-            OBJECT.SET_OBJECT_TINT_INDEX(spawnedwall, 7)
-
-            c.x = defx - 12
-            c.y = defy + 4
-            local spawnedwall = entities.create_object(wallbr, c)
-            ENTITY.SET_ENTITY_ROTATION(spawnedwall, 90.0, 90.0, 0.0, 1, true)
-            OBJECT.SET_OBJECT_TINT_INDEX(spawnedwall, 7)
-
-            c.y = defy - 7
-            local spawnedwall = entities.create_object(wallbr, c)
-            ENTITY.SET_ENTITY_ROTATION(spawnedwall, 90.0, 90.0, 0.0, 1, true)
-            OBJECT.SET_OBJECT_TINT_INDEX(spawnedwall, 7)
-
-            c.y = c.y - 10
-            local spawnedwall = entities.create_object(wallbr, c)
-            ENTITY.SET_ENTITY_ROTATION(spawnedwall, 90.0, 90.0, 0.0, 1, true)
-            OBJECT.SET_OBJECT_TINT_INDEX(spawnedwall, 7)
-
-            c.y = c.y - 7
-            local spawnedwall = entities.create_object(wallbr, c)
-            ENTITY.SET_ENTITY_ROTATION(spawnedwall, 0.0, 90.0, 0.0, 1, true)
-            OBJECT.SET_OBJECT_TINT_INDEX(spawnedwall, 7)
-
-            c.y = defy - 10
-            c.x = defx - 19
-            local spawnedwall = entities.create_object(wallbr, c)
-            ENTITY.SET_ENTITY_ROTATION(spawnedwall, 0.0, 90.0, 0.0, 1, true)
-            OBJECT.SET_OBJECT_TINT_INDEX(spawnedwall, 7)
-
-            c.x = defx - 3
-            c.y = defy + 6.5
-            local spawnedwall = entities.create_object(wallbr, c)
-            ENTITY.SET_ENTITY_ROTATION(spawnedwall, 90.0, 90.0, 0.0, 1, true)
-            OBJECT.SET_OBJECT_TINT_INDEX(spawnedwall, 7)
-
-            c.x = defx + 25
-            local spawnedwall = entities.create_object(wallbr, c)
-            ENTITY.SET_ENTITY_ROTATION(spawnedwall, 90.0, 90.0, 0.0, 1, true)
-            OBJECT.SET_OBJECT_TINT_INDEX(spawnedwall, 7)
-
-            c.x = c.x + 7
-            c.y = defy
-            local spawnedwall = entities.create_object(wallbr, c)
-            ENTITY.SET_ENTITY_ROTATION(spawnedwall, 0.0, 90.0, 0.0, 1, true)
-            OBJECT.SET_OBJECT_TINT_INDEX(spawnedwall, 7)
-
-            c.y = defy - 14.5
-            local spawnedwall = entities.create_object(wallbr, c)
-            ENTITY.SET_ENTITY_ROTATION(spawnedwall, 0.0, 90.0, 0.0, 1, true)
-            OBJECT.SET_OBJECT_TINT_INDEX(spawnedwall, 7)
-
-            c.y = c.y - 7
-            c.x = c.x - 7
-            local spawnedwall = entities.create_object(wallbr, c)
-            ENTITY.SET_ENTITY_ROTATION(spawnedwall, 90.0, 90.0, 0.0, 1, true)
-            OBJECT.SET_OBJECT_TINT_INDEX(spawnedwall, 7)
-
-            c.y = c.y - 7
-            local spawnedwall = entities.create_object(wallbr, c)
-            ENTITY.SET_ENTITY_ROTATION(spawnedwall, 0.0, 90.0, 0.0, 1, true)
-            OBJECT.SET_OBJECT_TINT_INDEX(spawnedwall, 7)
-
-            c.y = c.y - 7
-            c.x = c.x - 7.5
-            local spawnedwall = entities.create_object(wallbr, c)
-            ENTITY.SET_ENTITY_ROTATION(spawnedwall, 90.0, 90.0, 0.0, 1, true)
-            OBJECT.SET_OBJECT_TINT_INDEX(spawnedwall, 7)
-
-            c.x = c.x - 6.5
-            c.y = c.y - 6.5
-            local spawnedwall = entities.create_object(wallbr, c)
-            ENTITY.SET_ENTITY_ROTATION(spawnedwall, 0.0, 90.0, 0.0, 1, true)
-            OBJECT.SET_OBJECT_TINT_INDEX(spawnedwall, 7)
-
-            c.x = c.x - 7.5
-            c.y = c.y - 7
-            local spawnedwall = entities.create_object(wallbr, c)
-            ENTITY.SET_ENTITY_ROTATION(spawnedwall, 90.0, 90.0, 0.0, 1, true)
-            OBJECT.SET_OBJECT_TINT_INDEX(spawnedwall, 7)
-
-            c.x = c.x - 14
-            local spawnedwall = entities.create_object(wallbr, c)
-            ENTITY.SET_ENTITY_ROTATION(spawnedwall, 90.0, 90.0, 0.0, 1, true)
-            OBJECT.SET_OBJECT_TINT_INDEX(spawnedwall, 7)
-
-            local spawnedwall = entities.create_object(wallbr, c)
-            ENTITY.SET_ENTITY_ROTATION(spawnedwall, 0.0, 90.0, 0.0, 1, true)
-            OBJECT.SET_OBJECT_TINT_INDEX(spawnedwall, 7)
-
-            c.x = c.x - 6.5
-            c.y = c.y + 7
-            local spawnedwall = entities.create_object(wallbr, c)
-            ENTITY.SET_ENTITY_ROTATION(spawnedwall, 0.0, 90.0, 0.0, 1, true)
-            OBJECT.SET_OBJECT_TINT_INDEX(spawnedwall, 7)
-
-            c.x = c.x - 7.5
-            local spawnedwall = entities.create_object(wallbr, c)
-            ENTITY.SET_ENTITY_ROTATION(spawnedwall, 90.0, 90.0, 0.0, 1, true)
-            OBJECT.SET_OBJECT_TINT_INDEX(spawnedwall, 7)
-
-            c.x = c.x - 6.5
-            c.y = c.y + 7
-            local spawnedwall = entities.create_object(wallbr, c)
-            ENTITY.SET_ENTITY_ROTATION(spawnedwall, 0.0, 90.0, 0.0, 1, true)
-            OBJECT.SET_OBJECT_TINT_INDEX(spawnedwall, 7)
-
-            c.y = c.y + 14
-            local spawnedwall = entities.create_object(wallbr, c)
-            ENTITY.SET_ENTITY_ROTATION(spawnedwall, 0.0, 90.0, 0.0, 1, true)
-            OBJECT.SET_OBJECT_TINT_INDEX(spawnedwall, 7)
-
-            local spawnedwall = entities.create_object(wallbr, c)
-            ENTITY.SET_ENTITY_ROTATION(spawnedwall, 90.0, 90.0, 0.0, 1, true)
-            OBJECT.SET_OBJECT_TINT_INDEX(spawnedwall, 7)
-
-            c.y = c.y + 14
-            local spawnedwall = entities.create_object(wallbr, c)
-            ENTITY.SET_ENTITY_ROTATION(spawnedwall, 0.0, 90.0, 0.0, 1, true)
-            OBJECT.SET_OBJECT_TINT_INDEX(spawnedwall, 7)
-
-            c.y = c.y + 14
-            local spawnedwall = entities.create_object(wallbr, c)
-            ENTITY.SET_ENTITY_ROTATION(spawnedwall, 0.0, 90.0, 0.0, 1, true)
-            OBJECT.SET_OBJECT_TINT_INDEX(spawnedwall, 7)
-
-            c.y = c.y - 3.1
-            c.x = c.x + 5
-            local spawnedwall = entities.create_object(wallbr, c)
-            ENTITY.SET_ENTITY_ROTATION(spawnedwall, 90.0, 90.0, 0.0, 1, true)
-            OBJECT.SET_OBJECT_TINT_INDEX(spawnedwall, 7)
-
-            util.yield(600)
-            TASK.CLEAR_PED_TASKS_IMMEDIATELY(p)
-            util.yield(500)
-            entities.delete_by_handle(veh)
-        else
-            util.toast(players.get_name(player_id).. " Not in a vehicle")
-        end
     end)
 
     local control_veh
@@ -4378,51 +4444,7 @@ menu.divider(kicks, "Base Kicks")
 
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
--- Vehicle
-
-    menu.action(vehicle, "Detach", {"detach"}, "unstuck yourself \nDetach Will Not Work When Spectating", function()
-        local car = PED.GET_VEHICLE_PED_IS_IN(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id), false)
-        ENTITY.DETACH_ENTITY(players.user_ped(), car, false, false)
-        if player_cur_car ~= 0 then
-            ENTITY.DETACH_ENTITY(player_cur_car, false, false)
-        end
-        ENTITY.DETACH_ENTITY(players.user_ped(), false, false)
-    end)
-
-menu.action(vehicle, "Attach to BMX", {""}, "Use Ledge Sit animation to properly sit on the player's bars", function()
-    local car = PED.GET_VEHICLE_PED_IS_IN(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id), true)
-    if car ~= 0 then
-        ENTITY.ATTACH_ENTITY_TO_ENTITY(players.user_ped(), car, 0, 0.0--[[x]], 0.5--[[z]], 0.4--[[y]], 0.0--[[verticle (flip)]], 0.0--[[horizontal (go sideways)]], 0.0--[[w (turn)]], 1.0, 1, true, true, true, true, 0, true)
-    end
-end)
-
-menu.action(vehicle, "Attach to Addon Car Hood", {""}, "Use Ledge Sit animation to properly sit on the player's car", function()
-    local car = PED.GET_VEHICLE_PED_IS_IN(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id), true)
-    if car ~= 0 then
-        ENTITY.ATTACH_ENTITY_TO_ENTITY(players.user_ped(), car, 0, 0.5--[[x]], 1.9--[[z]], 0--[[y]], 0.0--[[verticle (flip)]], 0.0--[[horizontal (go sideways)]], 0.0--[[w (turn)]], 1.0, 1, true, true, true, true, 0, true)
-    end
-end)
-
-menu.action(vehicle, "Attach Floating", {""}, "Attach to player's car (syncs for everyone)", function()
-    local car = PED.GET_VEHICLE_PED_IS_IN(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id), true)
-    if car ~= 0 then
-        ENTITY.ATTACH_ENTITY_TO_ENTITY(players.user_ped(), car, 0, 0.0--[[x]], -1.60--[[z]], 3.3--[[y]], 0.0--[[verticle (flip)]], 0.0--[[horizontal (go sideways)]], 0.0--[[w (turn)]], 1.0, 1, true, true, true, true, 0, true)
-    end
-end)
-
-menu.action(vehicle, "Attach to Car Roof", {""}, "Attach to player's car (syncs for everyone)", function()
-    local car = PED.GET_VEHICLE_PED_IS_IN(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id), true)
-    if car ~= 0 then
-        ENTITY.ATTACH_ENTITY_TO_ENTITY(players.user_ped(), car, 0, 0.0, -0.20, 2.00, 0.0--[[verticle (flip)]], 0.0--[[horizontal (go sideways)]], 0.0--[[w (turn)]], 1.0, 1, true, true, true, true, 0, true)
-    end
-end)
-
-menu.action(vehicle, "Attach to Car Trunk", {""}, "Attach to player's car (syncs for everyone)", function()
-    local car = PED.GET_VEHICLE_PED_IS_IN(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id), true)
-    if car ~= 0 then
-        ENTITY.ATTACH_ENTITY_TO_ENTITY(players.user_ped(), car, 0, 0.0--[[x]], -1.60--[[z]], 1.60--[[y]], 0.0--[[verticle (flip)]], 0.0--[[horizontal (go sideways)]], 0.0--[[w (turn)]], 1.0, 1, true, true, true, true, 0, true)
-    end
-end)
+-- Player Attach
 
 menu.action(attachc, "Detach", {"detach"}, "unstuck yourself \nDetach Will Not Work When Spectating", function()
     local p = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)
@@ -4488,6 +4510,9 @@ menu.toggle_loop(attachc, "Auto Teleport", {""}, "Constantly Teleports to The Pl
     end
 end)
 
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-- Vehicle
+
     menu.action(vehicle, "Kick From Vehicle", {}, "Attempts to kick the player from their vehicle", function()
         local pped = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(players.user())
         local ped = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)
@@ -4544,6 +4569,52 @@ end)
             entities.delete_by_handle(veh2)
         end
     end)
+
+    local vehattach = menu.list(vehicle, "Attachment Options", {}, "Attach To Players Vehicle")
+
+    menu.action(vehattach, "Detach", {"detach"}, "unstuck yourself \nDetach Will Not Work When Spectating", function()
+        local car = PED.GET_VEHICLE_PED_IS_IN(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id), false)
+        ENTITY.DETACH_ENTITY(players.user_ped(), car, false, false)
+        if player_cur_car ~= 0 then
+            ENTITY.DETACH_ENTITY(player_cur_car, false, false)
+        end
+        ENTITY.DETACH_ENTITY(players.user_ped(), false, false)
+    end)
+
+menu.action(vehattach, "Attach to BMX", {""}, "Use Ledge Sit animation to properly sit on the player's bars", function()
+    local car = PED.GET_VEHICLE_PED_IS_IN(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id), true)
+    if car ~= 0 then
+        ENTITY.ATTACH_ENTITY_TO_ENTITY(players.user_ped(), car, 0, 0.0--[[x]], 0.5--[[z]], 0.4--[[y]], 0.0--[[verticle (flip)]], 0.0--[[horizontal (go sideways)]], 0.0--[[w (turn)]], 1.0, 1, true, true, true, true, 0, true)
+    end
+end)
+
+menu.action(vehattach, "Attach to Addon Car Hood", {""}, "Use Ledge Sit animation to properly sit on the player's car", function()
+    local car = PED.GET_VEHICLE_PED_IS_IN(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id), true)
+    if car ~= 0 then
+        ENTITY.ATTACH_ENTITY_TO_ENTITY(players.user_ped(), car, 0, 0.5--[[x]], 1.9--[[z]], 0--[[y]], 0.0--[[verticle (flip)]], 0.0--[[horizontal (go sideways)]], 0.0--[[w (turn)]], 1.0, 1, true, true, true, true, 0, true)
+    end
+end)
+
+menu.action(vehattach, "Attach Floating", {""}, "Attach to player's car (syncs for everyone)", function()
+    local car = PED.GET_VEHICLE_PED_IS_IN(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id), true)
+    if car ~= 0 then
+        ENTITY.ATTACH_ENTITY_TO_ENTITY(players.user_ped(), car, 0, 0.0--[[x]], -1.60--[[z]], 3.3--[[y]], 0.0--[[verticle (flip)]], 0.0--[[horizontal (go sideways)]], 0.0--[[w (turn)]], 1.0, 1, true, true, true, true, 0, true)
+    end
+end)
+
+menu.action(vehattach, "Attach to Car Roof", {""}, "Attach to player's car (syncs for everyone)", function()
+    local car = PED.GET_VEHICLE_PED_IS_IN(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id), true)
+    if car ~= 0 then
+        ENTITY.ATTACH_ENTITY_TO_ENTITY(players.user_ped(), car, 0, 0.0, -0.20, 2.00, 0.0--[[verticle (flip)]], 0.0--[[horizontal (go sideways)]], 0.0--[[w (turn)]], 1.0, 1, true, true, true, true, 0, true)
+    end
+end)
+
+menu.action(vehattach, "Attach to Car Trunk", {""}, "Attach to player's car (syncs for everyone)", function()
+    local car = PED.GET_VEHICLE_PED_IS_IN(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id), true)
+    if car ~= 0 then
+        ENTITY.ATTACH_ENTITY_TO_ENTITY(players.user_ped(), car, 0, 0.0--[[x]], -1.60--[[z]], 1.60--[[y]], 0.0--[[verticle (flip)]], 0.0--[[horizontal (go sideways)]], 0.0--[[w (turn)]], 1.0, 1, true, true, true, true, 0, true)
+    end
+end)
 	
     ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     -- Other
@@ -4773,7 +4844,7 @@ menu.toggle(yoinkSettings, "Pickups", {}, "", function (pick)
     YOINK_PICKUPS = pick
 end)
 
-menu.action(uwuworld, "Delete Objects", {"clearobj"}, "Deletes All Objects", function(on_click)
+menu.action(uwuworld, "Delete Objects", {"clearobj1"}, "Deletes All Objects", function(on_click)
     local player_pos = ENTITY.GET_ENTITY_COORDS(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(players.user()), 1)
     local ot = 0
     for k,ent in pairs(entities.get_all_objects_as_handles()) do
@@ -4784,7 +4855,7 @@ menu.action(uwuworld, "Delete Objects", {"clearobj"}, "Deletes All Objects", fun
 end)
 
 
-menu.action(uwuworld, "Delete Vehicles", {"clearveh"}, "Deletes All Cars", function(on_click)
+menu.action(uwuworld, "Delete Vehicles", {"clearveh1"}, "Deletes All Cars", function(on_click)
     local player_pos = ENTITY.GET_ENTITY_COORDS(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(players.user()), 1)
     local vt = 0
     for k,ent in pairs(entities.get_all_vehicles_as_handles()) do
@@ -4797,7 +4868,7 @@ menu.action(uwuworld, "Delete Vehicles", {"clearveh"}, "Deletes All Cars", funct
     util.yield_once()
 end)
 
-menu.action(uwuworld, "Delete Peds", {"clearpeds"}, "Deletes All Pedestrians", function(on_click)
+menu.action(uwuworld, "Delete Peds", {"clearpeds1"}, "Deletes All Pedestrians", function(on_click)
     local player_pos = ENTITY.GET_ENTITY_COORDS(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(players.user()), 1)
     local pt = 0
     for k,ent in pairs(entities.get_all_peds_as_handles()) do
@@ -4809,7 +4880,7 @@ menu.action(uwuworld, "Delete Peds", {"clearpeds"}, "Deletes All Pedestrians", f
     util.yield_once()
 end)
 
-menu.action(uwuworld, "Delete Ropes", {"clearropes"}, "Deletes All Ropes", function(on_click)
+menu.action(uwuworld, "Delete Ropes", {"clearropes1"}, "Deletes All Ropes", function(on_click)
     local ct = 0
     local rope_alloc = memory.alloc(4)
     for i=0, 100 do 
@@ -4826,13 +4897,10 @@ end)
 menu.action(uwuworld, "Clean World/Super Cleanse", {"clearworld"}, "Literally cleans everything in the area including peds, cars, objects, bools etc.", function(on_click)
     local player_pos = ENTITY.GET_ENTITY_COORDS(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(players.user()), 1)
     GRAPHICS.REMOVE_PARTICLE_FX_IN_RANGE(player_pos.x, player_pos.y, player_pos.z, 1000000)
-    menu.trigger_commands("clearropes")
-    util.yield(150)
-    menu.trigger_commands("clearpeds")
-    util.yield(150)
-    menu.trigger_commands("clearveh")
-    util.yield(150)
-    menu.trigger_commands("clearobj")
+    menu.trigger_commands("clearropes1")
+    menu.trigger_commands("clearpeds1")
+    menu.trigger_commands("clearveh1")
+    menu.trigger_commands("clearobj1")
     util.yield(150)
     clear_area(10000)
 end)
@@ -5965,6 +6033,15 @@ local modderlistinclude
 
 menu.divider(online, "Normal Stuff")
 
+menu.toggle_loop(online, "ESP Friends", {}, "Will draw a line directly to all friends.", function()
+    for _, player_id in players.list(false, true, false) do
+        local c = ENTITY.GET_ENTITY_COORDS(players.user_ped())
+        local p = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)
+        local j = ENTITY.GET_ENTITY_COORDS(p)
+        GRAPHICS.DRAW_LINE(c.x, c.y, c.z, j.x, j.y, j.z, 255, 255, 255, 255)
+    end
+end)
+
 menu.toggle(online, "Include ModderList On Toast Join", {"modderlist"}, "Sends the sessions list of modders to you as a notification", function(mli)
     modderlistinclude = mli
     --local modders = getModderList()
@@ -6038,7 +6115,7 @@ local interiors = {
     {"Motel Room", {x=152.2605, y=-1004.471, z=-99.024}, ""},
     {"Police Station", {x=443.4068, y=-983.256, z=30.689589}, ""},
     {"Bank Vault", {x=263.39627, y=214.39891, z=101.68336}, ""},
-    {"Blaine County Bank", {x=-109.77874, y=6464.8945, z=31.626724}, ""}, -- credit to fluidware for telling me about this one
+    {"Blaine County Bank", {x=-109.77874, y=6464.8945, z=31.626724}, ""},
     {"Tequi-La-La Bar", {x=-564.4645, y=275.5777, z=83.074585}, ""},
     {"Scrapyard Body Shop", {x=485.46396, y=-1315.0614, z=29.2141}, ""},
     {"The Lost MC Clubhouse", {x=980.8098, y=-101.96038, z=74.84504}, ""},
@@ -6058,11 +6135,6 @@ local interiors = {
     {"Big Fat White Cock", {x=-31.007448, y=6317.047, z=40.04039}, ""},
     {"Strip Club DJ Booth", {x=121.398254, y=-1281.0024, z=29.480522}, ""},
 }
-
-    menu.action(online, "Modder List To Chat", {"bcmodderlist"}, "Sends the sessions list of modders in chat", function()
-        local modders = getModderList()
-        chat.send_message("# Modders In This Session ("..table.getn(modders).."): "..table.concat(playerListToNames(modders), ", "), false, true, true)
-    end)
 
     menu.action(online, "Check Lobby for GodMode", {}, "Checks the entire lobby for godmode, and notifies you of their names.", function()
         CheckLobbyForGodmode()
@@ -6133,7 +6205,8 @@ local interiors = {
         memory.write_int(memory.script_global(global), value)
     end
 
-    menu.toggle_loop(moneywoo, "Start $500k + $750k Loop", {""}, "500k + 750k Loop Every 10 Seconds. Warning! Dont spend over 50 million a day. If cash stops it will start again in 60 seconds. \nCould Be Risky Idk", function()
+    --[[menu.toggle_loop(moneywoo, "Start $500k + $750k Loop", {""}, "500k + 750k Loop Every 10 Seconds. Warning! Dont spend over 50 million a day. If cash stops it will start again in 60 seconds. \nCould Be Risky Idk", function()
+        --Cant Find The New Global For This To Save My Life (If It Even Still Works)
         SET_INT_GLOBAL(1968313, 1)
         util.log("$500K Added")
         util.yield(250)
@@ -6156,14 +6229,24 @@ local interiors = {
         util.yield(150)
         menu.trigger_commands("accepterrors")
         util.yield(27000)
-    end)
+    end)]]
 
-    menu.toggle(moneywoo, "Money Drop All", {"cashloopall"}, "Money drops all players", function()
+    menu.toggle(moneywoo, "Money Drop All", {"cashloopall"}, "Money Drops All Players", function()
         for _, player_id in players.list(false, false, true) do
             local ped = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)
             local pos = players.get_position(ped)
             if ENTITY.DOES_ENTITY_EXIST(ped) then
             menu.trigger_commands("cashloop " .. PLAYER.GET_PLAYER_NAME(player_id))
+            end
+        end
+    end)
+
+    menu.toggle(moneywoo, "RP Drop All", {"rploopall"}, "Drops RP To All Players", function()
+        for _, player_id in players.list(false, false, true) do
+            local ped = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)
+            local pos = players.get_position(ped)
+            if ENTITY.DOES_ENTITY_EXIST(ped) then
+            menu.trigger_commands("dropfigures " .. PLAYER.GET_PLAYER_NAME(player_id))
             end
         end
     end)
@@ -6267,12 +6350,12 @@ local interiors = {
         menu.trigger_commands("bountyall 10000")
     end)
 
-    menu.action(uwuonline, "Breakup Kick All", {}, "Breakup Kicks Everyone In The Session", function()
-        menu.trigger_commands("breakupall")
+    menu.action(uwuonline, "Smart Kick All", {}, "Kicks Everyone In The Session", function()
+        menu.trigger_commands("kickall")
     end)
 
-    menu.action(uwuonline, "Ban Kick All", {}, "Discretely Kicks Everyone In The Session", function()
-        menu.trigger_commands("banall")
+    menu.action(uwuonline, "Pool's Closed Kick All", {}, "Pool's Closed Kicks Everyone In The Session", function()
+        menu.trigger_commands("aidsall")
     end)
 
     ------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -6600,6 +6683,13 @@ while run<10 do
 end
 
 play_info = menu.list(online, "Player Information Overlay", {}, "")
+
+--
+menu.action(online, "Modder List To Chat", {"bcmodderlist"}, "Sends the sessions list of modders in chat", function()
+    local modders = getModderList()
+    chat.send_message("# Modders In This Session ("..table.getn(modders).."): "..table.concat(playerListToNames(modders), ", "), false, true, true)
+end)
+
 players_info = menu.toggle_loop(play_info,"Toggle",{},"Turns The Player Information Overlay On\nUse Save Config For Other Options",function()
     infoverplaytoggle()
 end)
@@ -16759,10 +16849,10 @@ util.on_pre_stop(function()
     ---------------------------------------------------------------------------------------
     local player_pos = ENTITY.GET_ENTITY_COORDS(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(players.user()), 1)
     GRAPHICS.REMOVE_PARTICLE_FX_IN_RANGE(player_pos.x, player_pos.y, player_pos.z, 1000000)
-    menu.trigger_commands("clearropes")
-    menu.trigger_commands("clearpeds")
-    menu.trigger_commands("clearveh")
-    menu.trigger_commands("clearobj")
+    menu.trigger_commands("clearropes1")
+    menu.trigger_commands("clearpeds1")
+    menu.trigger_commands("clearveh1")
+    menu.trigger_commands("clearobj1")
     clear_area(10000)
     ----------------------------------------------------------------------------------------
 end)
