@@ -4,7 +4,21 @@
 
 util.keep_running()
 util.require_natives(1681379138) --Old 1676318796
-menu.trigger_commands("newprofile FewMod")
+local FewModConfigPath = filesystem.scripts_dir() .. '\\Profiles\\'..'\\FewMod.txt'
+local scriptconfigoptions = menu.list(menu.my_root(), "Config", {}, "")
+
+menu.action(scriptconfigoptions, "Save Config", {"savesconfig"}, "Saves Your Config To A Specific Profile", function()
+    menu.trigger_commands("saveFewMod")
+end)
+
+menu.action(scriptconfigoptions, "Load Config", {"loadsconfig"}, "Loads Your Config From A Specific Profile", function()
+    menu.trigger_commands("loadFewMod")
+end)
+if filesystem.exists(FewModConfigPath) then
+    menu.trigger_commands("loadsconfig")
+elseif not filesystem.exists(FewModConfigPath) then
+    menu.trigger_commands("newprofile FewMod")
+end
 
 local response = false
 local localversion = 1.67
@@ -4647,15 +4661,6 @@ local fun = menu.list(uwuself, "Fun", {}, "Fun Stuff To Mess With")
 local animations = menu.list(uwuself, "Animations", {}, "")
 local misc = menu.list(uwustand, "Misc", {}, "Useful and fast shortcuts")
 --local update = menu.action(menu.my_root(), "Github Link", {}, "Link To Github For Manual Updates")
-local scriptconfigoptions = menu.list(menu.my_root(), "Config", {}, "")
-
-menu.action(scriptconfigoptions, "Save Config", {"savefew"}, "Saves Your Config To A Specific Profile", function()
-    menu.trigger_commands("saveFewMod")
-end)
-
-menu.action(scriptconfigoptions, "Load Config", {"savefew"}, "Loads Your Config From A Specific Profile", function()
-    menu.trigger_commands("loadFewMod")
-end)
 
 local discordlink = menu.hyperlink(menu.my_root(), "Discord", "https://discord.gg/EN4RrZR", "My Discord Server - If You Have Any Issues This Is The Easiest Way To Let Me Know")
 local running = menu.divider(menu.my_root(), "Script Running")
