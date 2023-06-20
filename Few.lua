@@ -4,7 +4,7 @@
 
 util.keep_running()
 util.require_natives(1681379138) --Old 1676318796
-local FewModConfigPath = filesystem.scripts_dir() .. '\\Profiles\\'..'\\FewMod.txt'
+local FewModConfigPath = filesystem.stand_dir() .. '\\Profiles\\'..'\\FewMod.txt'
 local scriptconfigoptions = menu.list(menu.my_root(), "Config", {}, "")
 
 menu.action(scriptconfigoptions, "Save Config", {"savesconfig"}, "Saves Your Config To A Specific Profile", function()
@@ -14,11 +14,6 @@ end)
 menu.action(scriptconfigoptions, "Load Config", {"loadsconfig"}, "Loads Your Config From A Specific Profile", function()
     menu.trigger_commands("loadFewMod")
 end)
-if filesystem.exists(FewModConfigPath) then
-    menu.trigger_commands("loadsconfig")
-elseif not filesystem.exists(FewModConfigPath) then
-    menu.trigger_commands("newprofile FewMod")
-end
 
 local response = false
 local localversion = 1.67
@@ -4665,9 +4660,6 @@ local misc = menu.list(uwustand, "Misc", {}, "Useful and fast shortcuts")
 local discordlink = menu.hyperlink(menu.my_root(), "Discord", "https://discord.gg/EN4RrZR", "My Discord Server - If You Have Any Issues This Is The Easiest Way To Let Me Know")
 local running = menu.divider(menu.my_root(), "Script Running")
 local versionnumber = menu.divider(menu.my_root(), "Version: "..localversion)
-
-util.toast("FewMod Loaded")
-util.log("FewMod Loaded")
 
 -------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -16855,6 +16847,20 @@ GenerateFeatures = function()
 end
 
 GenerateFeatures()
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+if filesystem.exists(FewModConfigPath) then
+    util.toast("Found Config")
+    util.log("Found Config")
+    menu.trigger_commands("loadsconfig")
+elseif not filesystem.exists(FewModConfigPath) then
+    util.toast("Creating New Config")
+    util.log("Creating New Config")
+    menu.trigger_commands("newprofile FewMod")
+end
+util.toast("FewMod Loaded")
+util.log("FewMod Loaded")
 
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
