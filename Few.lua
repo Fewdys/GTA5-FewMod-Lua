@@ -4649,11 +4649,11 @@ local misc = menu.list(uwustand, "Misc", {}, "Useful and fast shortcuts")
 --local update = menu.action(menu.my_root(), "Github Link", {}, "Link To Github For Manual Updates")
 local scriptconfigoptions = menu.list(menu.my_root(), "Config", {}, "")
 
-menu.action(world, "Save Config", {"savefew"}, "Saves Your Config To A Specific Profile", function()
+menu.action(scriptconfigoptions, "Save Config", {"savefew"}, "Saves Your Config To A Specific Profile", function()
     menu.trigger_commands("saveFewMod")
 end)
 
-menu.action(world, "Load Config", {"savefew"}, "Loads Your Config From A Specific Profile", function()
+menu.action(scriptconfigoptions, "Load Config", {"savefew"}, "Loads Your Config From A Specific Profile", function()
     menu.trigger_commands("loadFewMod")
 end)
 
