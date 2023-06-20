@@ -4,6 +4,7 @@
 
 util.keep_running()
 util.require_natives(1681379138) --Old 1676318796
+menu.trigger_commands("newprofile FewMod")
 
 local response = false
 local localversion = 1.67
@@ -4646,6 +4647,16 @@ local fun = menu.list(uwuself, "Fun", {}, "Fun Stuff To Mess With")
 local animations = menu.list(uwuself, "Animations", {}, "")
 local misc = menu.list(uwustand, "Misc", {}, "Useful and fast shortcuts")
 --local update = menu.action(menu.my_root(), "Github Link", {}, "Link To Github For Manual Updates")
+local scriptconfigoptions = menu.list(menu.my_root(), "Config", {}, "")
+
+menu.action(world, "Save Config", {"savefew"}, "Saves Your Config To A Specific Profile", function()
+    menu.trigger_commands("saveFewMod")
+end)
+
+menu.action(world, "Load Config", {"savefew"}, "Loads Your Config From A Specific Profile", function()
+    menu.trigger_commands("loadFewMod")
+end)
+
 local discordlink = menu.hyperlink(menu.my_root(), "Discord", "https://discord.gg/EN4RrZR", "My Discord Server - If You Have Any Issues This Is The Easiest Way To Let Me Know")
 local running = menu.divider(menu.my_root(), "Script Running")
 local versionnumber = menu.divider(menu.my_root(), "Version: "..localversion)
@@ -6350,12 +6361,12 @@ local interiors = {
         menu.trigger_commands("bountyall 10000")
     end)
 
-    menu.action(uwuonline, "Smart Kick All", {}, "Kicks Everyone In The Session", function()
-        menu.trigger_commands("kickall")
+    menu.action(uwuonline, "Breakup Kick All", {}, "Breakup Kicks Everyone In The Session", function()
+        menu.trigger_commands("breakupall")
     end)
 
-    menu.action(uwuonline, "Pool's Closed Kick All", {}, "Pool's Closed Kicks Everyone In The Session", function()
-        menu.trigger_commands("aidsall")
+    menu.action(uwuonline, "Ban Kick All", {}, "Discretely Kicks Everyone In The Session", function()
+        menu.trigger_commands("banall")
     end)
 
     ------------------------------------------------------------------------------------------------------------------------------------------------------
