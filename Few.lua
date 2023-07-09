@@ -4,6 +4,7 @@
 
 util.keep_running()
 util.require_natives(1681379138) --Old 1676318796
+
 local FewModConfigPath = filesystem.stand_dir() .. '\\Profiles\\'..'\\FewMod.txt'
 local scriptconfigoptions = menu.list(menu.my_root(), "Config", {}, "")
 
@@ -16,7 +17,7 @@ menu.action(scriptconfigoptions, "Load Config", {"loadsconfig"}, "Loads Your Con
 end)
 
 local response = false
-local localversion = 1.67
+local localversion = 1.68
 local localKs = false
 async_http.init("raw.githubusercontent.com", "/Fewdys/GTA5-FewMod-Lua/main/FewModVersion.lua", function(output)
     currentVer = tonumber(output)
@@ -4102,7 +4103,7 @@ local kicks = menu.list(malicious, "Kicks", {}, "")
         util.trigger_script_event(1 << player_id, {1104117595, player_id, 1, 0, 2, 14, 3, 1})
         util.trigger_script_event(1 << player_id, {1104117595, player_id, 1, 0, 2, 167, 3, 1})
         util.trigger_script_event(1 << player_id, {1104117595, player_id, 1, 0, 2, 257, 3, 1})
-        menu.trigger_commands("loveletter" .. players.get_name(player_id))
+        menu.trigger_commands("loveletterkick" .. players.get_name(player_id))
     end)
 
     menu.action(kicks, "Script Kick", {}, "", function()
@@ -4114,6 +4115,35 @@ local kicks = menu.list(malicious, "Kicks", {}, "")
         util.trigger_script_event(1 << player_id, {1268038438, player_id, memory.script_global(2657589 + 1 + (player_id * 466) + 321 + 8)})
         util.trigger_script_event(1 << player_id, {915462795, players.user(), memory.read_int(memory.script_global(1894573 + 1 + (player_id * 608) + 510))})
         menu.trigger_commands("givesh" .. players.get_name(player_id))
+    end)
+
+    menu.action(kick, "Boop Kick", {"boop"}, "Contains 6 SE kicks.", function()
+        menu.trigger_commands("kick" .. players.get_name(player_id))
+        menu.trigger_commands("givesh" .. players.get_name(player_id))
+        util.trigger_script_event(1 << player_id, {697566862, player_id, 0x4, -1, 1, 1, 1}) --697566862 Give Collectible
+        util.trigger_script_event(1 << player_id, {1268038438, player_id, memory.script_global(2657704 + 1 + (player_id * 466) + 321 + 8)}) 
+        util.trigger_script_event(1 << player_id, {915462795, players.user(), memory.read_int(memory.script_global(0x1CE15F + 1 + (player_id * 0x257) + 0x1FE))})
+        util.trigger_script_event(1 << player_id, {697566862, player_id, 0x4, -1, 1, 1, 1})
+        util.trigger_script_event(1 << player_id, {1268038438, player_id, memory.script_global(2657704 + 1 + (player_id * 466) + 321 + 8)})
+        util.trigger_script_event(1 << player_id, {915462795, players.user(), memory.read_int(memory.script_global(1895156 + 1 + (player_id * 608) + 510))})
+    end, nil, nil, COMMANDPERM_AGGRESSIVE)
+
+    menu.toggle_loop(kick, "Array Kick", {"arraykick"}, "", function()
+        local int_min = -2147483647
+        local int_max = 2147483647
+        for i = 1, 15 do
+            util.trigger_script_event(1 << player_id, {1613825825, 20, 1, -1, -1, -1, -1, math.random(int_min, int_max), math.random(int_min, int_max), 
+            math.random(int_min, int_max), math.random(int_min, int_max), math.random(int_min, int_max), math.random(int_min, int_max),
+            math.random(int_min, int_max), player_id, math.random(int_min, int_max), math.random(int_min, int_max), math.random(int_min, int_max)})
+            util.trigger_script_event(1 << player_id, {1613825825, 20, 1, -1, -1, -1, -1})
+        end
+        menu.trigger_commands("givesh" .. players.get_name(player_id))
+        util.yield()
+        for i = 1, 15 do
+            util.trigger_script_event(1 << player_id, {1613825825, 20, 1, -1, -1, -1, -1, player_id, math.random(int_min, int_max)})
+            util.trigger_script_event(1 << player_id, {1613825825, 20, 1, -1, -1, -1, -1})
+            util.yield(100)
+        end
     end)
 
     menu.action(kicks, "Power Kick", {}, "", function()
@@ -4200,6 +4230,7 @@ local kicks = menu.list(malicious, "Kicks", {}, "")
             menu.trigger_commands("neversh ".."off")
         end
         util.toast("Disabled Never Script Host For You")
+        util.log("Disabled Never Script Host For You - [All Collectibles]")
         util.yield(1000)
         menu.trigger_commands("scripthost")
         util.yield(1000)
@@ -6213,9 +6244,8 @@ local interiors = {
         memory.write_int(memory.script_global(global), value)
     end
 
-    --[[menu.toggle_loop(moneywoo, "Start $500k + $750k Loop", {""}, "500k + 750k Loop Every 10 Seconds. Warning! Dont spend over 50 million a day. If cash stops it will start again in 60 seconds. \nCould Be Risky Idk", function()
-        --Cant Find The New Global For This To Save My Life (If It Even Still Works)
-        SET_INT_GLOBAL(1968313, 1)
+    menu.toggle_loop(moneywoo, "Start $500k + $750k Loop", {""}, "500k + 750k Loop Every 10 Seconds. Warning! Dont spend over 50 million a day. If cash stops it will start again in 60 seconds. \nCould Be Risky Idk", function()
+        SET_INT_GLOBAL(1969112, 1)
         util.log("$500K Added")
         util.yield(250)
         menu.trigger_commands("accepterrors")
@@ -6226,7 +6256,7 @@ local interiors = {
         util.yield(150)
         menu.trigger_commands("accepterrors")
         util.yield(15500)
-        SET_INT_GLOBAL(1968313, 2)
+        SET_INT_GLOBAL(1969112, 2)
         util.log("$750K Added")
         util.yield(250)
         menu.trigger_commands("accepterrors")
@@ -6237,7 +6267,7 @@ local interiors = {
         util.yield(150)
         menu.trigger_commands("accepterrors")
         util.yield(27000)
-    end)]]
+    end)
 
     menu.toggle(moneywoo, "Money Drop All", {"cashloopall"}, "Money Drops All Players", function()
         for _, player_id in players.list(false, false, true) do
