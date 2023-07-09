@@ -900,7 +900,7 @@ Fewd = {
         1775863255,
         125899875,
         -1217949151,
-    }
+    },
 
     power_kick = function(player_id)
         for i, v in pairs(Fewd.kicks) do
