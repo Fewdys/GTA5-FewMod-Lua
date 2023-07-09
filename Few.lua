@@ -17,7 +17,7 @@ menu.action(scriptconfigoptions, "Load Config", {"loadsconfig"}, "Loads Your Con
 end)
 
 local response = false
-local localversion = 1.68
+local localversion = 1.69
 local localKs = false
 async_http.init("raw.githubusercontent.com", "/Fewdys/GTA5-FewMod-Lua/main/FewModVersion.lua", function(output)
     currentVer = tonumber(output)
@@ -29,7 +29,7 @@ async_http.init("raw.githubusercontent.com", "/Fewdys/GTA5-FewMod-Lua/main/FewMo
                 util.yield_once()
                 local err = select(2,load(u))
                 if err then
-                    util.toast("There was a issue updating FewMod, please update it manually from github.")
+                    util.toast("There was a issue updating FewMod, This could be do to an error in the script or that there was an issue downloading the script, please update it manually from github and if.")
                     util.log("There was a issue updating FewMod, please update it manually from github.")
                     util.toast("Link: https://github.com/Fewdys/GTA5-FewMod-Lua")
                     util.log("Link: https://github.com/Fewdys/GTA5-FewMod-Lua")
@@ -512,7 +512,7 @@ Fewd = {
         return memory.read_int(util.Int_PTR)
     end,
 
-    local kicks = {
+    kicks = {
         0x493fc6bb,
         1228916411,
         1256866538,
