@@ -4476,9 +4476,9 @@ end)
 
 -------------------------------------------------------------------------------------------------------------------------------------------------------
 
-local kicks = menu.list(malicious, "Kicks", {}, "")
+local kicksm = menu.list(malicious, "Kicks", {}, "")
 
-    menu.action(kicks, "Adaptive Kick", {}, "", function()
+    menu.action(kicksm, "Adaptive Kick", {}, "", function()
         menu.trigger_commands("scripthost")
         util.trigger_script_event(1 << player_id, {1104117595, player_id, 1, 0, 2, 14, 3, 1})
         util.trigger_script_event(1 << player_id, {1104117595, player_id, 1, 0, 2, 167, 3, 1})
@@ -4486,7 +4486,7 @@ local kicks = menu.list(malicious, "Kicks", {}, "")
         menu.trigger_commands("loveletterkick" .. players.get_name(player_id))
     end)
 
-    menu.action(kicks, "Script Kick", {}, "", function()
+    menu.action(kicksm, "Script Kick", {}, "", function()
         util.trigger_script_event(1 << player_id, {1104117595, player_id, 1, 0, 2, math.random(14, 267), 3, 1})
         util.trigger_script_event(1 << player_id, {697566862, player_id, 0x4, -1, 1, 1, 1})
         util.trigger_script_event(1 << player_id, {1268038438, player_id, memory.script_global(2657589 + 1 + (player_id * 466) + 321 + 8)}) 
@@ -4497,7 +4497,7 @@ local kicks = menu.list(malicious, "Kicks", {}, "")
         menu.trigger_commands("givesh" .. players.get_name(player_id))
     end)
 
-    menu.action(kick, "Boop Kick", {"boop"}, "Contains 6 SE kicks.", function()
+    menu.action(kicksm, "Boop Kick", {"boop"}, "Contains 6 SE kicks.", function()
         menu.trigger_commands("kick" .. players.get_name(player_id))
         menu.trigger_commands("givesh" .. players.get_name(player_id))
         util.trigger_script_event(1 << player_id, {697566862, player_id, 0x4, -1, 1, 1, 1}) --697566862 Give Collectible
@@ -4508,7 +4508,11 @@ local kicks = menu.list(malicious, "Kicks", {}, "")
         util.trigger_script_event(1 << player_id, {915462795, players.user(), memory.read_int(memory.script_global(1895156 + 1 + (player_id * 608) + 510))})
     end, nil, nil, COMMANDPERM_AGGRESSIVE)
 
-    menu.toggle_loop(kick, "Array Kick", {"arraykick"}, "", function()
+    menu.action(kicksm, "Power Kick", {}, "", function()
+        Fewd.power_kick(player_id)
+    end)
+
+    menu.toggle_loop(kicksm, "Array Kick", {"arraykick"}, "", function()
         local int_min = -2147483647
         local int_max = 2147483647
         for i = 1, 15 do
@@ -4524,10 +4528,6 @@ local kicks = menu.list(malicious, "Kicks", {}, "")
             util.trigger_script_event(1 << player_id, {1613825825, 20, 1, -1, -1, -1, -1})
             util.yield(100)
         end
-    end)
-
-    menu.action(kicks, "Power Kick", {}, "", function()
-        Fewd.power_kick(player_id)
     end)
 
     local pclpid = {}
