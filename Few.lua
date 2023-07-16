@@ -8,11 +8,11 @@ util.require_natives(1681379138) --Old 1676318796
 local FewModConfigPath = filesystem.stand_dir() .. '\\Profiles\\'..'\\FewMod.txt'
 local scriptconfigoptions = menu.list(menu.my_root(), "Config", {}, "")
 
-menu.action(scriptconfigoptions, "Save Config", {"savesconfig"}, "Saves Your Config To A Specific Profile", function()
+menu.action(scriptconfigoptions, "Save Config", {"savesconfig"}, "Saves Your FewMod Config \n(Please Note This Will Be Saved To A Specific Profile - To Be Specific To The FewMod Profile Which AutoLoads On Script Startup)", function()
     menu.trigger_commands("saveFewMod")
 end)
 
-menu.action(scriptconfigoptions, "Load Config", {"loadsconfig"}, "Loads Your Config From A Specific Profile", function()
+menu.action(scriptconfigoptions, "Load Config", {"loadsconfig"}, "Loads Your FewMod Config", function()
     menu.trigger_commands("loadFewMod")
 end)
 
