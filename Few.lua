@@ -29,8 +29,8 @@ async_http.init("raw.githubusercontent.com", "/Fewdys/GTA5-FewMod-Lua/main/FewMo
                 util.yield_once()
                 local err = select(2,load(u))
                 if err then
-                    util.toast("There was a issue updating FewMod, This could be do to an error in the script or that there was an issue downloading the script, please update it manually from github and if.")
-                    util.log("There was a issue updating FewMod, please update it manually from github.")
+                    util.toast("There was a issue updating FewMod, This could be do to an error in the script or that there was an issue downloading the script, please try to update it manually from github.")
+                    util.log("There was a issue updating FewMod, This could be do to an error in the script or that there was an issue downloading the script, please try to update it manually from github.")
                     util.toast("Link: https://github.com/Fewdys/GTA5-FewMod-Lua")
                     util.log("Link: https://github.com/Fewdys/GTA5-FewMod-Lua")
                 return end
@@ -5423,7 +5423,7 @@ local BOUNTY_TIMER <constexpr> = 2359296 + 1 + (0 * 5568) + 5150 + 13
 inc_vehs = true
 local rbp = menu.ref_by_path
 
-local outfits = menu.list(selfc, "Outfits", {}, "")
+local outfits = menu.list(selfc, "Outfits", {}, "It")
 menu.hyperlink(outfits, "Outfits Link", "https://github.com/Fewdys/GTA5-NeptuniaCharacters/tree/main")
 local neptunia = menu.list(outfits, "Neptunia Outfits", {}, "Outfits From Neptunia\n(Ingnore If You Dont Have Neptunia DLC)")
 local otheroutfits = menu.list(outfits, "Other Outfits", {}, "Other DLC Outfits")
@@ -5618,42 +5618,42 @@ menu.action(neptunia, "Yoshino", {"yoshino"}, "Yoshino From Neptunia \n(Ingnore 
     menu.trigger_commands("allguns")
 end)
 
-menu.action(otheroutfits, "Emote Guy (Joe)", {"emoteguy"}, "Emote Guy Also Known As Joe", function()
+menu.action(otheroutfits, "Emote Guy (Joe)", {"emoteguy"}, "Emote Guy Also Known As Joe \n(Ingnore If Not Installed)", function()
     menu.trigger_commands("ammtranvest01")
     menu.trigger_commands("allguns")
 end)
 
-menu.action(otheroutfits, "Fischer", {"fischer"}, "Fischer", function()
+menu.action(otheroutfits, "Fischer", {"fischer"}, "Fischer \n(Ingnore If Not Installed)", function()
     menu.trigger_commands("afysoucent03")
     menu.trigger_commands("allguns")
 end)
 
-menu.action(otheroutfits, "Haku", {"haku"}, "Haku", function()
+menu.action(otheroutfits, "Haku", {"haku"}, "Haku \n(Ingnore If Not Installed)", function()
     menu.trigger_commands("afyeastsa03")
     menu.trigger_commands("allguns")
 end)
 
-menu.action(otheroutfits, "Inugami Korone", {"inugamikorone"}, "Inugami Korone", function()
+menu.action(otheroutfits, "Inugami Korone", {"inugamikorone"}, "Inugami Korone \n(Ingnore If Not Installed)", function()
     menu.trigger_commands("afysmartcaspat01")
     menu.trigger_commands("allguns")
 end)
 
-menu.action(otheroutfits, "KeQing", {"keqing"}, "KeQing", function()
+menu.action(otheroutfits, "KeQing", {"keqing"}, "KeQing \n(Ingnore If Not Installed)", function()
     menu.trigger_commands("afyscdressy01")
     menu.trigger_commands("allguns")
 end)
 
-menu.action(otheroutfits, "Rimuru Tempest", {"rimurutempest"}, "Rimuru Tempest", function()
+menu.action(otheroutfits, "Rimuru Tempest", {"rimurutempest"}, "Rimuru Tempest \n(Ingnore If Not Installed)", function()
     menu.trigger_commands("ammstlat02")
     menu.trigger_commands("allguns")
 end)
 
-menu.action(otheroutfits, "Sally", {"sally"}, "Sally", function()
+menu.action(otheroutfits, "Sally", {"sally"}, "Sally \n(Ingnore If Not Installed)", function()
     menu.trigger_commands("afytennis01")
     menu.trigger_commands("allguns")
 end)
 
-menu.action(otheroutfits, "Six Little Nightmares", {"sixlittlenightmares"}, "Six Little Nightmares", function()
+menu.action(otheroutfits, "Six Little Nightmares", {"sixlittlenightmares"}, "Six Little Nightmares \n(Ingnore If Not Installed)", function()
     menu.trigger_commands("afmskidrow01")
     menu.trigger_commands("allguns")
 end)
@@ -5686,7 +5686,7 @@ local kills_ptr  = mem.alloc(4)
 local deaths_ptr = mem.alloc(4)
 local ratio_ptr  = mem.alloc(4)
 
--- thank you Sapphire for helping me with reading/writing globals and helping me fix the ratio not being written c:
+-- Credit To Sapphire For Read/Write Globals
 local global_kills  = mem.g_global(1853910 + 1 + (players.user() * 862) + 205 + 28)
 local global_deaths = mem.g_global(1853910 + 1 + (players.user() * 862) + 205 + 29)
 local global_ratio  = mem.g_global(1853910 + 1 + (players.user() * 862) + 205 + 26)
@@ -6376,6 +6376,8 @@ end, function ()
 	PLAYER.SET_PLAYER_HEALTH_RECHARGE_MULTIPLIER(players.user_ped(), 1.0)
 end)
 
+-- Added The Two Additional Armour Options Myself
+
 menu.toggle_loop(selfc, "Refill Armour in Cover", {"armourincover"}, "", function()
 	if PED.IS_PED_IN_COVER(players.user_ped(), false) then
         menu.trigger_commands("maxarmour")
@@ -6479,8 +6481,8 @@ function CheckLobbyForPlayers()
             util.toast("Players in session: " .. #playersTable)
             util.yield(10)
             if modderlistinclude then
-            local modders = getModderList()
-            util.toast("Modders In This Session ("..table.getn(modders).."): "..table.concat(playerListToNames(getModderList()), ", "))
+                local modders = getModderList()
+                util.toast("Modders In This Session ("..table.getn(modders).."): "..table.concat(playerListToNames(getModderList()), ", "))
             end
         end
     end
