@@ -216,6 +216,14 @@ local function bone_within_bounds(ped, bone, bounds, fov)
     end
 end
 
+local function setGlobalInt(address, value)
+    memory.write_int(memory.script_global(address), value)
+end
+
+local function getGlobalInt(global)
+    return memory.read_int(memory.script_global(global))
+end
+
 menu.divider(uwuself, "Lua Shit")
 menu.divider(uwuvehicle, "Lua Shit")
 menu.divider(uwuonline, "Lua Shit")
