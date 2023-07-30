@@ -17,7 +17,7 @@ menu.action(scriptconfigoptions, "Load Config", {"loadsconfig"}, "Loads Your Few
 end)
 
 local response = false
-local localversion = 1.70
+local localversion = 1.71
 local localKs = false
 async_http.init("raw.githubusercontent.com", "/Fewdys/GTA5-FewMod-Lua/main/FewModVersion.lua", function(output)
     currentVer = tonumber(output)
@@ -11313,6 +11313,26 @@ end)
 -- Misc
 
 menu.hyperlink(misc, "Github Link", "https://github.com/Fewdys/GTA5-FewMod-Lua")
+
+menu.action(misc, "Update Script", {}, "Grabs The Newest Version Of Script From The Following Link:\nhttps://github.com/Fewdys/GTA5-FewMod-Lua", function()
+    async_http.init('raw.githubusercontent.com', '/Fewdys/GTA5-FewMod-Lua/main/Few.lua', function(u)
+        util.yield_once()
+        local err = select(2,load(u))
+        if err then
+            util.toast("There was a issue updating FewMod, This could be do to an error in the script or that there was an issue downloading the script, please try to update it manually from github.")
+            util.log("There was a issue updating FewMod, This could be do to an error in the script or that there was an issue downloading the script, please try to update it manually from github.")
+            util.toast("Link: https://github.com/Fewdys/GTA5-FewMod-Lua")
+            util.log("Link: https://github.com/Fewdys/GTA5-FewMod-Lua")
+        return end
+        local f = io.open(filesystem.scripts_dir()..SCRIPT_RELPATH, "wb")
+        f:write(u)
+        f:close()
+        util.toast("FewMod Updated Successfully. Restarting Script")
+        util.log("FewMod Updated Successfully. Restarting Script")
+        util.restart_script()
+    end)
+    async_http.dispatch()
+end)
 
 menu.action(misc, "Clear All Notifications", {}, "", function()
     menu.trigger_commands("clearnotifications")
