@@ -8626,10 +8626,6 @@ menu.hyperlink(objgun, "Objects/Props", "https://gtahash.ru")
 
 menu.toggle_loop(protects, "Accept Joins & Transaction Errors!", {"accepterrors"}, "Automatically accept join screens and transaction errors.", function()
     local mess_hash = HUD.GET_WARNING_SCREEN_MESSAGE_HASH()
-    if not util.is_session_started() then return end
-    if getGlobalInt(4536683) == 4 or 20 then
-        setGlobalInt(4536677, 0)
-    end
     if mess_hash == -896436592 then
         util.toast("This Player Left The Session.")
         PAD.SET_CONTROL_VALUE_NEXT_FRAME(2, 201, 1)
@@ -8652,9 +8648,13 @@ menu.toggle_loop(protects, "Accept Joins & Transaction Errors!", {"accepterrors"
     util.yield()
 end)
 
-menu.toggle_loop(protects, "Block Transaction Error Script", {}, "Blocks the destroy vehicle script from being used maliciously to give you a transaction error.", function()
+menu.toggle_loop(protects, "Block Transaction Error Script", {}, "Blocks Transaction Error Script", function()
+    if not util.is_session_started() then return end
+    if getGlobalInt(4536683) == 4 or 20 then
+        setGlobalInt(4536677, 0)
+    end
     if util.spoof_script("am_destroy_veh", SCRIPT.TERMINATE_THIS_THREAD) then
-        util.toast("Destroy Vehicle Script Detected. Terminating Script...")
+        util.toast("Destroy Vehicle Script Detected. Terminated Script")
     end
 end)
 
