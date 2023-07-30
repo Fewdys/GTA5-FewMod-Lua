@@ -8626,14 +8626,18 @@ menu.hyperlink(objgun, "Objects/Props", "https://gtahash.ru")
 
 menu.toggle_loop(protects, "Accept Joins & Transaction Errors!", {"accepterrors"}, "Automatically accept join screens and transaction errors.", function()
     local mess_hash = HUD.GET_WARNING_SCREEN_MESSAGE_HASH()
+    if not util.is_session_started() then return end
+    if getGlobalInt(4536683) == 4 or 20 then
+        setGlobalInt(4536677, 0)
+    end
     if mess_hash == -896436592 then
-        util.toast("This player left the session.")
+        util.toast("This Player Left The Session.")
         PAD.SET_CONTROL_VALUE_NEXT_FRAME(2, 201, 1)
     elseif mess_hash == 1575023314 then
-        util.toast("Session timeout.")
+        util.toast("Session Timeout.")
         PAD.SET_CONTROL_VALUE_NEXT_FRAME(2, 201, 1)
     elseif mess_hash == 1446064540 then
-        util.toast("You are already in the session.")
+        util.toast("You Are Already In The Session.")
         PAD.SET_CONTROL_VALUE_NEXT_FRAME(2, 201, 1)
         -- Auto Joins
     elseif mess_hash == 15890625 or mess_hash == -398982408 or mess_hash == -587688989 then
