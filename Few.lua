@@ -17,7 +17,7 @@ menu.action(scriptconfigoptions, "Load Config", {"loadsconfig"}, "Loads Your Few
 end)
 
 local response = false
-local localversion = 1.69
+local localversion = 1.70
 local localKs = false
 async_http.init("raw.githubusercontent.com", "/Fewdys/GTA5-FewMod-Lua/main/FewModVersion.lua", function(output)
     currentVer = tonumber(output)
@@ -6770,8 +6770,8 @@ local interiors = {
         menu.trigger_commands("bountyall 10000")
     end)
 
-    menu.action(uwuonline, "Breakup Kick All", {}, "Breakup Kicks Everyone In The Session", function()
-        menu.trigger_commands("breakupall")
+    menu.action(uwuonline, "Smart Kick All", {}, "Smart Kicks Everyone In The Session", function()
+        menu.trigger_commands("kickall")
     end)
 
     menu.action(uwuonline, "Ban Kick All", {}, "Discretely Kicks Everyone In The Session", function()
