@@ -17,7 +17,7 @@ menu.action(scriptconfigoptions, "Load Config", {"loadsconfig"}, "Loads Your Few
 end)
 
 local response = false
-local localversion = 1.71
+local localversion = 1.72
 local localKs = false
 async_http.init("raw.githubusercontent.com", "/Fewdys/GTA5-FewMod-Lua/main/FewModVersion.lua", function(output)
     currentVer = tonumber(output)
@@ -222,6 +222,30 @@ end
 
 local function getGlobalInt(global)
     return memory.read_int(memory.script_global(global))
+end
+
+local loop1State = false
+
+local function start1mLoop()
+    loop1State = true
+    while loop1State do
+        trigger_transaction(0x615762F1, 1000000)
+        coroutine.yield()
+    end
+end
+
+local function stop15mLoop()
+    loop15State = false
+end
+
+function trigger_transaction(hash, amount)
+    setGlobalInt(4536533 + 1, 2147483646)
+    setGlobalInt(4536533 + 7, 2147483647)
+    setGlobalInt(4536533 + 6, 0)
+    setGlobalInt(4536533 + 5, 0)
+    setGlobalInt(4536533 + 3, hash)
+    setGlobalInt(4536533 + 2, amount)
+    setGlobalInt(4536533,2)
 end
 
 menu.divider(uwuself, "Lua Shit")
@@ -6462,7 +6486,7 @@ local modderlistinclude
 
 menu.divider(online, "Normal Stuff")
 
-menu.toggle_loop(online, "ESP Friends", {}, "Will draw a line directly to all friends.", function()
+menu.toggle_loop(online, "ESP Friends/Friendly's", {}, "Will draw a line directly to all friends/friendly's.", function()
     for _, player_id in players.list(false, true, false) do
         local c = ENTITY.GET_ENTITY_COORDS(players.user_ped())
         local p = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)
@@ -6634,7 +6658,7 @@ local interiors = {
         memory.write_int(memory.script_global(global), value)
     end
 
-    menu.toggle_loop(moneywoo, "Start $500k + $750k Loop", {""}, "500k + 750k Loop Every 10 Seconds. Warning! Dont spend over 50 million a day. If cash stops it will start again in 60 seconds. \nCould Be Risky Idk", function()
+    menu.toggle_loop(moneywoo, "Start $500k + $750k Loop", {""}, "500k + 750k Loop Every 10 Seconds. (Dont 'Spend' Over 50 Million A Day) If Cash Stops It Will Start Again In 60s. \nCould Be Risky", function()
         SET_INT_GLOBAL(1969112, 1)
         util.log("$500K Added")
         util.yield(250)
@@ -6657,6 +6681,14 @@ local interiors = {
         util.yield(150)
         menu.trigger_commands("accepterrors")
         util.yield(27000)
+    end)
+
+    menu.toggle(moneywoo, "1M Loop", {""}, "Use At Your Own Risk (Dont 'Spend' Over 50 Million A Day)\nCould Be Risky", function(on)
+        if on then
+            start1mLoop()
+        else
+            stop1mLoop()
+        end
     end)
 
     menu.toggle(moneywoo, "Money Drop All", {"cashloopall"}, "Money Drops All Players", function()
