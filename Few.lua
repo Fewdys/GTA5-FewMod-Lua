@@ -11325,6 +11325,7 @@ menu.hyperlink(misc, "Github Link", "https://github.com/Fewdys/GTA5-FewMod-Lua")
 menu.action(misc, "Update Script", {}, "Grabs The Newest Version Of Script From The Following Link:\nhttps://github.com/Fewdys/GTA5-FewMod-Lua", function()
     async_http.init('raw.githubusercontent.com', '/Fewdys/GTA5-FewMod-Lua/main/Few.lua', function(u)
         util.yield_once()
+
         local err = select(2,load(u))
         if err then
             util.toast("There was a issue updating FewMod, This could be do to an error in the script or that there was an issue downloading the script, please try to update it manually from github.")
@@ -11333,6 +11334,9 @@ menu.action(misc, "Update Script", {}, "Grabs The Newest Version Of Script From 
             util.log("Link: https://github.com/Fewdys/GTA5-FewMod-Lua")
         return end
         local f = io.open(filesystem.scripts_dir()..SCRIPT_RELPATH, "wb")
+        if filesystem.exists(filesystem.scripts_dir() .. "Few.lua") then 
+            os.remove(filesystem.exists(filesystem.scripts_dir() .. "Few.lua"))
+        end
         f:write(u)
         f:close()
         util.toast("FewMod Updated Successfully. Restarting Script")
