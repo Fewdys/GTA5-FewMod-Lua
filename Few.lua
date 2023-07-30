@@ -5358,7 +5358,7 @@ menu.toggle_loop(detections, "Non-Buyable/Unreleased/Modded Vehicles", {}, "Dete
 end)
 
 menu.toggle_loop(detections, "Super Drive", {}, "Detects if a player is using Super Drive.", function()
-    for _, player_id in ipairs(players.list(true, true, true)) do
+    for _, player_id in ipairs(players.list(false, true, true)) do
         local ped = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)
         local vehicle = PED.GET_VEHICLE_PED_IS_USING(ped)
         local veh_speed = (ENTITY.GET_ENTITY_SPEED(vehicle)* 3.0107)
@@ -5371,7 +5371,7 @@ menu.toggle_loop(detections, "Super Drive", {}, "Detects if a player is using Su
 end)
 
 menu.toggle_loop(detections, "Modded Weapon", {}, "Detects if a player is using a Modded Weapon", function()
-    for _, player_id in ipairs(players.list(true, true, true)) do
+    for _, player_id in ipairs(players.list(false, true, true)) do
         local ped = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)
         local modelHash = WEAPON.GET_SELECTED_PED_WEAPON(ped)
         for i, hash in ipairs(Fewd.modded_weapons) do
@@ -8689,11 +8689,12 @@ menu.toggle_loop(protects, "Block PTFX/Particle Lag", {}, "Note: This Will Remov
     GRAPHICS.REMOVE_PARTICLE_FX_FROM_ENTITY(players.user_ped())
 end)
 
+local host2
+
 menu.toggle_loop(protects, "Anti Beast", {}, "Prevent them from turning you the beast with stand etc.", function()
     if SCRIPT.GET_NUMBER_OF_THREADS_RUNNING_THE_SCRIPT_WITH_THIS_HASH(util.joaat("am_hunt_the_beast")) > 0 then
-        local host
         repeat
-            host = NETWORK.NETWORK_GET_HOST_OF_SCRIPT("am_hunt_the_beast", -1, 0)
+            host2 = NETWORK.NETWORK_GET_HOST_OF_SCRIPT("am_hunt_the_beast", -1, 0)
             util.yield()
         until host ~= -1
         util.toast(players.get_name(host).." started Hunt The Beast. Killing script...")
@@ -8706,7 +8707,7 @@ end)
 util.create_thread(function()
 	while true do
 		if oppressor_kick_players then
-			local cur_players = players.list(target_self,target_friends,true)
+			local cur_players = players.list(false, false, true)
 			for k,v in pairs(cur_players) do
 				local ped = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(v)
 				local vehicle = PED.GET_VEHICLE_PED_IS_IN(ped, false)
@@ -8729,7 +8730,7 @@ end)
 util.create_thread(function()
 	while true do
 		if oppressormk2_kick_players then
-			local cur_players = players.list(target_self,target_friends,true)
+			local cur_players = players.list(false, false, true)
 			for k,v in pairs(cur_players) do
 				local ped = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(v)
 				local vehicle = PED.GET_VEHICLE_PED_IS_IN(ped, false)
@@ -8752,7 +8753,7 @@ end)
 util.create_thread(function()
 	while true do
 		if lazer_kick_players then
-			local cur_players = players.list(target_self,target_friends,true)
+			local cur_players = players.list(false, false, true)
 			for k,v in pairs(cur_players) do
 				local ped = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(v)
 				local vehicle = PED.GET_VEHICLE_PED_IS_IN(ped, false)
@@ -8775,7 +8776,7 @@ end)
 util.create_thread(function()
 	while true do
 		if kosatka_kick_players then
-			local cur_players = players.list(target_self,target_friends,true)
+			local cur_players = players.list(false, false, true)
 			for k,v in pairs(cur_players) do
 				local ped = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(v)
 				local vehicle = PED.GET_VEHICLE_PED_IS_IN(ped, false)
@@ -8798,7 +8799,7 @@ end)
 util.create_thread(function()
 	while true do
 		if hydra_kick_players then
-			local cur_players = players.list(target_self,target_friends,true)
+			local cur_players = players.list(false, false, true)
 			for k,v in pairs(cur_players) do
 				local ped = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(v)
 				local vehicle = PED.GET_VEHICLE_PED_IS_IN(ped, false)
@@ -8821,7 +8822,7 @@ end)
 util.create_thread(function()
 	while true do
 		if khanjali_kick_players then
-			local cur_players = players.list(target_self,target_friends,true)
+			local cur_players = players.list(false, false, true)
 			for k,v in pairs(cur_players) do
 				local ped = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(v)
 				local vehicle = PED.GET_VEHICLE_PED_IS_IN(ped, false)
