@@ -234,8 +234,8 @@ local function start1mLoop()
     end
 end
 
-local function stop15mLoop()
-    loop15State = false
+local function stop1mLoop()
+    loop1State = false
 end
 
 function trigger_transaction(hash, amount)
