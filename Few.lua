@@ -17,7 +17,7 @@ menu.action(scriptconfigoptions, "Load Config", {"loadsconfig"}, "Loads Your Few
 end)
 
 local response = false
-local localversion = 1.73
+local localversion = 1.74
 local localKs = false
 async_http.init("raw.githubusercontent.com", "/Fewdys/GTA5-FewMod-Lua/main/FewModVersion.lua", function(output)
     currentVer = tonumber(output)
@@ -6649,7 +6649,7 @@ local interiors = {
 
     menu.toggle_loop(online, "Never Script Host", {"neversh"}, "You never become the Script Host (Could Sometimes Help Prevent Kicks Related To Having Script Host) \nNote: Don't Use With Script Host Addiction, It Will Break The Session and Also Become Pointless", function()
         util.yield(500)
-        if players.get_script_host() == players.user() then
+        if players.get_script_host() == players.user() and not util.is_session_transition_active() then
             menu.trigger_command(menu.ref_by_path("Players>"..players.get_name_with_tags(players.get_host())..">Friendly>Give Script Host"))
         end
     end)
