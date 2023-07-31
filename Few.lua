@@ -7143,7 +7143,7 @@ run = 0
 while run<10 do 
 	translatedlocation = menu.get_value(translocation)
 	targetlangmessagesend = LangLookupByName[LangKeys[menu.get_value(finalmessage)]]
-	targetlang = targetlangs
+	targetlang = LangLookupByName[LangKeys[menu.get_value(targetlangs)]]
 	util.yield()
 	run = run+1
 end
