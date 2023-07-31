@@ -1927,7 +1927,7 @@ end)
         end)
 
     menu.action(windmilli, "Delete Objects", {"clearwindmills"}, "", function()
-        menu.trigger_commands("clearobj")
+        menu.trigger_commands("clearobj1")
     end)
 
     local cage = menu.list(trolling, "Cage Player", {}, "")
