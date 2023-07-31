@@ -17,7 +17,7 @@ menu.action(scriptconfigoptions, "Load Config", {"loadsconfig"}, "Loads Your Few
 end)
 
 local response = false
-local localversion = 1.74
+local localversion = 1.75
 local localKs = false
 async_http.init("raw.githubusercontent.com", "/Fewdys/GTA5-FewMod-Lua/main/FewModVersion.lua", function(output)
     currentVer = tonumber(output)
@@ -6914,7 +6914,6 @@ local sfchat = require("lib.ScaleformLib")("multiplayer_chat")
 sfchat:draw_fullscreen()
 
 local Languages = {
-    { Name = "English", Key = "en" },
 	{ Name = "Afrikaans", Key = "af" },
 	{ Name = "Albanian", Key = "sq" },
 	{ Name = "Arabic", Key = "ar" },
@@ -6930,6 +6929,7 @@ local Languages = {
 	{ Name = "Czech", Key = "cs" },
 	{ Name = "Danish", Key = "da" },
 	{ Name = "Dutch", Key = "nl" },
+    { Name = "English", Key = "en" },
 	{ Name = "Esperanto", Key = "eo" },
 	{ Name = "Estonian", Key = "et" },
 	{ Name = "Filipino", Key = "tl" },
@@ -6977,7 +6977,7 @@ local Languages = {
 	{ Name = "Urdu", Key = "ur" },
 	{ Name = "Vietnamese", Key = "vi" },
 	{ Name = "Welsh", Key = "cy" },
-	{ Name = "Yiddish", Key = "yi" },
+	{ Name = "Yiddish", Key = "yi" }
 }
 
 
@@ -7011,10 +7011,10 @@ end
 
 local chat_trans = menu.list(online, "Chat Translator")
 
-settingtrad = menu.list(chat_trans, "Settings For Translation")
+translatesettings = menu.list(chat_trans, "Settings For Translation")
 
 
-menu.text_input(settingtrad, "Custom label for ["..string.upper(util.get_label_text("MP_CHAT_TEAM")).."] translation message", {"labelteam"}, "leaving it blank will revert it to the original label", function(s, click_type)
+menu.text_input(translatesettings, "Custom label for ["..string.upper(util.get_label_text("MP_CHAT_TEAM")).."] translation message", {"labelteam"}, "leaving it blank will revert it to the original label", function(s, click_type)
 	if (s == "") then
 		teamchatlabel = util.get_label_text("MP_CHAT_TEAM")
 	else
@@ -7029,7 +7029,7 @@ if not (teamchatlabel == util.get_label_text("MP_CHAT_TEAM")) then
 end
 
 
-menu.text_input(settingtrad, "Custom label for ["..string.upper(util.get_label_text("MP_CHAT_ALL")).."] translation message", {"labelall"}, "leaving it blank will revert it to the original label", function(s, click_type)
+menu.text_input(translatesettings, "Custom label for ["..string.upper(util.get_label_text("MP_CHAT_ALL")).."] translation message", {"labelall"}, "leaving it blank will revert it to the original label", function(s, click_type)
 	if (s == "") then
 		allchatlabel = util.get_label_text("MP_CHAT_ALL")
 	else
@@ -7043,24 +7043,26 @@ if not (teamchatlabel == util.get_label_text("MP_CHAT_TEAM")) then
 	menu.trigger_commands("labelall "..allchatlabel)
 end
 
-targetlangaddict = menu.textslider(chat_trans, "Target Language", {}, "You need to click to apply change", LangName, function(s)
-	targetlang = LangLookupByName[LangKeys[s]]
-end)
+local targetlang = "en"
 
-tradlocaaddict = menu.textslider(settingtrad, "Location of Translated Message", {}, "You need to click to apply change", {"Global Chat networked", "Global Chat not networked", "Team Chat not networked", "Team Chat networked", "notification"}, function(s)
-	Tradloca = s
+targetlangs = menu.text_input(chat_trans, "Target Language", {"targetlang"}, "Be Sure To Use Keys Rather Then It's Normal Name.", function(s)
+    targetlang = s
+end, 'en')
+
+translocation = menu.textslider_stateful(translatesettings, "Location of Translated Message", {}, "You need to click to apply change", {"Global Chat networked", "Global Chat not networked", "Team Chat not networked", "Team Chat networked", "notification"}, function(s)
+	translatedlocation = s
 end)
 	
-traductself = false
-menu.toggle(settingtrad, "Translate Yourself", {}, "", function(on)
-	traductself = on	
+translateslef = false
+menu.toggle(translatesettings, "Translate Yourself", {}, "", function(on)
+	translateslef = on	
 end)
-traductsamelang = false
-menu.toggle(settingtrad, "Translate even if the language is the same as the desired one", {}, "might not work correctly because google is dumb", function(on)
-	traductsamelang = on	
+translatesamelang = false
+menu.toggle(translatesettings, "Translate even if the language is the same as the desired one", {}, "might not work correctly because google is dumb", function(on)
+	translatesamelang = on	
 end)
 oldway = false
-menu.toggle(settingtrad, "Use the old method", {}, players.get_name(players.user()).." [ALL] player_sender : their message", function(on)
+menu.toggle(translatesettings, "Use the old method", {}, players.get_name(players.user()).." [ALL] player_sender : their message", function(on)
 	oldway = on	
 end)
 traduct = false
@@ -7068,12 +7070,12 @@ menu.toggle(chat_trans, "Translator On/Off", {}, "", function(on)
 	traduct = on
 end, false)
 
-traductmymessage = menu.list(chat_trans, "Send Translated Message")
-finallangaddict = menu.textslider(traductmymessage, "Final Language", {"finallang"}, "Final Languge of your message.																	  You need to click to aply change", LangName, function(s)
+translatemymessages = menu.list(chat_trans, "Send Translated Message")
+finallangaddict = menu.textslider(translatemymessages, "Final Language", {"finallang"}, "Final Languge of your message.																	  You need to click to aply change", LangName, function(s)
    targetlangmessagesend = LangLookupByName[LangKeys[s]]
 end)
 
-menu.action(traductmymessage, "Send Message", {"Sendmessage"}, "Input the text For your message", function(on_click)
+menu.action(translatemymessages, "Send Message", {"Sendmessage"}, "Input the text For your message", function(on_click)
     util.toast("Please input your message")
     menu.show_command_box("Sendmessage ")
 end, function(on_command)
@@ -7091,13 +7093,13 @@ end)
 botsend = false
 chat.on_message(function(packet_sender, message_sender, text, team_chat)
 	if not botsend then
-		if not traductself and (packet_sender == players.user()) then
+		if not translateslef and (packet_sender == players.user()) then
 		else
 			if traduct then
 				async_http.init("translate.googleapis.com", "/translate_a/single?client=gtx&sl=auto&tl="..targetlang.."&dt=t&q="..encode(text), function(Sucess)
 					if Sucess ~= "" then
 						translation, original, sourceLang = Sucess:match("^%[%[%[\"(.-)\",\"(.-)\",.-,.-,.-]],.-,\"(.-)\"")
-						if not traductsamelang and (sourceLang == targetlang)then
+						if not translatesamelang and (sourceLang == targetlang)then
 						
 						else
 							if oldway then
@@ -7109,19 +7111,19 @@ chat.on_message(function(packet_sender, message_sender, text, team_chat)
 								translationtext = decode(translation)
 								colorfinal = colorselec
 							end
-							if (Tradloca == 1) then						
+							if (translatedlocation == 1) then						
 								sfchat.ADD_MESSAGE(sender, translationtext, teamchatlabel, false, colorfinal)
-							end if (Tradloca == 2) then
+							end if (translatedlocation == 2) then
 								botsend = true
 								chat.send_message("[Translation] "..players.get_name(packet_sender).." : "..decode(translation), true, false, true)
 								sfchat.ADD_MESSAGE(sender, translationtext, teamchatlabel, false, colorfinal)
-							end if (Tradloca == 3) then
+							end if (translatedlocation == 3) then
 								sfchat.ADD_MESSAGE(sender, translationtext, allchatlabel, false, colorfinal)
-							end if (Tradloca == 4) then
+							end if (translatedlocation == 4) then
 								botsend = true
 								chat.send_message("[Translation] "..players.get_name(packet_sender).." : "..decode(translation), false, false, true)
 								sfchat.ADD_MESSAGE(sender, translationtext, allchatlabel, false, colorfinal)
-							end if (Tradloca == 5) then
+							end if (translatedlocation == 5) then
 								util.toast("[Translation] "..players.get_name(packet_sender).." : "..decode(translation), TOAST_ALL)
 							end
 						end
@@ -7137,12 +7139,14 @@ end)
 
 run = 0
 while run<10 do 
-	Tradloca = menu.get_value(tradlocaaddict)
+	translatedlocation = menu.get_value(translocation)
 	targetlangmessagesend = LangLookupByName[LangKeys[menu.get_value(finallangaddict)]]
-	targetlang = LangLookupByName[LangKeys[menu.get_value(targetlangaddict)]]
+	targetlang = LangLookupByName[LangKeys[menu.get_value(targetlangs)]]
 	util.yield()
 	run = run+1
 end
+
+menu.hyperlink(chat_trans, "Language Keys", "https://cloud.google.com/translate/docs/languages", "Keys To Use For Target Translation")
 
 play_info = menu.list(online, "Player Information Overlay", {}, "")
 
