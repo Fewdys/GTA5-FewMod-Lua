@@ -6486,7 +6486,9 @@ local modderlistinclude
 
 menu.divider(online, "Normal Stuff")
 
-menu.toggle_loop(online, "ESP Friends/Friendly's", {}, "Will draw a line directly to all friends/friendly's. (This Includes Stand Users)", function()
+local friendsesp = menu.list(online, "ESP Friends/Friendly's", {}, "Will draw a line directly to all friends/friendly's. (This Includes Stand Users)")
+
+menu.toggle_loop(friendsesp, "ESP Friends/Friendly's", {}, "Will draw a line directly to all friends/friendly's. (This Includes Stand Users)", function()
     for _, player_id in players.list(false, true, false) do
         local c = ENTITY.GET_ENTITY_COORDS(players.user_ped())
         local p = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)
