@@ -17,7 +17,7 @@ menu.action(scriptconfigoptions, "Load Config", {"loadsconfig"}, "Loads Your Few
 end)
 
 local response = false
-local localversion = 1.75
+local localversion = 1.76
 local localKs = false
 async_http.init("raw.githubusercontent.com", "/Fewdys/GTA5-FewMod-Lua/main/FewModVersion.lua", function(output)
     currentVer = tonumber(output)
@@ -7043,19 +7043,19 @@ if not (teamchatlabel == util.get_label_text("MP_CHAT_TEAM")) then
 	menu.trigger_commands("labelall "..allchatlabel)
 end
 
-local targetlang = "en"
+local targetlang = 'en'
 
-targetlangs = menu.text_input(chat_trans, "Target Language", {"targetlang"}, "Be Sure To Use Keys Rather Then It's Normal Name.", function(s)
-    targetlang = s
-end, 'en')
+targetlangs = menu.text_input(chat_trans, "Target Language", {"targetlanguage"}, "Be Sure To Use Keys Rather Then It's Normal Name.", function(targetlanguage)
+    targetlang = targetlanguage
+end, '')
 
 translocation = menu.textslider_stateful(translatesettings, "Location of Translated Message", {}, "You need to click to apply change", {"Global Chat networked", "Global Chat not networked", "Team Chat not networked", "Team Chat networked", "notification"}, function(s)
 	translatedlocation = s
 end)
 	
-translateslef = false
+translateself = false
 menu.toggle(translatesettings, "Translate Yourself", {}, "", function(on)
-	translateslef = on	
+	translateself = on	
 end)
 translatesamelang = false
 menu.toggle(translatesettings, "Translate even if the language is the same as the desired one", {}, "might not work correctly because google is dumb", function(on)
@@ -7070,12 +7070,12 @@ menu.toggle(chat_trans, "Translator On/Off", {}, "", function(on)
 	traduct = on
 end, false)
 
-local targetlangmessagesend = "es"
+local targetlangmessagesend = 'es'
 
 translatemymessages = menu.list(chat_trans, "Send Translated Message")
-finalmessage = menu.text_input(translatemymessages, "Final Language", {"finallang"}, "Final Language of your message (Be Sure To Use Keys Rather Then It's Normal Name)", function(s)
-   targetlangmessagesend = s
-end, 'es')
+finalmessage = menu.text_input(translatemymessages, "Final Language", {"finallang"}, "Final Language of your message (Be Sure To Use Keys Rather Then It's Normal Name)", function(finallang)
+   targetlangmessagesend = finallang
+end, '')
 
 menu.action(translatemymessages, "Send Message", {"Sendmessage"}, "Input the text For your message", function(on_click)
     util.toast("Please input your message")
@@ -7095,7 +7095,7 @@ end)
 botsend = false
 chat.on_message(function(packet_sender, message_sender, text, team_chat)
 	if not botsend then
-		if not translateslef and (packet_sender == players.user()) then
+		if not translateself and (packet_sender == players.user()) then
 		else
 			if traduct then
 				async_http.init("translate.googleapis.com", "/translate_a/single?client=gtx&sl=auto&tl="..targetlang.."&dt=t&q="..encode(text), function(Sucess)
@@ -7143,7 +7143,7 @@ run = 0
 while run<10 do 
 	translatedlocation = menu.get_value(translocation)
 	targetlangmessagesend = LangLookupByName[LangKeys[menu.get_value(finalmessage)]]
-	targetlang = LangLookupByName[LangKeys[menu.get_value(targetlangs)]]
+	targetlang = targetlangs
 	util.yield()
 	run = run+1
 end
