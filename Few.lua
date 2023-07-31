@@ -7070,10 +7070,12 @@ menu.toggle(chat_trans, "Translator On/Off", {}, "", function(on)
 	traduct = on
 end, false)
 
+local targetlangmessagesend = "es"
+
 translatemymessages = menu.list(chat_trans, "Send Translated Message")
-finallangaddict = menu.textslider(translatemymessages, "Final Language", {"finallang"}, "Final Languge of your message.																	  You need to click to aply change", LangName, function(s)
-   targetlangmessagesend = LangLookupByName[LangKeys[s]]
-end)
+finalmessage = menu.text_input(translatemymessages, "Final Language", {"finallang"}, "Final Language of your message (Be Sure To Use Keys Rather Then It's Normal Name)", function(s)
+   targetlangmessagesend = s
+end, 'es')
 
 menu.action(translatemymessages, "Send Message", {"Sendmessage"}, "Input the text For your message", function(on_click)
     util.toast("Please input your message")
@@ -7140,7 +7142,7 @@ end)
 run = 0
 while run<10 do 
 	translatedlocation = menu.get_value(translocation)
-	targetlangmessagesend = LangLookupByName[LangKeys[menu.get_value(finallangaddict)]]
+	targetlangmessagesend = LangLookupByName[LangKeys[menu.get_value(finalmessage)]]
 	targetlang = LangLookupByName[LangKeys[menu.get_value(targetlangs)]]
 	util.yield()
 	run = run+1
