@@ -17,7 +17,7 @@ menu.action(scriptconfigoptions, "Load Config", {"loadsconfig"}, "Loads Your Few
 end)
 
 local response = false
-local localversion = 1.72
+local localversion = 1.73
 local localKs = false
 async_http.init("raw.githubusercontent.com", "/Fewdys/GTA5-FewMod-Lua/main/FewModVersion.lua", function(output)
     currentVer = tonumber(output)
@@ -8730,8 +8730,8 @@ menu.toggle_loop(protects, "Anti Beast", {}, "Prevent them from turning you the 
         repeat
             host2 = NETWORK.NETWORK_GET_HOST_OF_SCRIPT("am_hunt_the_beast", -1, 0)
             util.yield()
-        until host ~= -1
-        util.toast(players.get_name(host).." started Hunt The Beast. Killing script...")
+        until host2 ~= -1
+        util.toast(players.get_name(host2).." started Hunt The Beast. Killing script...")
         menu.trigger_command(menu.ref_by_path("Online>Session>Session Scripts>Hunt the Beast>Stop Script"))
         menu.trigger_commands("stopsounds")
     end
