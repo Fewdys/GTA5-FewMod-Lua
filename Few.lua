@@ -8665,7 +8665,7 @@ menu.text_input(objgun, "Custom Object", {"cusobj"}, "Enter the model name of an
            util.toast("Improper Object Name (check the spelling)")
        end
     end
-end, 'prop_keg_01')
+end, '')
 
 menu.hyperlink(objgun, "Objects/Props", "https://gtahash.ru")
 
