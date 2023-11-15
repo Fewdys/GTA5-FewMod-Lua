@@ -1,9 +1,9 @@
 --[[A Lot Was Taken From Other Scripts]]--
 --[[Most Was Kept Original, Remade or Modified]]--
---[[Script Is Still A WIP So There May Be Minor Issues]]--
+--[[If You Run Into Any Issues Please Let Me Know (Discord: Fewdy)]]--
 
 util.keep_running()
-util.require_natives(1681379138) --Old 1676318796
+util.require_natives(1681379138)
 
 local FewModConfigPath = filesystem.stand_dir() .. '\\Profiles\\'..'\\FewMod.txt'
 local scriptconfigoptions = menu.list(menu.my_root(), "Config", {}, "")
@@ -17,7 +17,7 @@ menu.action(scriptconfigoptions, "Load Config", {"loadsconfig"}, "Loads Your Few
 end)
 
 local response = false
-local localversion = 1.76
+local localversion = 1.77
 local localKs = false
 async_http.init("raw.githubusercontent.com", "/Fewdys/GTA5-FewMod-Lua/main/FewModVersion.lua", function(output)
     currentVer = tonumber(output)
@@ -54,9 +54,9 @@ local pos = players.get_position(players.user())
 local changed_pos = pos;
 local aim_only, aim_only_fake_lag, aim_rand = false, false, false;
 local x_off, y_off = 0, 0;
-local fakelag_ms = 0;
+local fakelag_ms = 480;
 local radius = 5
-local interval = 5000
+local interval = 2000
 local debug = false;
 local path = menu.ref_by_path("Online>Spoofing>Position Spoofing")
 --local protecc = menu.ref_by_path("Online>Protections")
@@ -113,7 +113,7 @@ function myModule(name, pattern, callback)
         util.log("Found " .. name)
         callback(address)
     else
-        util.log("Not Found " .. name)
+        util.log(name .. " Not Found")
         util.stop_script()
     end
 end
@@ -224,6 +224,16 @@ local function getGlobalInt(global)
     return memory.read_int(memory.script_global(global))
 end
 
+local function trigger_transaction(hash, amount)
+    setGlobalInt(4536533 + 1, 2147483646)
+    setGlobalInt(4536533 + 7, 2147483647)
+    setGlobalInt(4536533 + 6, 0)
+    setGlobalInt(4536533 + 5, 0)
+    setGlobalInt(4536533 + 3, hash)
+    setGlobalInt(4536533 + 2, amount)
+    setGlobalInt(4536533,2)
+end
+
 local loop1State = false
 
 local function start1mLoop()
@@ -236,16 +246,6 @@ end
 
 local function stop1mLoop()
     loop1State = false
-end
-
-function trigger_transaction(hash, amount)
-    setGlobalInt(4536533 + 1, 2147483646)
-    setGlobalInt(4536533 + 7, 2147483647)
-    setGlobalInt(4536533 + 6, 0)
-    setGlobalInt(4536533 + 5, 0)
-    setGlobalInt(4536533 + 3, hash)
-    setGlobalInt(4536533 + 2, amount)
-    setGlobalInt(4536533,2)
 end
 
 menu.divider(uwuself, "Lua Shit")
@@ -1028,10 +1028,15 @@ function direction()
     c2.z = (c2.z - c1.z) * 1000
     return c2, c1
 end
-clear_radius = 10000
-function clear_area(clear_radius)
-    target_pos = ENTITY.GET_ENTITY_COORDS(PLAYER.PLAYER_PED_ID())
-    MISC.CLEAR_AREA(target_pos['x'], target_pos['y'], target_pos['z'], clear_radius, true, true, true, true)
+
+function clear_area()
+    menu.trigger_commands("clearnodelay ".."on")
+    menu.trigger_commands("clearpickups ".."on")
+    menu.trigger_commands("clearobjects ".."on")
+    menu.trigger_commands("clearpeds ".."on")
+    menu.trigger_commands("clearvehicles ".."on")
+    menu.trigger_commands("clearproximity ".."1000.00")
+    menu.trigger_commands("cleararea")
 end
 
 local function request_ptfx_asset(asset)
@@ -1589,17 +1594,6 @@ end)
         end
     end)
 
-    menu.action(vehtrolling, "Invert Vehicle Controls", {}, "Inverts players vehicle controls (Permanent)", function ()
-        local pname = PLAYER.GET_PLAYER_NAME(player_id)
-        local pedm = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id) -- get the players model
-        if PED.IS_PED_IN_ANY_VEHICLE(pedm, true) then --checking if they are in a vehicle
-            local vmod = PED.GET_VEHICLE_PED_IS_IN(pedm, true) --get the vehicle they are in
-            Get_Entity(vmod) --get control
-        end  
-        local vmod = PED.GET_VEHICLE_PED_IS_IN(pedm, true)
-        SET_INVERT_VEHICLE_CONTROLS(vmod, true)
-    end)
-
     menu.action(vehtrolling, "Delete Vehicle", {}, "Deletes the players current vehicle", function ()
         local pname = PLAYER.GET_PLAYER_NAME(player_id)
         local pedm = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id) -- get the players model
@@ -1905,27 +1899,6 @@ end)
         util.yield(100)
     end)
 
-    menu.toggle_loop(windmilli, "Windmills V2", {"togglemillsv1"}, "", function(on_toggle)
-        Fewd.BlockSyncs(player_id, function()
-                local object = entities.create_object(util.joaat("prop_windmill_01"), ENTITY.GET_ENTITY_COORDS(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)))
-                OBJECT.BREAK_OBJECT_FRAGMENT_CHILD(object, 1, true)
-                entities.delete_by_handle(object)
-                local object = entities.create_object(util.joaat("prop_windmill_01"), ENTITY.GET_ENTITY_COORDS(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)))
-                OBJECT.BREAK_OBJECT_FRAGMENT_CHILD(object, 1, true)
-                entities.delete_by_handle(object)
-                local object = entities.create_object(util.joaat("prop_windmill_01"), ENTITY.GET_ENTITY_COORDS(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)))
-                OBJECT.BREAK_OBJECT_FRAGMENT_CHILD(object, 1, true)
-                entities.delete_by_handle(object)
-                local object = entities.create_object(util.joaat("prop_windmill_01"), ENTITY.GET_ENTITY_COORDS(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)))
-                OBJECT.BREAK_OBJECT_FRAGMENT_CHILD(object, 1, true)
-                entities.delete_by_handle(object)
-                local object = entities.create_object(util.joaat("prop_windmill_01"), ENTITY.GET_ENTITY_COORDS(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)))
-                OBJECT.BREAK_OBJECT_FRAGMENT_CHILD(object, 1, true)
-                entities.delete_by_handle(object)
-                util.yield(1000)
-            end)
-        end)
-
     menu.action(windmilli, "Delete Objects", {"clearwindmills"}, "", function()
         menu.trigger_commands("clearobj1")
     end)
@@ -1933,24 +1906,24 @@ end)
     local cage = menu.list(trolling, "Cage Player", {}, "")
 
     menu.action(cage, "Shiped", {"ship"}, "", function(cl)
-        local number_of_cages = 12
+        local number_of_cages = 10
         local elec_box = util.joaat("prop_contr_03b_ld")
         local ped = PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(player_id)
         local pos = ENTITY.GET_ENTITY_COORDS(ped)
-        pos.z -= 0.75
+        pos.z -= 0.70
         request_model(elec_box)
         local temp_v3 = v3.new(0, 0, 0)
         for i = 1, number_of_cages do
             local angle = (i / number_of_cages) * 360
             temp_v3.z = angle
             local obj_pos = temp_v3:toDir()
-            obj_pos:mul(8)
+            obj_pos:mul(6.3)
             obj_pos:add(pos)
-            for offs_z = 1, 5 do
+            for offs_z = 1, 3 do
                 local electric_cage = entities.create_object(elec_box, obj_pos)
                 spawned_objects[#spawned_objects + 1] = electric_cage
-                ENTITY.SET_ENTITY_ROTATION(electric_cage, 0.0, 0.0, angle, 2, 0)
-                obj_pos.z += 1.8
+                ENTITY.SET_ENTITY_ROTATION(electric_cage, 0.0, 0.0, angle, 3.1, 0)
+                obj_pos.z += 2.55
                 ENTITY.FREEZE_ENTITY_POSITION(electric_cage, true)
             end
         end
@@ -5302,7 +5275,6 @@ menu.action(uwuworld, "Delete Objects", {"clearobj1"}, "Deletes All Objects", fu
         entities.delete_by_handle(ent)
         ot += 1
     end
-    util.yield_once()
 end)
 
 
@@ -5316,7 +5288,6 @@ menu.action(uwuworld, "Delete Vehicles", {"clearveh1"}, "Deletes All Cars", func
             vt += 1
         end
     end
-    util.yield_once()
 end)
 
 menu.action(uwuworld, "Delete Peds", {"clearpeds1"}, "Deletes All Pedestrians", function(on_click)
@@ -5328,7 +5299,6 @@ menu.action(uwuworld, "Delete Peds", {"clearpeds1"}, "Deletes All Pedestrians", 
         end
         pt += 1
     end
-    util.yield_once()
 end)
 
 menu.action(uwuworld, "Delete Ropes", {"clearropes1"}, "Deletes All Ropes", function(on_click)
@@ -5341,7 +5311,6 @@ menu.action(uwuworld, "Delete Ropes", {"clearropes1"}, "Deletes All Ropes", func
             ct += 1
         end
     end
-    util.yield_once()
 end)
 
 
@@ -5352,8 +5321,7 @@ menu.action(uwuworld, "Clean World/Super Cleanse", {"clearworld"}, "Literally cl
     menu.trigger_commands("clearpeds1")
     menu.trigger_commands("clearveh1")
     menu.trigger_commands("clearobj1")
-    util.yield(150)
-    clear_area(10000)
+    menu.trigger_commands("cleararea")
 end)
 
 --------------------------------------------------------------------------------------------------------------------------------
@@ -5817,7 +5785,7 @@ menu.toggle_loop(Noclip2T1, "2T1 NoClip", {}, "", function()
     local cam = players.get_cam_rot(players.user())
     local veh = PED.GET_VEHICLE_PED_IS_USING(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(players.user()))
     local ped = players.user_ped()
-    if veh > 0 and inc_vehs then ent = veh else ent = ped end 
+    ent = ped
     if lev then
         ENTITY.SET_ENTITY_ROTATION(ent, cam.x, cam.y, cam.z)
     end
@@ -5828,10 +5796,6 @@ end, function()
     if veh > 0 then ent = veh else ent = ped end
     ENTITY.SET_ENTITY_ROTATION(ent, 0.0, 0.0, cam.z)
 end)
-
-tog_veh = menu.toggle(Noclip2T1, "Include Vehicle", {}, "", function()
-    inc_vehs = tog_veh.value
-end, true)
 
 menu.action(Noclip2T1, "Apply Recommended Profile", {}, "Apply changes to the levitation settings.", function()
     for _, value in ipairs({"Upward Force", "Downward Force", "Speed"}) do
@@ -6882,10 +6846,7 @@ local interiors = {
         end)
     end
 
-    focusref = {}
-isfocused = false
-selectedcoloraddict = 0
-colorselec = 1
+ --[[colorselec = 1
 allchatlabel = util.get_label_text("MP_CHAT_ALL")
 teamchatlabel = util.get_label_text("MP_CHAT_TEAM")
 
@@ -7083,9 +7044,9 @@ menu.action(translatemymessages, "Send Message", {"Sendmessage"}, "Input the tex
 end, function(on_command)
     mytext = on_command
     async_http.init("translate.googleapis.com", "/translate_a/single?client=gtx&sl=auto&tl="..targetlangmessagesend.."&dt=t&q="..encode(mytext), function(Sucess)
-		if Sucess ~= "" then
-			translation, original, sourceLang = Sucess:match("^%[%[%[\"(.-)\",\"(.-)\",.-,.-,.-]],.-,\"(.-)\"")
-			for _, pId in ipairs(players.list()) do
+		if Sucess ~= "" then--]]
+			--translation, original, sourceLang = Sucess:match("^%[%[%[\"(.-)\",\"(.-)\",.-,.-,.-]],.-,\"(.-)\"")
+			--[[for _, pId in ipairs(players.list()) do
 				chat.send_targeted_message(pId, players.user(), string.gsub(translation, "%+", " "), false)
 			end
 		end
@@ -7099,9 +7060,9 @@ chat.on_message(function(packet_sender, message_sender, text, team_chat)
 		else
 			if traduct then
 				async_http.init("translate.googleapis.com", "/translate_a/single?client=gtx&sl=auto&tl="..targetlang.."&dt=t&q="..encode(text), function(Sucess)
-					if Sucess ~= "" then
-						translation, original, sourceLang = Sucess:match("^%[%[%[\"(.-)\",\"(.-)\",.-,.-,.-]],.-,\"(.-)\"")
-						if not translatesamelang and (sourceLang == targetlang)then
+					if Sucess ~= "" then--]]
+						--translation, original, sourceLang = Sucess:match("^%[%[%[\"(.-)\",\"(.-)\",.-,.-,.-]],.-,\"(.-)\"")
+						--[[if not translatesamelang and (sourceLang == targetlang)then
 						
 						else
 							if oldway then
@@ -7141,14 +7102,14 @@ end)
 
 run = 0
 while run<10 do 
-	translatedlocation = menu.get_value(translocation)
-	targetlangmessagesend = LangLookupByName[LangKeys[menu.get_value(finalmessage)]]
-	targetlang = LangLookupByName[LangKeys[menu.get_value(targetlangs)]]
-	util.yield()
+	translatedlocation = menu.get_value(translocation)--]]
+	--targetlangmessagesend = LangLookupByName[LangKeys[menu.get_value(finalmessage)]]
+	--targetlang = LangLookupByName[LangKeys[menu.get_value(targetlangs)]]
+	--[[util.yield()
 	run = run+1
 end
 
-menu.hyperlink(chat_trans, "Language Keys", "https://cloud.google.com/translate/docs/languages", "Keys To Use For Target Translation")
+menu.hyperlink(chat_trans, "Language Keys", "https://cloud.google.com/translate/docs/languages", "Keys To Use For Target Translation")--]]
 
 play_info = menu.list(online, "Player Information Overlay", {}, "")
 
@@ -9093,7 +9054,7 @@ end)
 local rgbvm = menu.list(vehicles, "RGB Vehicle", {}, "Allows For RGB Neons ect.")
 local rgb = {cus = 100}
 
-menu.toggle_loop(rgbvm, "Custom RGB Synced", {}, "Change the vehicle color and neon lights to custom RGB with a synced color", function ()
+menu.toggle_loop(rgbvm, "Vehicle RGB", {}, "Change the vehicle color to custom RGB with a synced color", function ()
    if PED.IS_PED_IN_ANY_VEHICLE(players.user_ped(), true) != 0 then
         local vmod = PED.GET_VEHICLE_PED_IS_IN(players.user_ped(), true)
         RGBNeonKit(players.user_ped())
@@ -9106,12 +9067,12 @@ menu.toggle_loop(rgbvm, "Custom RGB Synced", {}, "Change the vehicle color and n
    end
 end)
 
-menu.slider(rgbvm, "Custom RGB Speed", {''}, "Adjust the speed of the custom RGB", 1, 5000, 500, 10, function (c)
+menu.slider(rgbvm, "Custom Vehicle RGB Speed", {''}, "Adjust the speed of the custom RGB", 1, 5000, 500, 10, function (c)
     rgb.cus = c
 end)
 
     local srgb = {cus = 100}
-menu.toggle_loop(rgbvm, "Synced Color with Headlights", {}, "Change the neons, headlights, interior and vehicle color to the same color", function ()
+menu.toggle_loop(rgbvm, "RGB Headlights", {}, "Change the neons, headlights and interior to the same color", function ()
     local color = {
       {64, 1}, --blue
       {73, 2}, --eblue  
@@ -9139,7 +9100,7 @@ menu.toggle_loop(rgbvm, "Synced Color with Headlights", {}, "Change the neons, h
     end
 end)
   
-menu.slider(rgbvm, "Synced RGB Speed", {''}, "Adjust the speed of the synced RGB", 1, 5000, 500, 10, function (c)
+menu.slider(rgbvm, "Custom Headlight RGB Speed", {''}, "Adjust the speed of the synced RGB", 1, 5000, 500, 10, function (c)
     srgb.cus = c
 end)
 
@@ -16930,60 +16891,34 @@ function random_pos()
     changed_pos.z = get_ground_z(changed_pos)
 end
 
+local fakelagoffset = 1
+function offsetposfl()
+    changed_pos.x = pos.x + math.random(-fakelagoffset, fakelagoffset)
+    changed_pos.y = pos.y + math.random(-fakelagoffset, fakelagoffset)
+    changed_pos.z += 1;
+    changed_pos.z = get_ground_z(changed_pos)
+end
+
 menu.toggle_loop(path, "Randomize Position", {"randwarp"}, "spoofs your position to a random place within a radius around your current position at the given interval", function ()
 
     if pos then
         if not aim_rand then
-        random_pos();
-        menu.trigger_commands("spoofedposition " .. tostring(changed_pos.x) .. ", " .. tostring(changed_pos.y) .. ", " .. tostring(changed_pos.z))
-        util.yield(interval)
+            random_pos();
+            menu.trigger_commands("spoofedposition " .. tostring(changed_pos.x) .. ", " .. tostring(changed_pos.y) .. ", " .. tostring(changed_pos.z))
+            util.yield(interval)
+            menu.trigger_commands("fakelag ".."off")
         elseif aim_rand and PED.GET_PED_CONFIG_FLAG(players.user_ped(), 78, false) then
-        random_pos();
-        menu.trigger_commands("spoofedposition " .. tostring(changed_pos.x) .. ", " .. tostring(changed_pos.y) .. ", " .. tostring(changed_pos.z))
-        util.yield(interval)
+            random_pos();
+            menu.trigger_commands("spoofedposition " .. tostring(changed_pos.x) .. ", " .. tostring(changed_pos.y) .. ", " .. tostring(changed_pos.z))
+            util.yield(interval)
         end
     else
         util.toast("Failed Lmao")
     end
 end)
 
-menu.toggle(path, "Random Position When Aiming", {},"spoofs your position to a random place within a radius around your current position at the given interval but only when aiming", function()
-    aim_rand = not aim_rand
-end)
-
---------------------------------------------------------------------------------------------------------------------------------------------------------
-
-menu.divider(path, "Slight Offset")
-
-menu.toggle_loop(path, "Offset Position", {"offsetpos"}, "spoofs your position a slight offset from your actual ped when ADS'ing", function ()
-
-    if PED.GET_PED_CONFIG_FLAG(players.user_ped(), 78, false) then
-        changed_pos.x = pos.x + x_off
-        changed_pos.y = pos.y + y_off
-        changed_pos.z += 50;
-        changed_pos.z = get_ground_z(changed_pos)
-    elseif not aim_only then
-        changed_pos.x = pos.x + x_off
-        changed_pos.y = pos.y + y_off
-        changed_pos.z += 50;
-        changed_pos.z = get_ground_z(changed_pos)
-    else
-        changed_pos = pos
-    end
-    menu.trigger_commands("spoofedposition " .. tostring(changed_pos.x) .. ", " .. tostring(changed_pos.y) .. ", " .. tostring(changed_pos.z))
-
-end, function() menu.trigger_commands("spoofpos off") end)
-
-menu.toggle(path, "Only When Aiming", {},"only offset pos when aiming", function()
-    aim_only = not aim_only
-end)
-
-menu.slider_float(path, "X Offse", {}, "sets the x offset for offset position", -100, 100, 0, 5, function (value)
-    x_off = value / 100;
-end)
-
-menu.slider_float(path, "Y Offse", {}, "sets the y offset for offset position", -100, 100, 0, 5, function (value)
-    y_off = value / 100;
+menu.toggle(path, "Random Position When Aiming", {"randwarpaim"},"spoofs your position to a random place within a radius around your current position at the given interval but only when aiming (Randomize Position Must Be On For This To Work)", function(value)
+    aim_rand = value
 end)
 
 --------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -16994,26 +16929,24 @@ menu.toggle_loop(path, "Fake Lag", {"fakelag"}, "makes your position update only
 
     if pos then
         if not aim_only_fake_lag then
-            changed_pos = pos
+            changed_pos = players.get_position(players.user())
             menu.trigger_commands("spoofedposition " .. tostring(changed_pos.x) .. ", " .. tostring(changed_pos.y) .. ", " .. tostring(changed_pos.z))
             util.yield(fakelag_ms)
-        elseif  aim_only_fake_lag and PED.GET_PED_CONFIG_FLAG(players.user_ped(), 78, false) then
-            changed_pos = pos
+            menu.trigger_commands("randwarp ".."off")
+        elseif aim_only_fake_lag and PED.GET_PED_CONFIG_FLAG(players.user_ped(), 78, false) then
+            changed_pos = players.get_position(players.user())
             menu.trigger_commands("spoofedposition " .. tostring(changed_pos.x) .. ", " .. tostring(changed_pos.y) .. ", " .. tostring(changed_pos.z))
             util.yield(fakelag_ms)
-        else
-            changed_pos = pos
-            menu.trigger_commands("spoofedposition " .. tostring(changed_pos.x) .. ", " .. tostring(changed_pos.y) .. ", " .. tostring(changed_pos.z))
         end
     end
 
-end, function() menu.trigger_commands("spoofpos off") end)
-
-menu.toggle(path, "Only When Aiming", {},"only fakelag when aiming", function()
-    aim_only_fake_lag  = not aim_only_fake_lag
 end)
 
-menu.slider(path, "Fakelag MS (ms)", {}, "sets interval between position updates", 0, 1000, 0, 5, function (value)
+menu.toggle(path, "Only When Aiming", {"fakelagaim"},"only fakelag when aiming", function(value)
+    aim_only_fake_lag = value
+end)
+
+menu.slider(path, "Fakelag MS (ms)", {}, "sets interval between position updates", 0, 1000, 480, 5, function (value)
     fakelag_ms = value
 end)
 
@@ -17352,25 +17285,23 @@ util.toast("FewMod Loaded")
 util.log("FewMod Loaded")
 
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-util.on_pre_stop(function()
-    menu.trigger_commands("clearworld")
-    util.toast("Cleaning...")
-    --Incase "clearworld" above doesn't work
-    ---------------------------------------------------------------------------------------
-    local player_pos = ENTITY.GET_ENTITY_COORDS(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(players.user()), 1)
-    GRAPHICS.REMOVE_PARTICLE_FX_IN_RANGE(player_pos.x, player_pos.y, player_pos.z, 1000000)
-    menu.trigger_commands("clearropes1")
-    menu.trigger_commands("clearpeds1")
-    menu.trigger_commands("clearveh1")
-    menu.trigger_commands("clearobj1")
-    clear_area(10000)
-    ----------------------------------------------------------------------------------------
-end)
+local littleguy
 
 util.on_stop(function()
     VEHICLE.SET_VEHICLE_GRAVITY(veh, true)
     VEHICLE.SET_VEHICLE_REDUCE_GRIP(veh, false)
-    ENTITY.SET_ENTITY_COLLISION(veh, true, true);
+    ENTITY.SET_ENTITY_COLLISION(veh, true, true)
+    menu.trigger_commands("clearworld")
+    util.toast("Cleaning...")
+    --Incase "clearworld" above doesn't work
+    ---------------------------------------------------------------------------------------
+    littleguy = ENTITY.GET_ENTITY_COORDS(PLAYER.GET_PLAYER_PED_SCRIPT_INDEX(players.user()), 1)
+    GRAPHICS.REMOVE_PARTICLE_FX_IN_RANGE(littleguy.x, littleguy.y, littleguy.z, 1000000)
+    menu.trigger_commands("clearropes1")
+    menu.trigger_commands("clearpeds1")
+    menu.trigger_commands("clearveh1")
+    menu.trigger_commands("clearobj1")
+    menu.trigger_commands("cleararea")
+    ---------------------------------------------------------------------------------------
     util.toast("Cleaned, Bye <3")
 end)
