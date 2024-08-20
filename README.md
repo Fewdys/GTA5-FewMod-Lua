@@ -4,4 +4,4 @@
 
 #### If You Run Into Any Issues or Notice Any Bugs Please Join The Discord To Let Me Know, or Contact Me On Discord: @Fewdy or Fewdy#3336
 
-[Discord Link](https://discord.gg/EN4RrZR)
+[Discord Link](https://discord.gg/A4QwEZJY6f)
